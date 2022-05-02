@@ -16,6 +16,7 @@ public class ABSEngine implements Engine{
     List<String> categories;
     int currentTime = 1;
     boolean dataLoaded= false;
+    String currentFilePath = "";
 
     public ABSEngine(){
 
@@ -35,6 +36,11 @@ public class ABSEngine implements Engine{
         }
         return null;
     }
+
+    public String getFilePath(){
+        return currentFilePath;
+    }
+
     public List<String> getCategories() {
         return categories;
     }
@@ -58,6 +64,7 @@ public class ABSEngine implements Engine{
             connectDataLoadedFromFile();
 
             dataLoaded = true;
+            currentFilePath = filePath;
             System.out.println("Data Loaded Successfully!");
         }catch (FileFormatException e){
             throw e;

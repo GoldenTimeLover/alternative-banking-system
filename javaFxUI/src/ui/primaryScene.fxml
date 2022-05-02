@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<ScrollPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.PrimaryController">
+   <content>
+      <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="600.0">
+         <top>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="A.B.S - Alternative Banking System">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Text>
+                  <MenuBar VBox.vgrow="ALWAYS">
+                    <menus>
+                        <Menu fx:id="themes" mnemonicParsing="false" styleClass="PrimaryToolbarItem" text="Themes">
+                           <items>
+                              <RadioMenuItem fx:id="defaultTheme" mnemonicParsing="false" onAction="#defaultThemePressed" selected="true" styleClass="PrimaryToolbarItemOption" text="Default">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="templates" />
+                                 </toggleGroup>
+                              </RadioMenuItem>
+                              <RadioMenuItem fx:id="darkModeTheme" mnemonicParsing="false" onAction="#darkModeThemePressed" styleClass="PrimaryToolbarItemOption" text="Dark mode" toggleGroup="$templates" />
+                           </items>
+                        </Menu>
+                      <Menu fx:id="info" mnemonicParsing="false" text="Info">
+                        <items>
+                          <MenuItem fx:id="aboutButton" mnemonicParsing="false" onAction="#aboutButtonPressed" text="About" />
+                        </items>
+                      </Menu>
+                    </menus>
+                  </MenuBar>
+                  <FlowPane hgap="20.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: pink;">
+                     <children>
+                        <ComboBox fx:id="userSelectorCB" onAction="#userSelectorCBPressed" prefWidth="150.0" promptText="Select User" />
+                        
+                        <Text fx:id="filePathText" strokeType="OUTSIDE" strokeWidth="0.0" text="No file Selected Yet" />
+                        <Text fx:id="currentYazText" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Yaz :">
+                           <FlowPane.margin>
+                              <Insets />
+                           </FlowPane.margin>
+                        </Text>
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </padding>
+                  </FlowPane>
+               </children>
+            </VBox>
+         </top>
+         <center>
+            <fx:include fx:id="adminPanelComponent" source="components/adminPanel/adminPanel.fxml" />
+         </center>
+      </BorderPane>
+   </content>
+</ScrollPane>

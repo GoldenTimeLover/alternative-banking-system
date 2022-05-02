@@ -38,10 +38,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" +
-                "id='" + id + '\'' +
-                ", balance=" + balance +
-                '}';
+        return id + "-(Customer)";
     }
 
     public String getId() {
