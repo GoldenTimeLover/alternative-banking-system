@@ -19,20 +19,19 @@ public class Main extends Application{
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        primaryStage.setTitle("A.B.S - Alternative Banking System");
 
-        Parent load = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("primaryScene.fxml")));
-        Scene scene = new Scene(load,600,500);
+        primaryStage.setTitle("A.B.S - Alternative Banking System");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("primaryScene.fxml"));
+        Parent root = loader.load();
+        primaryStage.setScene(new Scene(root));
 
         primaryStage.getIcons().add(new Image("/resources/logo.png"));
-        //primaryStage.getScene().getStylesheets().add(BodyComponentsPaths.LIGHT_MAIN_THEME);
 
-
-        primaryStage.setScene(scene);
+        //Set the Stage
+        PrimaryController primaryController = loader.getController();
+        primaryController.setPrimaryStage(primaryStage);
+        //show the stage
         primaryStage.show();
-
-
-
 
 
 

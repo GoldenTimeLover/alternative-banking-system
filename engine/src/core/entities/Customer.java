@@ -1,5 +1,7 @@
 package core.entities;
 
+import javafx.beans.property.SimpleIntegerProperty;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,7 +40,19 @@ public class Customer {
 
     @Override
     public String toString() {
-        return id + "-(Customer)";
+        return id;
+    }
+
+    public ArrayList<Loan> getGivingLoans() {
+        return givingLoans;
+    }
+
+    public ArrayList<Loan> getTakingLoans() {
+        return takingLoans;
+    }
+
+    public ArrayList<Transaction> getTransactions() {
+        return transactions;
     }
 
     public String getId() {
@@ -148,6 +162,16 @@ public class Customer {
         }
         return res;
     }
+
+    public SimpleIntegerProperty getAmountOfLoansGiven(){
+        return new SimpleIntegerProperty(givingLoans.size());
+    }
+
+    public int getAmountOfTakenLoans(){
+        return takingLoans.size();
+    }
+
+
 
 
 }

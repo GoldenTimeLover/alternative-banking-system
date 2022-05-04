@@ -6,6 +6,10 @@ import core.entities.Loan;
 import core.entities.Transaction;
 import core.utils.utils;
 import core.xml.ABSXmlParser;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 import java.util.*;
 
@@ -16,7 +20,17 @@ public class ABSEngine implements Engine{
     List<String> categories;
     int currentTime = 1;
     boolean dataLoaded= false;
-    String currentFilePath = "";
+    StringProperty currentFilePath = new SimpleStringProperty(this,"currentFilePath","No File Selected");
+
+    public int getCurrTimeForGui() {
+        return CurrTimeForGui.get();
+    }
+
+    public IntegerProperty currTimeForGuiProperty() {
+        return CurrTimeForGui;
+    }
+
+    IntegerProperty CurrTimeForGui = new SimpleIntegerProperty(1);
 
     public ABSEngine(){
 
@@ -37,9 +51,18 @@ public class ABSEngine implements Engine{
         return null;
     }
 
-    public String getFilePath(){
+    public String getCurrentFilePath() {
+        return currentFilePath.get();
+    }
+
+    public StringProperty currentFilePathProperty() {
         return currentFilePath;
     }
+
+    public void setCurrentFilePath(String currentFilePath) {
+        this.currentFilePath.set(currentFilePath);
+    }
+
 
     public List<String> getCategories() {
         return categories;
@@ -57,6 +80,7 @@ public class ABSEngine implements Engine{
 
         //Set Current Time to 1 whenever you load new Data
         this.currentTime = 1;
+        CurrTimeForGui.set(currentTime);
 
         try {
             verifyData();
@@ -64,7 +88,7 @@ public class ABSEngine implements Engine{
             connectDataLoadedFromFile();
 
             dataLoaded = true;
-            currentFilePath = filePath;
+            currentFilePath.set(filePath);
             System.out.println("Data Loaded Successfully!");
         }catch (FileFormatException e){
             throw e;
@@ -230,6 +254,7 @@ public class ABSEngine implements Engine{
 
         // set current time plus 1
         currentTime+= 1;
+        CurrTimeForGui.set(currentTime);
     }
 
     private void payLoans(List<Loan> loanList){
