@@ -1,6 +1,8 @@
 package ui.components.customerPanel;
 
 import core.entities.Customer;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringExpression;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
@@ -9,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Text;
 import resources.paths.Paths;
 import ui.components.SubController;
 
@@ -49,20 +52,38 @@ public class CustomerPanelController extends SubController {
     private ScrollPane centerContent;
 
     @FXML
+    private Text balanceText;
+
+
+    /*
+    Response to the pressing of the information button in the Customer Panel.
+    - clears data stored in the tables
+    - fill with new data
+    - set the center of the border pane to the information panel
+     */
+    @FXML
     void informationButtonPressed(ActionEvent event) {
-
-
         customerInfoComponentController.clearTables();
         customerInfoComponentController.setInfoForCustomerIntoTables();
         centerContent.setContent(customerInfoComponent);
 
     }
 
+
+    /*
+    Response to the pressing of the payment button in the Customer Panel.
+    - set the center of the border pane to the payment panel
+ */
     @FXML
     void paymentButtonPressed(ActionEvent event) {
         centerContent.setContent(customerPaymentComponent);
     }
 
+    /*
+    Response to the pressing of the Scramble/matching in the Customer Panel.
+    - calls the set categories in the sub controller to be filled with needed values
+    - set the center of the border pane to the matching component
+     */
     @FXML
     void scrambleButtonPressed(ActionEvent event) {
 
@@ -80,9 +101,17 @@ public class CustomerPanelController extends SubController {
         customerInfoComponentController.setInfoForCustomerIntoTables();
         centerContent.setContent(customerInfoComponent);
 
+        String id = mainController.getUserSelectorCB().getValue().getId();
+        StringExpression sb = Bindings.concat("$", mainController.getEngine().findCustomerById(id).balanceProperty());
+        balanceText.textProperty().bind(sb);
+
+
     }
 
-
+    /**
+     * initialises the customer information component and wires it and the main customer
+     * component to point at each other.
+     */
     private void initCustomerInfoComponent(){
 
         FXMLLoader loader = new FXMLLoader();
@@ -98,6 +127,10 @@ public class CustomerPanelController extends SubController {
         }
     }
 
+    /**
+     * initialises the customer payment component and wires it and the main customer
+     * component to point at each other.
+     */
     private void initCustomerPaymentComponent(){
         FXMLLoader loader = new FXMLLoader();
         URL url = getClass().getResource(Paths.customerPaymentComp);
@@ -112,6 +145,10 @@ public class CustomerPanelController extends SubController {
         }
     }
 
+    /**
+     * initialises the customer matching component and wires it and the main customer
+     * component to point at each other.
+     */
     private void initCustomerMatchingComponent(){
         FXMLLoader loader = new FXMLLoader();
         URL url = getClass().getResource(Paths.customerMatchComp);

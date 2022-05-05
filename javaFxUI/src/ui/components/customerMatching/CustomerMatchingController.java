@@ -15,6 +15,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import ui.components.SubController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -139,7 +140,13 @@ public class CustomerMatchingController extends SubController {
             return;
         }
 
-        List<String> temp = new ArrayList<>(selectedCategories);
+        List<String> temp;
+        if (selectedCategories == null || selectedCategories.size() == 0){
+            temp = mainController.getEngine().getCategories();
+        }else{
+            temp = new ArrayList<>(selectedCategories);
+        }
+
 
         List<Loan> availableLoans = mainController.getEngine().findPossibleLoanMatches(customerId, temp, (double) amount, (double) minInterest, minYaz);
 
