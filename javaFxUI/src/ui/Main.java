@@ -16,6 +16,10 @@ public class Main extends Application{
 
 
 
+    /*
+    main function for the program, set's initial title calls the fxml loader and launches the
+    primary scene which calls other components as needed.
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 

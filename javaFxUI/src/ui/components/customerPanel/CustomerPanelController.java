@@ -8,10 +8,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 
+import javafx.scene.layout.BorderPane;
 import resources.paths.Paths;
 import ui.components.SubController;
 
 import ui.components.customerInfo.CustomerInfoController;
+import ui.components.customerMatching.CustomerMatchingController;
+import ui.components.customerPayment.CustomerPaymentController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -19,10 +22,19 @@ import java.net.URL;
 public class CustomerPanelController extends SubController {
 
 
+    // Information panel
     @FXML private ScrollPane customerInfoComponent;
     @FXML private CustomerInfoController customerInfoComponentController;
 
 
+    // Payment panel
+    @FXML private BorderPane customerPaymentComponent;
+    @FXML private CustomerPaymentController customerPaymentComponentController;
+
+
+    // Matching/"Scramble" panel
+    @FXML private BorderPane customerMatchingComponent;
+    @FXML public CustomerMatchingController customerMatchingComponentController;
 
     @FXML
     private Button informationButton;
@@ -48,11 +60,14 @@ public class CustomerPanelController extends SubController {
 
     @FXML
     void paymentButtonPressed(ActionEvent event) {
-
+        centerContent.setContent(customerPaymentComponent);
     }
 
     @FXML
     void scrambleButtonPressed(ActionEvent event) {
+
+        customerMatchingComponentController.setCategories();
+        centerContent.setContent(customerMatchingComponent);
 
     }
 
@@ -60,6 +75,8 @@ public class CustomerPanelController extends SubController {
     public void setPanelForCustomer(){
 
         initCustomerInfoComponent();
+        initCustomerPaymentComponent();
+        initCustomerMatchingComponent();
         customerInfoComponentController.setInfoForCustomerIntoTables();
         centerContent.setContent(customerInfoComponent);
 
@@ -76,6 +93,34 @@ public class CustomerPanelController extends SubController {
             customerInfoComponent = loader.load(url.openStream());
             customerInfoComponentController = loader.getController();
             customerInfoComponentController.setMainController(mainController);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initCustomerPaymentComponent(){
+        FXMLLoader loader = new FXMLLoader();
+        URL url = getClass().getResource(Paths.customerPaymentComp);
+        loader.setLocation(url);
+        try {
+            assert url != null;
+            customerPaymentComponent = loader.load(url.openStream());
+            customerPaymentComponentController = loader.getController();
+            customerPaymentComponentController.setMainController(mainController);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initCustomerMatchingComponent(){
+        FXMLLoader loader = new FXMLLoader();
+        URL url = getClass().getResource(Paths.customerMatchComp);
+        loader.setLocation(url);
+        try {
+            assert url != null;
+            customerMatchingComponent = loader.load(url.openStream());
+            customerMatchingComponentController = loader.getController();
+            customerMatchingComponentController.setMainController(mainController);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -24,6 +24,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
+
+
+/*
+
+    The "Master" controller that all other controllers are subordinates to and know him throught
+    their inheritance of "SubController" class.
+ */
 public class PrimaryController {
 
 

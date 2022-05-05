@@ -6,6 +6,8 @@ public class Paths {
     public static String adminPanel = "/ui/components/adminPanel/adminPanel.fxml";
     public static String customerPanel = "/ui/components/customerPanel/customerPanel.fxml";
     public static String customerInfoComp = "/ui/components/customerInfo/customerInfo.fxml";
+    public static String customerPaymentComp = "/ui/components/customerPayment/customerPayment.fxml";
+    public static String customerMatchComp = "/ui/components/customerMatching/customerMatching.fxml";
 
 //    public static String LIGHT_MAIN_THEME = "/userInterface/Stylesheets/LightMode.css";
 //    public static String LIGHT_CENTER_THEME = "/userInterface/Stylesheets/CenterLightMode.css";

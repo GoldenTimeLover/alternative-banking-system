@@ -8,13 +8,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import ui.components.SubController;
 
 import java.util.List;
+import java.util.Optional;
 
 public class CustomerInfoController extends SubController {
 
@@ -34,13 +33,28 @@ public class CustomerInfoController extends SubController {
     private Button withdrawButton;
 
     @FXML
+    private Spinner<Integer> amountSpinner;
+
+
+
+    @FXML
     void depositButtonPressed(ActionEvent event) {
 
+
+        if (amountSpinner.getValue() == 0){
+            return;
+        }
         String customerId = mainController.getUserSelectorCB().getValue().getId();
-        mainController.getEngine().addTransactionToCustomer(customerId,100.0, Transaction.TransactionType.DEPOSIT);
+
+        int amount = amountSpinner.getValue();
+        mainController.getEngine().addTransactionToCustomer(customerId,(double) amount, Transaction.TransactionType.DEPOSIT);
         Customer customer = mainController.getEngine().findCustomerById(mainController.getUserSelectorCB().getValue().getId());
+
         accountTransactionsTable.getItems().clear();
         accountTransactionsTable.getColumns().clear();
+
+        amountSpinner.getValueFactory().setValue(0);
+
         loadTransactionTable(customer);
     }
 
@@ -61,7 +75,34 @@ public class CustomerInfoController extends SubController {
     }
     @FXML
     void withdrawButtonPressed(ActionEvent event) {
+        if (amountSpinner.getValue() == 0 ){
+            return;
+        }
+        String customerId = mainController.getUserSelectorCB().getValue().getId();
+        int amount = amountSpinner.getValue();
+        Customer customer = mainController.getEngine().findCustomerById(mainController.getUserSelectorCB().getValue().getId());
 
+        if(amount > customer.getBalance()){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning - trying to overdraft!");
+
+            alert.setContentText("You are trying to withdraw" + amount + " but the customer only has " + customer.getBalance() +
+                    " in their account!");
+
+            ButtonType yesButton = new ButtonType("Cool");
+            alert.getButtonTypes().setAll(yesButton);
+            Optional<ButtonType> result = alert.showAndWait();
+            return;
+
+        }
+        mainController.getEngine().addTransactionToCustomer(customerId,(double) amount, Transaction.TransactionType.WITHDRAW);
+
+        accountTransactionsTable.getItems().clear();
+        accountTransactionsTable.getColumns().clear();
+
+        amountSpinner.getValueFactory().setValue(0);
+
+        loadTransactionTable(customer);
     }
 
     public void setInfoForCustomerIntoTables(){
@@ -74,6 +115,13 @@ public class CustomerInfoController extends SubController {
         loadGivingLoansTable(customer);
         loadLendingLoansTable(customer);
         loadTransactionTable(customer);
+
+
+        SpinnerValueFactory<Integer> valueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
+
+
+        amountSpinner.setValueFactory(valueFactory);
     }
 
     private void loadGivingLoansTable(Customer customer){
