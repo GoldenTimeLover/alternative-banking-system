@@ -27,7 +27,7 @@ public class Main extends Application{
         primaryStage.setTitle("A.B.S - Alternative Banking System");
         FXMLLoader loader = new FXMLLoader(getClass().getResource("primaryScene.fxml"));
         Parent root = loader.load();
-        primaryStage.setScene(new Scene(root));
+        primaryStage.setScene(new Scene(root, 1050, 600));
 
         primaryStage.getIcons().add(new Image("/resources/logo.png"));
 

@@ -34,6 +34,7 @@ public class Loan implements Comparable{
     double singlePayment;
     double singlePaymentTotal ;
     List<Transaction> payments;
+    boolean paidThisYaz = false;
 
     public Loan(String id, int startData, int amount, Customer borrower, ArrayList<Customer> lenders, LoanStatus status,
                 String category, int interestRate,String ownerName,int lengthOfTime,int timeBetweenPayments) {
@@ -63,6 +64,14 @@ public class Loan implements Comparable{
         int compareData=((Loan)o).getStartDate();
         /* For Ascending order*/
         return this.startDate-compareData;
+    }
+
+    public boolean isPaidThisYaz() {
+        return paidThisYaz;
+    }
+
+    public void setPaidThisYaz(boolean paidThisYaz) {
+        this.paidThisYaz = paidThisYaz;
     }
 
     public void setBorrower(Customer borrower) {

@@ -129,6 +129,7 @@ public class PrimaryController {
         customers.add(0,new Customer("Admin",0,null,null,null));
         userSelectorCB.setItems(customers);
         userSelectorCB.getSelectionModel().select(0);
+        userSelectorCB.setDisable(false);
     }
     @FXML
     void darkModeThemePressed(ActionEvent event) {

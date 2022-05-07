@@ -76,6 +76,7 @@ public class CustomerPanelController extends SubController {
  */
     @FXML
     void paymentButtonPressed(ActionEvent event) {
+        customerPaymentComponentController.prepareNotificationArea();
         centerContent.setContent(customerPaymentComponent);
     }
 

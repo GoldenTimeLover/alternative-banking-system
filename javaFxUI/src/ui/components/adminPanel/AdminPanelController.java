@@ -163,8 +163,13 @@ public class AdminPanelController extends SubController {
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
+        //Time between each payment
+        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        timeBetweenCol.setMinWidth(100);
+        timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
+
         loansTableView.setItems(loans);
-        loansTableView.getColumns().addAll(idColumn,ownerColumn,categoryColumn,startDateColumn,amountColumn,
+        loansTableView.getColumns().addAll(idColumn,ownerColumn,categoryColumn,timeBetweenCol,startDateColumn,amountColumn,
                 statusColumn,lengthColumn,interestColumn);
     }
 }

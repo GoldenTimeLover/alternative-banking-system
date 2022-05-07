@@ -3,6 +3,7 @@ package core.engine;
 import core.Exceptions.FileFormatException;
 import core.entities.Customer;
 import core.entities.Loan;
+import core.entities.Notification;
 import core.entities.Transaction;
 import core.utils.utils;
 import core.xml.ABSXmlParser;
@@ -15,16 +16,18 @@ import java.util.*;
 
 public class ABSEngine implements Engine{
 
-    List<Loan> loans;
-    List<Customer> customers;
-    List<String> categories;
-    int currentTime = 1;
-    boolean dataLoaded= false;
-    StringProperty currentFilePath = new SimpleStringProperty(this,"currentFilePath","No File Selected");
+    private List<Loan> loans;
+    private List<Customer> customers;
+    private List<String> categories;
+    private int currentTime = 1;
+    private boolean dataLoaded= false;
+    private final StringProperty currentFilePath = new SimpleStringProperty(this,"currentFilePath","No File Selected");
+    private final Map<String,List<Notification>> notifications;
 
-    public int getCurrTimeForGui() {
-        return CurrTimeForGui.get();
+    public Map<String, List<Notification>> getNotifications() {
+        return notifications;
     }
+
 
     public IntegerProperty currTimeForGuiProperty() {
         return CurrTimeForGui;
@@ -38,6 +41,7 @@ public class ABSEngine implements Engine{
         this.customers = new ArrayList<>();
         this.loans = new ArrayList<>();
         this.categories = new ArrayList<>();
+        this.notifications = new HashMap<>();
 
     }
 
@@ -91,29 +95,45 @@ public class ABSEngine implements Engine{
             currentFilePath.set(filePath);
             System.out.println("Data Loaded Successfully!");
         }catch (FileFormatException e){
-            throw e;
+            e.printStackTrace();
         }
     }
 
+
+    /**
+     * <ul>
+     *
+     * <li>
+     * Iterates over each loan object read from .xml file.
+     * Find sets each loan owner to the customer with the matching ID.
+     * </li>
+     *
+     *<li>
+     * Iterates over all the customers and adds to each customer the loans that are
+     * related to him.
+     *</li>
+     *<li>
+     * Sets a new arrayList of notifications for each customer
+     *</li>
+     * </ul>
+     */
     private void connectDataLoadedFromFile(){
-        for (int i = 0; i < loans.size(); i++) {
+        for (Loan loan : loans) {
             Customer temp = null;
-            for (int j = 0; j < customers.size(); j++) {
-                if (customers.get(j).getId().equals(loans.get(i).getOwnerName())){
-                    temp = customers.get(j);
+            for (Customer customer : customers) {
+                if (customer.getId().equals(loan.getOwnerName())) {
+                    temp = customer;
                 }
+                notifications.putIfAbsent(customer.getId(), new ArrayList<Notification>());
             }
-            loans.get(i).setBorrower(temp);
+            loan.setBorrower(temp);
+
+            assert temp != null;
+            temp.addLoan(loan);
         }
 
-        for (int i = 0; i < customers.size(); i++) {
 
-            for (int j = 0; j < loans.size(); j++) {
-                if (loans.get(j).getOwnerName().equals(customers.get(i).getId())){
-                    customers.get(i).addLoan(loans.get(j));
-                }
-            }
-        }
+
 
 
     }
@@ -126,6 +146,15 @@ public class ABSEngine implements Engine{
         return customers;
     }
 
+
+    /**
+     *
+     * performs check to ensure that the .xml file read is valid.
+     * - doesn't have owners of loans that are not customers of the system
+     * - doesn't have loan categories that appear in loans but aren't part of the system.
+     * - doesn't have repeating customers
+     * - check that loans received from file divide evenly across the timespan provided.
+     */
     private void verifyData() throws FileFormatException{
 
         List<String> customerNames = new ArrayList<>();
@@ -174,6 +203,23 @@ public class ABSEngine implements Engine{
     }
 
 
+    /**
+     * <p>
+     *     scans all the loans in the system that are not yet active (PENDING,NEW)
+     *     and filters them based on the following parameters:
+     * </p>
+     * <ul>
+     *     <li>Make sure the customer looking to lend isn't lending to himself.</li>
+     *     <li>Find only loans that are one of the categories provided in categoryFilters.</li>
+     *     <li>The min interest that the lender is willing to accept.</li>
+     *     <li>The minimum amount of time the lender is willing the loan to span across.</li>
+     * </ul>
+     * @param customerID
+     * @param categoryFilters
+     * @param amount
+     * @param interest
+     * @param time
+     */
     public List<Loan> findPossibleLoanMatches(String customerID,List<String> categoryFilters,double amount,double interest,int time){
         List<Loan> possibleLoans = new ArrayList<>();
 
@@ -232,6 +278,11 @@ public class ABSEngine implements Engine{
         //If loan became active add money to the loaners account via transaction
         if (theLoan.getStatus().equals(Loan.LoanStatus.ACTIVE)){
             addTransactionToCustomer(theLoan.getOwnerName(),theLoan.getAmount(), Transaction.TransactionType.DEPOSIT);
+            if(theLoan.getTimeBetweenPayments() == 1){
+                List<Loan> temp = new ArrayList<>();
+                temp.add(theLoan);
+                sendNotifications(temp);
+            }
         }
         //remove money and add transaction from lender's account
         addTransactionToCustomer(lenderId,amountOfMoney,Transaction.TransactionType.WITHDRAW);
@@ -250,55 +301,123 @@ public class ABSEngine implements Engine{
         List<Loan> activeLoans = getActiveLoans();
 
 
-        payLoans(activeLoans);
+
+
+
+
+
 
         // set current time plus 1
         currentTime+= 1;
         CurrTimeForGui.set(currentTime);
+
+        reduceTimeNextPayment(activeLoans);
+        //send to notification to customers that need to pay this date
+        sendNotifications(activeLoans);
+
+        setLoansToUnPaidThisTurn(activeLoans);
+
+
     }
 
-    private void payLoans(List<Loan> loanList){
-
-        //Sort the list of Active loans
-        //First sort by which loan started earlier
-        //Then sort by which loan is greater
-        Collections.sort(loanList, new Comparator<Loan>() {
-            @Override
-            public int compare(Loan o1, Loan o2) {
-                Integer x1 = (o1).getStartDate();
-                Integer x2 = (o2).getStartDate();
-                int sComp = x1.compareTo(x2);
-
-                if (sComp != 0) {
-                    return sComp;
-                }
-
-                Double y1 = (o1).getAmount();
-                Double y2 = (o2).getAmount();
-                return y1.compareTo(y2);
-            }
-        });
-
-
-
-        for (int i = 0; i < loanList.size(); i++) {
-            payLoan(loanList.get(i));
+    private void setLoansToUnPaidThisTurn(List<Loan> loanList){
+        for (Loan loan: loanList) {
+            loan.setPaidThisYaz(false);
         }
+    }
+
+    private void sendNotifications(List<Loan> loanList){
+
+        for (Loan l : loanList) {
+            double amount  = l.getSinglePaymentTotal() + l.getUnpaidDebt();
+
+            Notification notification = new Notification("Loan" + l.getId() + "Needs Payment",currentTime,"" +
+                    "Dear Mr./Mrs./Miss. " + l.getOwnerName() + " This is a formal notification that you need to repay the" +
+                    "amount of " + amount + " for the loan '"+ l.getId() +"'.");
+            if(notifications.get(l.getOwnerName()).contains(notification)){
+                return;
+            }
+            if (l.getTimeNextPayment() <= 1){
+                notifications.get(l.getOwnerName()).add(0,notification);
+            }
+
+
+        }
+
+
+    }
+
+    public void reduceTimeNextPayment(List<Loan> loanList){
+
+
+        for (Loan loan : loanList) {
+            //If it's still not time to pay
+            if (loan.getTimeNextPayment() > 1) {
+                loan.setTimeNextPayment(loan.getTimeNextPayment() - 1);
+                return;
+            } else {
+                //reset to the amount of time between payments
+                loan.setTimeNextPayment(loan.getTimeBetweenPayments());
+
+                // if this was a yaz to be paid and the customer did not pay... set to risk
+                if (!loan.isPaidThisYaz()){
+                    loan.setStatus(Loan.LoanStatus.RISK);
+                }
+            }
+        }
+    }
+
+
+
+    public void payCurrLoan(Loan loan){
+
+
+        if(loan.isPaidThisYaz()){
+            return;
+        }
+        //the customer that needs to pay
+        Customer c = findCustomerById(loan.getOwnerName());
+
+        // money that needs to be paid
+        double moneyToReturn = loan.getSinglePaymentTotal();
+        moneyToReturn += loan.getUnpaidDebt();
+
+        //if the customer is so late on payments he doesn't need to pay anymore
+        if (loan.getLengthOfTime() + loan.getStartDate() <= currentTime){
+            moneyToReturn = loan.getUnpaidDebt();
+        }
+
+        if (c.getBalance() >= moneyToReturn){
+            //set did pay this yaz to true
+            loan.setPaidThisYaz(true);
+
+
+            //Remove money for loaner's account with transaction
+            addTransactionToCustomer(loan.getOwnerName(), (int) moneyToReturn, Transaction.TransactionType.WITHDRAW);
+
+            //calculate the amount each lender should receive proportionally to what he gave
+            Map<String, Double> lenderMap= loan.getLenderAmounts();
+            for (int i = 0; i < loan.getLenders().size(); i++) {
+                String lenderName = loan.getLenders().get(i).getId();
+                double amountLent = lenderMap.get(lenderName);
+                double percentageLent =  amountLent /  loan.getAmount();
+                double lenderReturn = utils.round(percentageLent * moneyToReturn);
+                addTransactionToCustomer(lenderName, lenderReturn, Transaction.TransactionType.DEPOSIT);
+            }
+            loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
+
+
+            if (loan.getLengthOfTime() + loan.getStartDate() <= currentTime + 1){
+                loan.setStatus(Loan.LoanStatus.FINISHED);
+                loan.setEndDate(currentTime);
+            }
+        }
+
+
     }
 
     private void payLoan(Loan loan){
 
-
-
-        //If it's still not time to pay
-        if (loan.getTimeNextPayment() > 1){
-            loan.setTimeNextPayment(loan.getTimeNextPayment() - 1);
-            return;
-        }
-        else{
-            //reset to the amount of time between payments
-            loan.setTimeNextPayment(loan.getTimeBetweenPayments());
-        }
 
         //the customer that needs to pay
         Customer c = findCustomerById(loan.getOwnerName());
@@ -318,7 +437,7 @@ public class ABSEngine implements Engine{
             //Remove money for loaner's account with transaction
             addTransactionToCustomer(loan.getOwnerName(), (int) moneyToReturn, Transaction.TransactionType.WITHDRAW);
 
-            //calculate the amount each lender should recieve proportionally to what he gave
+            //calculate the amount each lender should receive proportionally to what he gave
             Map<String, Double> lenderMap= loan.getLenderAmounts();
             for (int i = 0; i < loan.getLenders().size(); i++) {
                 String lenderName = loan.getLenders().get(i).getId();
