@@ -1,13 +1,15 @@
 package core.entities;
 
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Customer {
 
     private String id;
-    private double balance;
+    private SimpleDoubleProperty balance = new SimpleDoubleProperty(this,"balance");
     private ArrayList<Loan> givingLoans;
     private ArrayList<Loan> takingLoans;
     private ArrayList<Transaction> transactions;
@@ -15,11 +17,15 @@ public class Customer {
     public Customer(String id, int balance, ArrayList<Loan> givingLoans,
                     ArrayList<Loan> takingLoans,ArrayList<Transaction> transactions) {
         this.id = id;
-        this.balance = balance;
+        this.balance.set(balance);
         this.givingLoans = givingLoans;
         this.takingLoans = takingLoans;
         this.transactions = transactions;
+
+
+
     }
+
 
     public void addTransaction(Transaction transaction){
         transactions.add(transaction);
@@ -38,10 +44,19 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer{" +
-                "id='" + id + '\'' +
-                ", balance=" + balance +
-                '}';
+        return id;
+    }
+
+    public ArrayList<Loan> getGivingLoans() {
+        return givingLoans;
+    }
+
+    public ArrayList<Loan> getTakingLoans() {
+        return takingLoans;
+    }
+
+    public ArrayList<Transaction> getTransactions() {
+        return transactions;
     }
 
     public String getId() {
@@ -49,11 +64,15 @@ public class Customer {
     }
 
     public double getBalance() {
+        return balance.get();
+    }
+
+    public SimpleDoubleProperty balanceProperty() {
         return balance;
     }
 
     public void setBalance(double balance) {
-        this.balance = balance;
+        this.balance.set(balance);
     }
 
     public String stringForConsole(){
@@ -151,6 +170,16 @@ public class Customer {
         }
         return res;
     }
+
+    public SimpleIntegerProperty getAmountOfLoansGiven(){
+        return new SimpleIntegerProperty(givingLoans.size());
+    }
+
+    public int getAmountOfTakenLoans(){
+        return takingLoans.size();
+    }
+
+
 
 
 }

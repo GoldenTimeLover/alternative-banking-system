@@ -10,6 +10,23 @@ public class Transaction implements Comparable  {
     int date;
     TransactionType type;
     double balanceBefore;
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public double getBalanceBefore() {
+        return balanceBefore;
+    }
+
+    public double getBalanceAfter() {
+        return balanceAfter;
+    }
+
     double balanceAfter;
 
     public Transaction(double amount, int date, TransactionType type, double balanceBefore, double balanceAfter) {

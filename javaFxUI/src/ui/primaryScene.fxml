@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane fx:id="mainBorderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.PrimaryController">
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="A.B.S - Alternative Banking System">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <MenuBar VBox.vgrow="ALWAYS">
+              <menus>
+                  <Menu fx:id="themes" mnemonicParsing="false" styleClass="PrimaryToolbarItem" text="Themes">
+                     <items>
+                        <RadioMenuItem fx:id="defaultTheme" mnemonicParsing="false" onAction="#defaultThemePressed" selected="true" styleClass="PrimaryToolbarItemOption" text="Default">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="templates" />
+                           </toggleGroup>
+                        </RadioMenuItem>
+                        <RadioMenuItem fx:id="darkModeTheme" mnemonicParsing="false" onAction="#darkModeThemePressed" styleClass="PrimaryToolbarItemOption" text="Dark mode" toggleGroup="$templates" />
+                        <RadioMenuItem fx:id="mcDonaldModeTheme" mnemonicParsing="false" onAction="#mcDonaldModeThemePressed" styleClass="PrimaryToolbarItemOption" text="Mcdonald's mode" toggleGroup="$templates" />
+                     </items>
+                  </Menu>
+                <Menu fx:id="info" mnemonicParsing="false" text="Info">
+                  <items>
+                    <MenuItem fx:id="aboutButton" mnemonicParsing="false" onAction="#aboutButtonPressed" text="About" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <FlowPane hgap="20.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: lightgrey;">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label style="-fx-font-weight: bold;" text="Selected User:" />
+                        <ComboBox fx:id="userSelectorCB" disable="true" onAction="#userSelectorCBPressed" prefWidth="150.0" promptText="Select User" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <children>
+                        <Label style="-fx-font-weight: bold;" text="File:" />
+                        
+                                    <Text fx:id="filePathText" strokeType="OUTSIDE" strokeWidth="0.0" text="No file Selected Yet" />
+                     </children>
+                  </VBox>
+                  <VBox>
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                     <children>
+                        <Label style="-fx-font-weight: bold;" text="YAZ:" />
+                        <Text fx:id="currentYazText" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Yaz :" />
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+            </FlowPane>
+         </children>
+      </VBox>
+   </top>
+   <center>
+      <fx:include fx:id="adminPanelComponent" source="components/adminPanel/adminPanel.fxml" />
+   </center>
+</BorderPane>
