@@ -1,5 +1,6 @@
 package ui.components.adminPanel;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import core.entities.Customer;
 import core.entities.Loan;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -168,8 +169,24 @@ public class AdminPanelController extends SubController {
         timeBetweenCol.setMinWidth(100);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
+        //Time between each payment
+        TableColumn<Loan,Double> aaaa = new TableColumn<>("Total to be paid");
+        aaaa.setMinWidth(100);
+        aaaa.setCellValueFactory(new PropertyValueFactory<>("completeAmountToBePaid"));
+
+        //Time between each payment
+        TableColumn<Loan,Double> bbb = new TableColumn<>("paid so far");
+        bbb.setMinWidth(100);
+        bbb.setCellValueFactory(new PropertyValueFactory<>("amountPaidUntilNow"));
+
+
+        //Time between each payment
+        TableColumn<Loan, Boolean> ccc = new TableColumn<>("did pay this yazs");
+        ccc.setMinWidth(100);
+        ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
+
         loansTableView.setItems(loans);
-        loansTableView.getColumns().addAll(idColumn,ownerColumn,categoryColumn,timeBetweenCol,startDateColumn,amountColumn,
+        loansTableView.getColumns().addAll(idColumn,aaaa,bbb,ccc,ownerColumn,categoryColumn,timeBetweenCol,startDateColumn,amountColumn,
                 statusColumn,lengthColumn,interestColumn);
     }
 }

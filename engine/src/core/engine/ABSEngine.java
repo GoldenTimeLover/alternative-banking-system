@@ -311,14 +311,19 @@ public class ABSEngine implements Engine{
         currentTime+= 1;
         CurrTimeForGui.set(currentTime);
 
+        // reduce time until next payment, if not paid update status to risk
         reduceTimeNextPayment(activeLoans);
+
         //send to notification to customers that need to pay this date
         sendNotifications(activeLoans);
 
         setLoansToUnPaidThisTurn(activeLoans);
 
 
+
     }
+
+
 
     private void setLoansToUnPaidThisTurn(List<Loan> loanList){
         for (Loan loan: loanList) {
@@ -329,7 +334,7 @@ public class ABSEngine implements Engine{
     private void sendNotifications(List<Loan> loanList){
 
         for (Loan l : loanList) {
-            double amount  = l.getSinglePaymentTotal() + l.getUnpaidDebt();
+            double amount  = Math.min(l.getSinglePaymentTotal() + l.getUnpaidDebt(),l.getCompleteAmountToBePaid() - l.getAmountPaidUntilNow());
 
             Notification notification = new Notification("Loan" + l.getId() + "Needs Payment",currentTime,"" +
                     "Dear Mr./Mrs./Miss. " + l.getOwnerName() + " This is a formal notification that you need to repay the" +
@@ -359,8 +364,29 @@ public class ABSEngine implements Engine{
                 //reset to the amount of time between payments
                 loan.setTimeNextPayment(loan.getTimeBetweenPayments());
 
+                if(currentTime == 12){
+                    System.out.println("i kill you!");
+                }
                 // if this was a yaz to be paid and the customer did not pay... set to risk
                 if (!loan.isPaidThisYaz()){
+
+                    // if the amount the customer paid until now + the amount he owes + the amount for a single payment
+                    // is greater than the total he has to pay set the amount to the remainder...
+                    if(loan.getUnpaidDebt() == loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()){
+                        System.out.println("do nothing");
+                    }
+                    else if(loan.getUnpaidDebt() + loan.getSinglePaymentTotal() <= loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()){
+                        loan.setUnpaidDebt(loan.getUnpaidDebt() + loan.getSinglePaymentTotal());
+
+
+                    }
+                    else if(loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()){
+                        System.out.println("Something is wrong");
+                    }
+
+                    else{
+                        loan.setUnpaidDebt(loan.getCompleteAmountToBePaid() -loan.getAmountPaidUntilNow());
+                    }
                     loan.setStatus(Loan.LoanStatus.RISK);
                 }
             }
@@ -375,6 +401,7 @@ public class ABSEngine implements Engine{
         if(loan.isPaidThisYaz()){
             return;
         }
+
         //the customer that needs to pay
         Customer c = findCustomerById(loan.getOwnerName());
 
@@ -382,15 +409,19 @@ public class ABSEngine implements Engine{
         double moneyToReturn = loan.getSinglePaymentTotal();
         moneyToReturn += loan.getUnpaidDebt();
 
-        //if the customer is so late on payments he doesn't need to pay anymore
-        if (loan.getLengthOfTime() + loan.getStartDate() <= currentTime){
-            moneyToReturn = loan.getUnpaidDebt();
+        if(loan.getAmountPaidUntilNow() + loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid()){
+            moneyToReturn = loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow();
         }
 
         if (c.getBalance() >= moneyToReturn){
+
+
+
             //set did pay this yaz to true
             loan.setPaidThisYaz(true);
 
+            //set status to active in case it's in risk
+            loan.setStatus(Loan.LoanStatus.ACTIVE);
 
             //Remove money for loaner's account with transaction
             addTransactionToCustomer(loan.getOwnerName(), (int) moneyToReturn, Transaction.TransactionType.WITHDRAW);
@@ -406,61 +437,16 @@ public class ABSEngine implements Engine{
             }
             loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
 
+            loan.setAmountPaidUntilNow(loan.getAmountPaidUntilNow() + moneyToReturn);
 
-            if (loan.getLengthOfTime() + loan.getStartDate() <= currentTime + 1){
+            if(loan.getAmountPaidUntilNow() == loan.getCompleteAmountToBePaid()){
                 loan.setStatus(Loan.LoanStatus.FINISHED);
-                loan.setEndDate(currentTime);
             }
         }
 
 
     }
 
-    private void payLoan(Loan loan){
-
-
-        //the customer that needs to pay
-        Customer c = findCustomerById(loan.getOwnerName());
-
-        // money that needs to be paid
-        double moneyToReturn = loan.getSinglePaymentTotal();
-        moneyToReturn += loan.getUnpaidDebt();
-
-        //if the customer is so late on payments he doesn't need to pay anymore
-        if (loan.getLengthOfTime() + loan.getStartDate() <= currentTime){
-            moneyToReturn = loan.getUnpaidDebt();
-        }
-
-
-        // if the customer has enough money to return
-        if (c.getBalance() >= moneyToReturn){
-            //Remove money for loaner's account with transaction
-            addTransactionToCustomer(loan.getOwnerName(), (int) moneyToReturn, Transaction.TransactionType.WITHDRAW);
-
-            //calculate the amount each lender should receive proportionally to what he gave
-            Map<String, Double> lenderMap= loan.getLenderAmounts();
-            for (int i = 0; i < loan.getLenders().size(); i++) {
-                String lenderName = loan.getLenders().get(i).getId();
-                double amountLent = lenderMap.get(lenderName);
-                double percentageLent =  amountLent /  loan.getAmount();
-                double lenderReturn = utils.round(percentageLent * moneyToReturn);
-                addTransactionToCustomer(lenderName, lenderReturn, Transaction.TransactionType.DEPOSIT);
-            }
-            loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
-
-            if (loan.getLengthOfTime() + loan.getStartDate() <= currentTime + 1){
-                loan.setStatus(Loan.LoanStatus.FINISHED);
-                loan.setEndDate(currentTime);
-            }
-        }
-        // if customer doesn't have enough money in his account
-        else{
-            // set loan to risk mode
-            loan.setStatus(Loan.LoanStatus.RISK);
-            // add money supposed to return to unpaid counter
-            loan.setUnpaidDebt(moneyToReturn);
-        }
-    }
 
     /**
      * getter function for all loans that are ACTIVE or RISK (loans that need to be paid).

@@ -33,6 +33,8 @@ public class Loan implements Comparable{
     double paymentPerYaz ;
     double singlePayment;
     double singlePaymentTotal ;
+    double completeAmountToBePaid;
+    double amountPaidUntilNow;
     List<Transaction> payments;
     boolean paidThisYaz = false;
 
@@ -56,6 +58,8 @@ public class Loan implements Comparable{
         this.paymentPerYaz = amount / lengthOfTime;
         this.singlePayment = paymentPerYaz * timeBetweenPayments;
         this.singlePaymentTotal = singlePayment + (singlePayment * interestRate / 100);
+        this.completeAmountToBePaid = singlePaymentTotal * (lengthOfTime / timeBetweenPayments);
+        this.amountPaidUntilNow = 0.0;
         this.payments = new ArrayList<>();
     }
 
@@ -72,6 +76,18 @@ public class Loan implements Comparable{
 
     public void setPaidThisYaz(boolean paidThisYaz) {
         this.paidThisYaz = paidThisYaz;
+    }
+
+    public double getCompleteAmountToBePaid() {
+        return completeAmountToBePaid;
+    }
+
+    public double getAmountPaidUntilNow() {
+        return amountPaidUntilNow;
+    }
+
+    public void setAmountPaidUntilNow(double amountPaidUntilNow) {
+        this.amountPaidUntilNow = amountPaidUntilNow;
     }
 
     public void setBorrower(Customer borrower) {
