@@ -118,6 +118,10 @@ public class Loan implements Comparable{
                 ", category='" + category;
     }
 
+    public Customer getBorrower() {
+        return borrower;
+    }
+
     public int getEndDate() {
         return endDate;
     }

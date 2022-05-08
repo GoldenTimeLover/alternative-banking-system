@@ -1,6 +1,7 @@
 package core.engine;
 
 import core.Exceptions.FileFormatException;
+import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Notification;
@@ -293,6 +294,8 @@ public class ABSEngine implements Engine{
 
     }
 
+
+
     public void moveTimeForward(){
 
 
@@ -393,9 +396,45 @@ public class ABSEngine implements Engine{
         }
     }
 
+    public void payEntireLoan(Loan loan){
+
+        //the customer that needs to pay
+        Customer c = findCustomerById(loan.getOwnerName());
+        double moneyToReturn = loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow();
+
+        if (c.getBalance() >= moneyToReturn){
+
+            //set did pay this yaz to true
+            loan.setPaidThisYaz(true);
 
 
-    public void payCurrLoan(Loan loan){
+
+            //Remove money for loaner's account with transaction
+            addTransactionToCustomer(loan.getOwnerName(), (int) moneyToReturn, Transaction.TransactionType.WITHDRAW);
+
+            //calculate the amount each lender should receive proportionally to what he gave
+            Map<String, Double> lenderMap= loan.getLenderAmounts();
+            for (int i = 0; i < loan.getLenders().size(); i++) {
+                String lenderName = loan.getLenders().get(i).getId();
+                double amountLent = lenderMap.get(lenderName);
+                double percentageLent =  amountLent /  loan.getAmount();
+                double lenderReturn = utils.round(percentageLent * moneyToReturn);
+                addTransactionToCustomer(lenderName, lenderReturn, Transaction.TransactionType.DEPOSIT);
+            }
+
+            loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
+
+            loan.setAmountPaidUntilNow(loan.getCompleteAmountToBePaid());
+
+
+            loan.setStatus(Loan.LoanStatus.FINISHED);
+
+
+        }
+
+    }
+
+    public void payCurrLoan(Loan loan) throws NotEnoughMoneyException {
 
 
         if(loan.isPaidThisYaz()){
@@ -442,6 +481,9 @@ public class ABSEngine implements Engine{
             if(loan.getAmountPaidUntilNow() == loan.getCompleteAmountToBePaid()){
                 loan.setStatus(Loan.LoanStatus.FINISHED);
             }
+        }
+        else{
+            throw new NotEnoughMoneyException("seems like you don't have enough money in your account",c.getBalance(),moneyToReturn);
         }
 
 
