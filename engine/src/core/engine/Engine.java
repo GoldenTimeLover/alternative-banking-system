@@ -14,7 +14,6 @@ public interface Engine {
     public List<Loan> getActiveLoans();
     public void moveTimeForward();
     public void matchLoan(String loanId,double amountOfMoney,String lenderId);
-    public List<Loan> findPossibleLoanMatches(String customerID,List<String> categoryFilters,double amount,double interest,int time);
     public boolean isDataLoaded();
     public void checkLoanTimes(Loan loan) throws FileFormatException;
     public void loadDataFromFile(String filePath) throws FileFormatException;

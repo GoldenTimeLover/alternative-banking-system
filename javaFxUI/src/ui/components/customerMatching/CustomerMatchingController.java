@@ -62,25 +62,57 @@ public class CustomerMatchingController extends SubController {
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
         loanAmountInput.setValueFactory(amountValueFactory);
 
+        loanAmountInput.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                loanAmountInput.increment(0); // won't change value, but will commit editor
+            }
+        });
+
+
         // interest field
         SpinnerValueFactory<Integer> mininumIntrerestSpinnerValueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
         mininumIntrerestSpinner.setValueFactory(mininumIntrerestSpinnerValueFactory);
+
+        mininumIntrerestSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                mininumIntrerestSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
 
         //yaz field
         SpinnerValueFactory<Integer> minLoanYazSpinnerValueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
         minLoanYazSpinner.setValueFactory(minLoanYazSpinnerValueFactory);
 
+        minLoanYazSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                minLoanYazSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
+
         // max open loans field
         SpinnerValueFactory<Integer> maxOpenLoansSpinnerValueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
         maxOpenLoansSpinner.setValueFactory(maxOpenLoansSpinnerValueFactory);
 
+        maxOpenLoansSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                maxOpenLoansSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
+
+
         // percentage of loan field
         SpinnerValueFactory<Integer> maxPercentageSpinnerValueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
         maxPercentageSpinner.setValueFactory(maxPercentageSpinnerValueFactory);
+
+        maxPercentageSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                maxPercentageSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
 
 
         // category list initialization
@@ -120,7 +152,8 @@ public class CustomerMatchingController extends SubController {
         int amount = loanAmountInput.getValue();
         int minYaz = minLoanYazSpinner.getValue();
         int minInterest = mininumIntrerestSpinner.getValue();
-
+        int amountOfOpenLoans = maxOpenLoansSpinner.getValue();
+        int maxPercentageOfLoan = maxPercentageSpinner.getValue();
 
         if (amount == 0){
             return;
@@ -148,7 +181,7 @@ public class CustomerMatchingController extends SubController {
         }
 
 
-        List<Loan> availableLoans = mainController.getEngine().findPossibleLoanMatches(customerId, temp, (double) amount, (double) minInterest, minYaz);
+        List<Loan> availableLoans = mainController.getEngine().findPossibleLoanMatches(customerId, temp, (double) amount, (double) minInterest, minYaz,amountOfOpenLoans,maxPercentageOfLoan);
 
         loadLendingLoansTable(availableLoans);
 
@@ -209,7 +242,7 @@ public class CustomerMatchingController extends SubController {
         lengthColumn.setMinWidth(100);
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("lengthOfTime"));
 
-        //Intreset Rate
+        //Interest Rate
         TableColumn<Loan,Integer> interestColumn = new TableColumn<>("Interest Rate");
         interestColumn.setMinWidth(100);
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
