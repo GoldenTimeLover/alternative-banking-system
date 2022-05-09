@@ -1,0 +1,15 @@
+
+
+.banner {
+    -fx-background-color: #e3e3e3;
+}
+
+.PrimaryToolbar{
+    -fx-background-color: #EDF3F6;
+    -fx-font-weight: bold;
+}
+
+.banner Label {
+    -fx-font-size: 16px;
+}
+

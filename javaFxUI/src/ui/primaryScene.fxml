@@ -11,19 +11,13 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <BorderPane fx:id="mainBorderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.PrimaryController">
    <top>
-      <VBox BorderPane.alignment="CENTER">
+      <VBox styleClass="banner" BorderPane.alignment="CENTER">
          <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="A.B.S - Alternative Banking System">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Text>
-            <MenuBar VBox.vgrow="ALWAYS">
+            <MenuBar styleClass="PrimaryToolbar" VBox.vgrow="ALWAYS">
               <menus>
                   <Menu fx:id="themes" mnemonicParsing="false" styleClass="PrimaryToolbarItem" text="Themes">
                      <items>
@@ -36,35 +30,35 @@
                         <RadioMenuItem fx:id="mcDonaldModeTheme" mnemonicParsing="false" onAction="#mcDonaldModeThemePressed" styleClass="PrimaryToolbarItemOption" text="Mcdonald's mode" toggleGroup="$templates" />
                      </items>
                   </Menu>
-                <Menu fx:id="info" mnemonicParsing="false" text="Info">
+                <Menu fx:id="info" mnemonicParsing="false" styleClass="PrimaryToolbarItem" text="Info">
                   <items>
-                    <MenuItem fx:id="aboutButton" mnemonicParsing="false" onAction="#aboutButtonPressed" text="About" />
+                    <MenuItem fx:id="aboutButton" mnemonicParsing="false" onAction="#aboutButtonPressed" styleClass="PrimaryToolbarItemOption" text="About" />
                   </items>
                 </Menu>
               </menus>
             </MenuBar>
-            <FlowPane hgap="20.0" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: lightgrey;">
+            <FlowPane hgap="20.0" prefHeight="100.0" prefWidth="200.0" styleClass="selection-area-container">
                <children>
-                  <VBox>
+                  <VBox styleClass="combo-box-selection-area">
                      <children>
-                        <Label style="-fx-font-weight: bold;" text="Selected User:" />
-                        <ComboBox fx:id="userSelectorCB" disable="true" onAction="#userSelectorCBPressed" prefWidth="150.0" promptText="Select User" />
+                        <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="Selected User:" />
+                        <ComboBox fx:id="userSelectorCB" disable="true" onAction="#userSelectorCBPressed" prefWidth="150.0" promptText="Select User" styleClass="combo-box" />
                      </children>
                   </VBox>
-                  <VBox>
+                  <VBox styleClass="file-display-area">
                      <children>
-                        <Label style="-fx-font-weight: bold;" text="File:" />
+                        <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="File:" />
                         
-                                    <Text fx:id="filePathText" strokeType="OUTSIDE" strokeWidth="0.0" text="No file Selected Yet" />
+                                    <Text fx:id="filePathText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text-under-primary-label" text="                        " />
                      </children>
                   </VBox>
-                  <VBox>
+                  <VBox styleClass="time-display-area">
                      <FlowPane.margin>
                         <Insets />
                      </FlowPane.margin>
                      <children>
-                        <Label style="-fx-font-weight: bold;" text="YAZ:" />
-                        <Text fx:id="currentYazText" strokeType="OUTSIDE" strokeWidth="0.0" text="Current Yaz :" />
+                        <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="YAZ:" />
+                        <Text id="you" fx:id="currentYazText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="text-under-primary-label" />
                      </children>
                   </VBox>
                </children>

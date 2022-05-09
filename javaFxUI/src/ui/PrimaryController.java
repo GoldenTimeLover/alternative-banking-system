@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -22,6 +23,7 @@ import ui.components.customerPanel.CustomerPanelController;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -133,17 +135,36 @@ public class PrimaryController {
     }
     @FXML
     void darkModeThemePressed(ActionEvent event) {
+
+
         System.out.println("dark theme pressed!");
+
+        Scene scene = primaryStage.getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.DARK_PRIMARY_THEME)).toExternalForm());
+
+
+
     }
 
     @FXML
     void mcDonaldModeThemePressed(ActionEvent event) {
         System.out.println("MCd's theme pressed!");
+
+        Scene scene = primaryStage.getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.MCDONALDS_PRIMARY_THEME)).toExternalForm());
+
+
     }
     @FXML
     void defaultThemePressed(ActionEvent event) {
 
-        System.out.println("default theme pressed!");
+        Scene scene = primaryStage.getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.LIGHT_PRIMARY_THEME)).toExternalForm());
+
+
     }
 
     @FXML

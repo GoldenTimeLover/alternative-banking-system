@@ -1,0 +1,23 @@
+.banner {
+    -fx-background-color: #555555;
+    -fx-text-fill: white;
+}
+
+.PrimaryToolbar{
+    -fx-background-color: black;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+
+.PrimaryToolbarItemOption{
+    -fx-text-fill: white;
+}
+
+.primary-container-label{
+    -fx-text-fill: white;
+}
+.banner Label {
+    -fx-font-size: 16px;
+
+}
