@@ -1,0 +1,30 @@
+
+
+.admin-container{
+    -fx-background-color: #DA291C;
+}
+
+.cool-button {
+
+    -fx-background-color: #FFCC00 ;
+    -fx-text-fill: red;
+
+    -fx-text-alignment: center;
+
+}
+
+.cool-button:hover{
+    -fx-background-color: yellow ; /* Grey */
+    -fx-cursor: hand;
+    -fx-text-fill: black;
+}
+
+.cool-label{
+    -fx-text-fill: #FFCC00;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.cool-table{
+    -fx-background-color: white;
+}

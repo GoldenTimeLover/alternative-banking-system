@@ -1,0 +1,43 @@
+
+
+.admin-container{
+    -fx-background-color: #1a181aff;
+}
+.container{
+    -fx-background-color: #1a181aff;
+}
+
+#balance{
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.cool-text{
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+}
+
+.cool-button {
+
+    -fx-background-color: grey ;
+    -fx-text-fill: white;
+
+    -fx-text-alignment: center;
+
+}
+
+.cool-button:hover{
+    -fx-background-color: #505050ff ; /* Grey */
+    -fx-cursor: hand;
+    -fx-text-fill: white;
+}
+
+.cool-label{
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.cool-table{
+    -fx-background-color: white;
+}

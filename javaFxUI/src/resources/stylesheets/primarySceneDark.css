@@ -4,12 +4,25 @@
 }
 
 .PrimaryToolbar{
-    -fx-background-color: black;
+    -fx-background-color: #1a181aff;
     -fx-font-weight: bold;
     -fx-text-fill: white;
 }
+.whole-body{
+    -fx-background-color: #1a181aff;
+}
 
+.whole-body Center{
+    -fx-background-color: #1a181aff;
+}
 
+.whole-body CENTER{
+    -fx-background-color: #1a181aff;
+}
+
+.whole-body center{
+    -fx-background-color: #1a181aff;
+}
 .PrimaryToolbarItemOption{
     -fx-text-fill: white;
 }

@@ -15,6 +15,10 @@ public class Paths {
     public static String MCDONALDS_PRIMARY_THEME = "/resources/stylesheets/primarySceneMcdonalds.css";
     public static String DARK_PRIMARY_THEME = "/resources/stylesheets/primarySceneDark.css";
 
+    public static String MCDONALDS_BODY_THEME  = "/resources/stylesheets/bodyComponentMcdonalds.css";
+    public static String  LIGHT_BODY_THEME = "/resources/stylesheets/bodyComponentLight.css";
+    public static String DARK_BODY_THEME = "/resources/stylesheets/bodyComponentDark.css";
+
 
 //    public static String DARK_CENTER_THEME = "/userInterface/Stylesheets/CenterDarkMode.css";
 //    public static String RAINBOW_MAIN_THEME = "/userInterface/Stylesheets/RainbowMode.css";

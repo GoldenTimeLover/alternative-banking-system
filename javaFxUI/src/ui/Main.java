@@ -30,7 +30,8 @@ public class Main extends Application{
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root, 1050, 600));
 
-        primaryStage.getScene().getStylesheets().add(Paths.LIGHT_PRIMARY_THEME);
+        primaryStage.getScene().getStylesheets().add(Paths.DARK_PRIMARY_THEME);
+        primaryStage.getScene().getStylesheets().add(Paths.DARK_BODY_THEME);
 
         primaryStage.getIcons().add(new Image("/resources/logo.png"));
 

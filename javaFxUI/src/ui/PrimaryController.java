@@ -36,8 +36,13 @@ import java.util.Optional;
 public class PrimaryController {
 
 
+    enum Theme {DARK,LIGHT,MCDONADLS};
+
     private Stage primaryStage;
     private ABSEngine engine;
+    private Theme currentTheme;
+
+
 
 
 
@@ -137,11 +142,12 @@ public class PrimaryController {
     void darkModeThemePressed(ActionEvent event) {
 
 
-        System.out.println("dark theme pressed!");
 
+        currentTheme = Theme.DARK;
         Scene scene = primaryStage.getScene();
         scene.getStylesheets().clear();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.DARK_PRIMARY_THEME)).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.DARK_BODY_THEME)).toExternalForm());
 
 
 
@@ -149,20 +155,24 @@ public class PrimaryController {
 
     @FXML
     void mcDonaldModeThemePressed(ActionEvent event) {
-        System.out.println("MCd's theme pressed!");
 
+        currentTheme = Theme.MCDONADLS;
         Scene scene = primaryStage.getScene();
         scene.getStylesheets().clear();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.MCDONALDS_PRIMARY_THEME)).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.MCDONALDS_BODY_THEME)).toExternalForm());
+
 
 
     }
     @FXML
     void defaultThemePressed(ActionEvent event) {
 
+        currentTheme = Theme.LIGHT;
         Scene scene = primaryStage.getScene();
         scene.getStylesheets().clear();
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.LIGHT_PRIMARY_THEME)).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.LIGHT_BODY_THEME)).toExternalForm());
 
 
     }
@@ -171,12 +181,12 @@ public class PrimaryController {
     void userSelectorCBPressed(ActionEvent event) {
 
         if(!userSelectorCB.getValue().getId().equals("Admin")) {
-            System.out.println("Switch to Customer Screen");
+
             mainBorderPane.setCenter(customerPanelComponent);
             customerPanelComponentController.setPanelForCustomer();
 
         }else{
-            System.out.println("Switch to Admin Screen");
+
 
             mainBorderPane.setCenter(adminPanelComponent);
             adminPanelComponentController.unlockPanelButtons();
@@ -206,7 +216,7 @@ public class PrimaryController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
         selectedFile = fileChooser.showOpenDialog(primaryStage);
 
-        System.out.println(primaryStage.toString());
+
         if(selectedFile == null)
             return;
 

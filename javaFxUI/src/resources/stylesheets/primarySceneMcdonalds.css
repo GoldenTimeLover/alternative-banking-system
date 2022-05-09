@@ -22,6 +22,10 @@
 
 }
 
+.whole-body{
+    -fx-background-color: #DA291C;
+}
+
 .combo-box{
     -fx-background-color: #FFCC00 ;
 }

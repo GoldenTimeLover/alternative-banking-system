@@ -105,6 +105,7 @@ public class CustomerPanelController extends SubController {
         String id = mainController.getUserSelectorCB().getValue().getId();
         StringExpression sb = Bindings.concat("$", mainController.getEngine().findCustomerById(id).balanceProperty());
         balanceText.textProperty().bind(sb);
+        balanceText.setId("balance");
 
 
     }

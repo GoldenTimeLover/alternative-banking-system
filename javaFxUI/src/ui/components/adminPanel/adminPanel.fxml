@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.adminPanel.AdminPanelController">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="admin-container" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.adminPanel.AdminPanelController">
   <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -26,12 +26,12 @@
       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Button fx:id="increaseYazButton" disable="true" mnemonicParsing="false" onAction="#increaseYazButtonPressed" text="Increase Yaz" GridPane.columnIndex="1" />
-      <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFileButtonPressed" text="Load File" GridPane.columnIndex="3" />
-      <TableView fx:id="loansTableView" disable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.rowSpan="2" />
-      <TableView fx:id="customersTableView" disable="true" prefHeight="200.0" prefWidth="200.0" GridPane.columnSpan="5" GridPane.rowIndex="6" GridPane.rowSpan="2" />
-      <Label text="Loans:" GridPane.rowIndex="1" />
-      <Label text="Customers:" GridPane.rowIndex="5" />
-      <Button fx:id="showLoanDetailsButton" mnemonicParsing="false" onAction="#showLoanDetailsButtonPressed" text="Show loan detailed view" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+      <Button fx:id="increaseYazButton" disable="true" mnemonicParsing="false" onAction="#increaseYazButtonPressed" styleClass="cool-button" text="Increase Yaz" GridPane.columnIndex="1" />
+      <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFileButtonPressed" styleClass="cool-button" text="Load File" GridPane.columnIndex="3" />
+      <TableView fx:id="loansTableView" disable="true" prefHeight="200.0" prefWidth="200.0" styleClass="cool-table" GridPane.columnSpan="5" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+      <TableView fx:id="customersTableView" disable="true" prefHeight="200.0" prefWidth="200.0" styleClass="cool-table" GridPane.columnSpan="5" GridPane.rowIndex="6" GridPane.rowSpan="2" />
+      <Label styleClass="cool-label" text="Loans:" GridPane.rowIndex="1" />
+      <Label styleClass="cool-label" text="Customers:" GridPane.rowIndex="5" />
+      <Button fx:id="showLoanDetailsButton" mnemonicParsing="false" onAction="#showLoanDetailsButtonPressed" styleClass="cool-button" text="Show loan detailed view" GridPane.columnSpan="2" GridPane.rowIndex="4" />
    </children>
 </GridPane>
