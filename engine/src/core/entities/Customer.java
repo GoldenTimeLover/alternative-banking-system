@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Customer {
 
@@ -180,6 +181,27 @@ public class Customer {
     }
 
 
+    public int getAmountOfStatusLoan(Loan.LoanStatus status,boolean giving){
+
+
+
+        int counter = 0;
+        List<Loan> list;
+
+        if(giving){
+            list = givingLoans;
+        }else{
+            list = takingLoans;
+        }
+        for (Loan loan : list) {
+
+            if (loan.status.equals(status)) {
+                counter++;
+            }
+        }
+
+        return counter;
+    }
 
 
 }

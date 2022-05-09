@@ -45,6 +45,8 @@ public class AdminPanelController extends SubController {
     private Loan selectedLoan;
 
 
+
+
     @FXML
     void showLoanDetailsButtonPressed(ActionEvent event) {
         ObservableList<Loan> selectedItems = this.loansTableView.getSelectionModel().getSelectedItems();
@@ -140,8 +142,62 @@ public class AdminPanelController extends SubController {
         givenColumn.setMinWidth(100);
         givenColumn.setCellValueFactory(c-> c.getValue().getAmountOfLoansGiven().asObject());
 
+
+        //amount of new loans asking
+        TableColumn<Customer,Integer> aaa = new TableColumn<>("New loaner loans");
+        aaa.setMinWidth(150);
+        aaa.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.NEW,false)).asObject());
+
+
+        //amount of pending loans asking
+        TableColumn<Customer,Integer> bbb = new TableColumn<>("Pending loaner loans");
+        bbb.setMinWidth(150);
+        bbb.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.PENDING,false)).asObject());
+
+        //amount of active loans asking
+        TableColumn<Customer,Integer> ccc = new TableColumn<>("Active loaner loans");
+        ccc.setMinWidth(150);
+        ccc.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.ACTIVE,false)).asObject());
+
+        //amount of risk loans asking
+        TableColumn<Customer,Integer> ddd = new TableColumn<>("Risk loaner loans");
+        ddd.setMinWidth(150);
+        ddd.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.RISK,false)).asObject());
+
+        //amount of finished loans asking
+        TableColumn<Customer,Integer> eee = new TableColumn<>("Finish loaner loans");
+        eee.setMinWidth(150);
+        eee.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.FINISHED,false)).asObject());
+
+
+        //amount of new loans giving
+        TableColumn<Customer,Integer> AAA = new TableColumn<>("New lender loans");
+        AAA.setMinWidth(150);
+        AAA.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.NEW,true)).asObject());
+
+
+        //amount of pending loans giving
+        TableColumn<Customer,Integer> BBB = new TableColumn<>("Pending lender loans");
+        BBB.setMinWidth(150);
+        BBB.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.PENDING,true)).asObject());
+
+        //amount of active loans giving
+        TableColumn<Customer,Integer> CCC = new TableColumn<>("Active lender loans");
+        CCC.setMinWidth(150);
+        CCC.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.ACTIVE,true)).asObject());
+
+        //amount of risk loans giving
+        TableColumn<Customer,Integer> DDD = new TableColumn<>("Risk lender loans");
+        DDD.setMinWidth(150);
+        DDD.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.RISK,true)).asObject());
+
+        //amount of finished loans giving
+        TableColumn<Customer,Integer> EEE = new TableColumn<>("Finish lender loans");
+        EEE.setMinWidth(150);
+        EEE.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.FINISHED,true)).asObject());
+
         customersTableView.setItems(customers);
-        customersTableView.getColumns().addAll(idColumn,balanceColumn,givenColumn);
+        customersTableView.getColumns().addAll(idColumn,balanceColumn,givenColumn,aaa,bbb,ccc,ddd,eee,AAA,BBB,CCC,DDD,EEE);
 
 
     }
