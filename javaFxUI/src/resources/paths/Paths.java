@@ -9,6 +9,7 @@ public class Paths {
     public static String customerPaymentComp = "/ui/components/customerPayment/customerPayment.fxml";
     public static String customerMatchComp = "/ui/components/customerMatching/customerMatching.fxml";
     public static String singleNotification = "/ui/components/notificationArea/notification.fxml";
+    public static String loanInfo = "/ui/components/loanDetails/loanDetail.fxml";
 
 //    public static String LIGHT_MAIN_THEME = "/userInterface/Stylesheets/LightMode.css";
 //    public static String LIGHT_CENTER_THEME = "/userInterface/Stylesheets/CenterLightMode.css";

@@ -299,4 +299,17 @@ public class Loan implements Comparable{
     public void setUnpaidDebt(double unpaidDebt) {
         this.unpaidDebt = unpaidDebt;
     }
+
+
+    public String getInvestorString() {
+        StringBuilder res = new StringBuilder();
+
+        for (String name : lenderAmounts.keySet()){
+            res.append(name).append(",").append(lenderAmounts.get(name)).append("$");
+            res.append(" |");
+        }
+
+        return res.toString();
+    }
+
 }
