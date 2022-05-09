@@ -221,7 +221,7 @@ public class ABSEngine implements Engine{
      * @param interest
      * @param time
      */
-    public List<Loan> findPossibleLoanMatches(String customerID,List<String> categoryFilters,double amount,double interest,int time){
+    public List<Loan> findPossibleLoanMatches(String customerID,List<String> categoryFilters,double amount,double interest,int time,int amountOfOpenLoans,int maxPercentage){
         List<Loan> possibleLoans = new ArrayList<>();
 
         for (int i = 0; i < loans.size(); i++) {
@@ -238,7 +238,20 @@ public class ABSEngine implements Engine{
             boolean inCategories =  (categoryFilters.contains(curLoan.getCategory()) || categoryFilters.size() == 0);
             boolean okInterest =  curLoan.getInterestRate() >= interest;
             boolean okTime = curLoan.getLengthOfTime() >= time;
-            if ((!curLoan.getOwnerName().equals(customerID)) && inCategories && okInterest && okTime){
+            int openLoansCount = 0;
+            for(Loan l : curLoan.getBorrower().getTakingLoans()){
+                if (!l.getStatus().equals(Loan.LoanStatus.FINISHED)){
+                    openLoansCount++;
+                }
+            }
+            boolean okOpenLoanAmount = openLoansCount <= amountOfOpenLoans;
+
+            if(amountOfOpenLoans == 0){
+                okOpenLoanAmount = true;
+            }
+
+
+            if ((!curLoan.getOwnerName().equals(customerID)) && inCategories && okInterest && okTime && okOpenLoanAmount){
                 possibleLoans.add(loans.get(i));
             }
 
