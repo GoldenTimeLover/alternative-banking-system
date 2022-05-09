@@ -9,14 +9,21 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
+import resources.paths.Paths;
 import ui.PrimaryController;
 import ui.components.SubController;
+import ui.components.loanDetails.LoanDetailsComp;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 public class AdminPanelController extends SubController {
 
@@ -32,6 +39,38 @@ public class AdminPanelController extends SubController {
     @FXML
     private TableView<Customer> customersTableView;
 
+    @FXML
+    private Button showLoanDetailsButton;
+
+    private Loan selectedLoan;
+
+
+    @FXML
+    void showLoanDetailsButtonPressed(ActionEvent event) {
+        ObservableList<Loan> selectedItems = this.loansTableView.getSelectionModel().getSelectedItems();
+
+
+        // if no loan was selected from the table
+        if(selectedItems.size() == 0){
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning - No loan selected!");
+
+            alert.setContentText("You pressed the loan details button but no loan was selected.\n" +
+                    "Please try selecting a loan from the list and only then pressing the button.(:");
+
+            ButtonType yesButton = new ButtonType("Ok");
+            alert.getButtonTypes().setAll(yesButton);
+            Optional<ButtonType> result = alert.showAndWait();
+            return;
+        }else {
+
+            this.selectedLoan = selectedItems.get(0);
+
+            createShowLoanComponent(selectedLoan);
+
+
+        }
+    }
 
 
     @FXML
@@ -45,16 +84,6 @@ public class AdminPanelController extends SubController {
         this.mainController.loadXMLButtonPressed(event);
     }
 
-    @FXML
-    void showCustomersButtonPressed(ActionEvent event) {
-
-    }
-
-    @FXML
-    void showLoansButtonPressed(ActionEvent event) {
-
-    }
-
     public void unlockPanelButtons(){
 
 
@@ -65,13 +94,22 @@ public class AdminPanelController extends SubController {
     @SuppressWarnings("unchecked")
     private void loadDataIntoTables(){
 
+        // clear tableview of previous data
+        loansTableView.getColumns().clear();
+        loansTableView.getItems().clear();
 
         //load loans into table
         loadLoansItoTable();
         //set disable
         loansTableView.setDisable(false);
 
+        // clear tableview of previous data
+        customersTableView.getColumns().clear();
+        customersTableView.getItems().clear();
+
+        //load customer data into table
         loadCustomersIntoTable();
+        //set disable
         customersTableView.setDisable(false);
 
 
@@ -169,24 +207,66 @@ public class AdminPanelController extends SubController {
         timeBetweenCol.setMinWidth(100);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
-        //Time between each payment
+
         TableColumn<Loan,Double> aaaa = new TableColumn<>("Total to be paid");
         aaaa.setMinWidth(100);
         aaaa.setCellValueFactory(new PropertyValueFactory<>("completeAmountToBePaid"));
 
-        //Time between each payment
+
         TableColumn<Loan,Double> bbb = new TableColumn<>("paid so far");
         bbb.setMinWidth(100);
         bbb.setCellValueFactory(new PropertyValueFactory<>("amountPaidUntilNow"));
 
 
-        //Time between each payment
+
         TableColumn<Loan, Boolean> ccc = new TableColumn<>("did pay this yazs");
         ccc.setMinWidth(100);
         ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
 
+
+
+        TableColumn<Loan,String> investorsCol =  new TableColumn<>("Investors");
+        investorsCol.setMinWidth(100);
+        investorsCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInvestorString()));
+
+        TableColumn<Loan,Double> amountRaised = new TableColumn<>("money needed to activate");
+        amountRaised.setMinWidth(100);
+        amountRaised.setCellValueFactory(new PropertyValueFactory<>("remainingAmount"));
+
         loansTableView.setItems(loans);
-        loansTableView.getColumns().addAll(idColumn,aaaa,bbb,ccc,ownerColumn,categoryColumn,timeBetweenCol,startDateColumn,amountColumn,
-                statusColumn,lengthColumn,interestColumn);
+        loansTableView.getColumns().addAll(idColumn, investorsCol,amountRaised, aaaa, bbb, ccc, ownerColumn, categoryColumn, timeBetweenCol, startDateColumn, amountColumn,
+                statusColumn, lengthColumn, interestColumn);
+    }
+
+    private void createShowLoanComponent(Loan l){
+
+        ScrollPane scrollPane = new ScrollPane();
+        LoanDetailsComp loanDetailsComp = new LoanDetailsComp();
+        FXMLLoader loader = new FXMLLoader();
+        URL url = getClass().getResource(Paths.loanInfo);
+        loader.setLocation(url);
+        try {
+            assert url != null;
+            scrollPane = loader.load(url.openStream());
+            loanDetailsComp = loader.getController();
+            loanDetailsComp.setMainController(mainController);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        loanDetailsComp.setInfoFromLoan(l);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Loan Info");
+        alert.setHeaderText("Info about loan " + selectedLoan.getId());
+
+
+        alert.getDialogPane().setContent(scrollPane);
+        alert.setResizable(true);
+
+        ButtonType yesButton = new ButtonType("Ok");
+        alert.getButtonTypes().setAll(yesButton);
+        Optional<ButtonType> result = alert.showAndWait();
+        return;
     }
 }

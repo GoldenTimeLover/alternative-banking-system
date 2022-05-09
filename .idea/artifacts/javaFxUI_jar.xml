@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="javaFxUI:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/javaFxUI_jar</output-path>
+    <root id="root">
+      <element id="archive" name="javaFxUI.jar">
+        <element id="module-output" name="javaFxUI" />
+        <element id="module-output" name="engine" />
+      </element>
+    </root>
+  </artifact>
+</component>
