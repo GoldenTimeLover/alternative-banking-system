@@ -1,5 +1,44 @@
 
 
+/*Tables*/
+.table-view .virtual-flow .scroll-bar:vertical,
+.table-view .virtual-flow .scroll-bar:vertical .track,
+.table-view .virtual-flow .scroll-bar:vertical .track-background,
+.table-view .virtual-flow .scroll-bar:horizontal,
+.table-view .virtual-flow .scroll-bar:horizontal .track,
+.table-view .virtual-flow .scroll-bar:horizontal .track-background {
+    -fx-background-color: red;
+}
+
+.table-row-cell:odd{
+    -fx-background-color: #FFCC00;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+    -fx-text-background-color: #b01717;
+}
+.table-row-cell:even{
+    -fx-background-color: #e03131;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+    -fx-text-background-color: #cbcb01;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #088a08;
+    -fx-text-background-color: white;
+
+}
+.table-view .column-header-background{
+    -fx-background-color: red;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-text-background-color: #FFCC00;
+}
+
+
+/*backgrounds*/
 .admin-container{
     -fx-background-color: #DA291C;
 }
@@ -7,6 +46,7 @@
     -fx-background-color: #DA291C;
 }
 
+/*text*/
 #balance{
     -fx-text-fill: #FFCC00;
     -fx-font-weight: bold;
@@ -17,7 +57,14 @@
     -fx-fill:  #FFCC00;
     -fx-font-size: 14px;
 }
+.cool-label{
+    -fx-text-fill: #FFCC00;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
 
+
+/*buttons*/
 .cool-button {
 
     -fx-background-color: #FFCC00;
@@ -33,12 +80,27 @@
     -fx-text-fill: red;
 }
 
-.cool-label{
-    -fx-text-fill: #FFCC00;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
+
+/*spinners*/
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-body-color: yellow;
 }
 
-.cool-table{
-    -fx-background-color: white;
+.spinner .increment-arrow-button:hover,
+.spinner .decrement-arrow-button:hover {
+    /* interpolate color between yellow and red based on first color brightness */
+    -fx-body-color: ladder(#444, yellow 0%, red 100%);
+}
+
+.spinner .increment-arrow-button:hover:pressed,
+.spinner .decrement-arrow-button:hover:pressed,
+.spinner .increment-arrow-button:pressed,
+.spinner .decrement-arrow-button:pressed {
+    /* interpolate color between yellow and red based on first color brightness */
+    -fx-body-color: ladder(#AAA, yellow 0%, red 100%);
+}
+
+.spinner {
+    -fx-background-color: yellow;
 }

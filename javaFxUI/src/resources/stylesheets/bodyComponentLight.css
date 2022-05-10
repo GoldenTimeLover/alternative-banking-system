@@ -1,5 +1,22 @@
 
 
+/*table*/
+.table-row-cell:odd{
+    -fx-background-color: #93f9b911;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+.table-row-cell:even{
+    -fx-background-color: #1dbbdd11;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #81c483;
+}
+
+/*buttons*/
 .cool-button {
 
     -fx-background-color: darkgrey; /* Grey */
