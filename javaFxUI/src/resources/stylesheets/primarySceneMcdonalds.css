@@ -36,3 +36,17 @@
 #you {
     -fx-text-fill: #FFCC00 ;
 }
+
+
+#withdraw-button{
+
+    -fx-background-color: #FFCC00;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+}
+
+#deposit-button{
+    -fx-background-color: green;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}

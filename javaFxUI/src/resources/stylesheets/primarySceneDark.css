@@ -33,4 +33,9 @@
 .banner Label {
     -fx-font-size: 16px;
 
+
+}
+
+.text-under-primary-label{
+    -fx-text-fill: white;
 }

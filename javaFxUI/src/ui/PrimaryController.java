@@ -70,10 +70,10 @@ public class PrimaryController {
     private ComboBox<Customer> userSelectorCB;
 
     @FXML
-    private Text filePathText;
+    private Label filePathText;
 
     @FXML
-    private Text currentYazText;
+    private Label currentYazText;
 
     @FXML
     private Menu themes;
@@ -237,7 +237,9 @@ public class PrimaryController {
             filePathText.textProperty().bind(engine.currentFilePathProperty());
 
             StringExpression sb = Bindings.concat("Current YAZ: ", engine.currTimeForGuiProperty());
+
             currentYazText.textProperty().bind(sb);
+
 
             initCustomerPanel();
 

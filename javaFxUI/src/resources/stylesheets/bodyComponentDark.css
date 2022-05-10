@@ -1,5 +1,18 @@
 
 
+#withdraw-button{
+
+    -fx-background-color: darkred;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+#deposit-button{
+    -fx-background-color: darkgreen;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
 .admin-container{
     -fx-background-color: #1a181aff;
 }
@@ -12,8 +25,15 @@
     -fx-font-weight: bold;
 }
 
+.text-under-primary-label{
+    -fx-text-fill: white;
+
+
+}
+
 .cool-text{
     -fx-text-fill: white;
+    -fx-fill: white;
     -fx-font-size: 14px;
 }
 

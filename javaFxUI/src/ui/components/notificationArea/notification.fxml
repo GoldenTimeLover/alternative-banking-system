@@ -8,12 +8,12 @@
 
 <VBox minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" styleClass="container" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.notificationArea.singleNotificationController">
    <children>
-      <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="cool-label" text="Notification Title:">
+      <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="cool-text" text="Notification Title:">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
       </Text>
-      <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="cool-label" text="date: 0">
+      <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="cool-text" text="date: 0">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>

@@ -23,18 +23,18 @@
                 </VBox>
                 <VBox>
                     <children>
-                        <Label style="-fx-font-weight: bold;" text="Lender loans table:" />
+                        <Label styleClass="cool-label" text="Lender loans table:" />
                         <TableView fx:id="lenderLoansTable" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" />
                     </children>
                 </VBox>
                 <VBox layoutX="210.0" layoutY="10.0">
                     <children>
-                        <Label style="-fx-font-weight: bold;" text="Account transactions:" />
+                        <Label styleClass="cool-label" text="Account transactions:" />
                         <TableView fx:id="accountTransactionsTable" prefHeight="200.0" prefWidth="300.0" />
                   <HBox spacing="50.0">
                      <children>
-                        <Button fx:id="depositButton" mnemonicParsing="false" onAction="#depositButtonPressed" style="-fx-background-color: green; -fx-text-fill: white;" text="Deposit" />
-                        <Button fx:id="withdrawButton" mnemonicParsing="false" onAction="#withdrawButtonPressed" style="-fx-background-color: red; -fx-text-fill: white;" text="Withdraw" />
+                        <Button id="deposit-button" fx:id="depositButton" mnemonicParsing="false" onAction="#depositButtonPressed" text="Deposit" />
+                        <Button id="withdraw-button" fx:id="withdrawButton" mnemonicParsing="false" onAction="#withdrawButtonPressed" text="Withdraw" />
                      </children>
                      <VBox.margin>
                         <Insets />

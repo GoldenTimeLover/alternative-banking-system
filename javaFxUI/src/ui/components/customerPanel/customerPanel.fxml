@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
 <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.customerPanel.CustomerPanelController">
    <top>
@@ -24,7 +23,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Text id="balance" fx:id="balanceText" strokeType="OUTSIDE" strokeWidth="0.0" text="0.0$" />
+                  <Label id="balance" fx:id="balanceText" text="0.0$" />
                </children>
             </VBox>
          </children>
