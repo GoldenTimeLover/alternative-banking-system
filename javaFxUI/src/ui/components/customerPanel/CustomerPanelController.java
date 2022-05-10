@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 
 import javafx.scene.layout.BorderPane;
@@ -52,7 +53,7 @@ public class CustomerPanelController extends SubController {
     private ScrollPane centerContent;
 
     @FXML
-    private Text balanceText;
+    private Label balanceText;
 
 
     /*
@@ -105,6 +106,7 @@ public class CustomerPanelController extends SubController {
         String id = mainController.getUserSelectorCB().getValue().getId();
         StringExpression sb = Bindings.concat("$", mainController.getEngine().findCustomerById(id).balanceProperty());
         balanceText.textProperty().bind(sb);
+        balanceText.setId("balance");
 
 
     }

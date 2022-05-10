@@ -10,31 +10,31 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="554.0" prefWidth="605.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.customerInfo.CustomerInfoController">
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="container" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.customerInfo.CustomerInfoController">
     <content>
         <!-- do not put bounds on the FlowPane size -->
-        <FlowPane alignment="TOP_CENTER" hgap="10.0" maxHeight="-Infinity" maxWidth="Infinity" minHeight="-Infinity" prefWidth="551.0" vgap="10.0">
+        <FlowPane alignment="TOP_CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="container" vgap="10.0">
             <children>
                 <VBox>
                     <children>
-                        <Label style="-fx-font-weight: bold;" text="Loaner loans table:" />
+                        <Label style="-fx-font-weight: bold;" styleClass="cool-label" text="Loaner loans table:" />
                         <TableView fx:id="loanerLoansTable" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" />
                     </children>
                 </VBox>
                 <VBox>
                     <children>
-                        <Label style="-fx-font-weight: bold;" text="Lender loans table:" />
+                        <Label styleClass="cool-label" text="Lender loans table:" />
                         <TableView fx:id="lenderLoansTable" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" />
                     </children>
                 </VBox>
                 <VBox layoutX="210.0" layoutY="10.0">
                     <children>
-                        <Label style="-fx-font-weight: bold;" text="Account transactions:" />
+                        <Label styleClass="cool-label" text="Account transactions:" />
                         <TableView fx:id="accountTransactionsTable" prefHeight="200.0" prefWidth="300.0" />
                   <HBox spacing="50.0">
                      <children>
-                        <Button fx:id="depositButton" mnemonicParsing="false" onAction="#depositButtonPressed" style="-fx-background-color: green; -fx-text-fill: white;" text="Deposit" />
-                        <Button fx:id="withdrawButton" mnemonicParsing="false" onAction="#withdrawButtonPressed" style="-fx-background-color: red; -fx-text-fill: white;" text="Withdraw" />
+                        <Button id="deposit-button" fx:id="depositButton" mnemonicParsing="false" onAction="#depositButtonPressed" text="Deposit" />
+                        <Button id="withdraw-button" fx:id="withdrawButton" mnemonicParsing="false" onAction="#withdrawButtonPressed" text="Withdraw" />
                      </children>
                      <VBox.margin>
                         <Insets />
@@ -53,7 +53,4 @@
             </children>
         </FlowPane>
     </content>
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
 </ScrollPane>

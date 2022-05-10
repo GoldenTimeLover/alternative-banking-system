@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import resources.paths.Paths;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -28,6 +29,9 @@ public class Main extends Application{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("primaryScene.fxml"));
         Parent root = loader.load();
         primaryStage.setScene(new Scene(root, 1050, 600));
+
+        primaryStage.getScene().getStylesheets().add(Paths.LIGHT_PRIMARY_THEME);
+        primaryStage.getScene().getStylesheets().add(Paths.LIGHT_BODY_THEME);
 
         primaryStage.getIcons().add(new Image("/resources/logo.png"));
 

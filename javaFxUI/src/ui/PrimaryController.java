@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -22,6 +23,7 @@ import ui.components.customerPanel.CustomerPanelController;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -34,8 +36,13 @@ import java.util.Optional;
 public class PrimaryController {
 
 
+    enum Theme {DARK,LIGHT,MCDONADLS};
+
     private Stage primaryStage;
     private ABSEngine engine;
+    private Theme currentTheme;
+
+
 
 
 
@@ -63,10 +70,10 @@ public class PrimaryController {
     private ComboBox<Customer> userSelectorCB;
 
     @FXML
-    private Text filePathText;
+    private Label filePathText;
 
     @FXML
-    private Text currentYazText;
+    private Label currentYazText;
 
     @FXML
     private Menu themes;
@@ -133,29 +140,53 @@ public class PrimaryController {
     }
     @FXML
     void darkModeThemePressed(ActionEvent event) {
-        System.out.println("dark theme pressed!");
+
+
+
+        currentTheme = Theme.DARK;
+        Scene scene = primaryStage.getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.DARK_PRIMARY_THEME)).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.DARK_BODY_THEME)).toExternalForm());
+
+
+
     }
 
     @FXML
     void mcDonaldModeThemePressed(ActionEvent event) {
-        System.out.println("MCd's theme pressed!");
+
+        currentTheme = Theme.MCDONADLS;
+        Scene scene = primaryStage.getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.MCDONALDS_PRIMARY_THEME)).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.MCDONALDS_BODY_THEME)).toExternalForm());
+
+
+
     }
     @FXML
     void defaultThemePressed(ActionEvent event) {
 
-        System.out.println("default theme pressed!");
+        currentTheme = Theme.LIGHT;
+        Scene scene = primaryStage.getScene();
+        scene.getStylesheets().clear();
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.LIGHT_PRIMARY_THEME)).toExternalForm());
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource(Paths.LIGHT_BODY_THEME)).toExternalForm());
+
+
     }
 
     @FXML
     void userSelectorCBPressed(ActionEvent event) {
 
         if(!userSelectorCB.getValue().getId().equals("Admin")) {
-            System.out.println("Switch to Customer Screen");
+
             mainBorderPane.setCenter(customerPanelComponent);
             customerPanelComponentController.setPanelForCustomer();
 
         }else{
-            System.out.println("Switch to Admin Screen");
+
 
             mainBorderPane.setCenter(adminPanelComponent);
             adminPanelComponentController.unlockPanelButtons();
@@ -185,7 +216,7 @@ public class PrimaryController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
         selectedFile = fileChooser.showOpenDialog(primaryStage);
 
-        System.out.println(primaryStage.toString());
+
         if(selectedFile == null)
             return;
 
@@ -206,7 +237,9 @@ public class PrimaryController {
             filePathText.textProperty().bind(engine.currentFilePathProperty());
 
             StringExpression sb = Bindings.concat("Current YAZ: ", engine.currTimeForGuiProperty());
+
             currentYazText.textProperty().bind(sb);
+
 
             initCustomerPanel();
 

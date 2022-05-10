@@ -1,0 +1,33 @@
+
+
+/*table*/
+.table-row-cell:odd{
+    -fx-background-color: #93f9b911;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+.table-row-cell:even{
+    -fx-background-color: #1dbbdd11;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #81c483;
+}
+
+/*buttons*/
+.cool-button {
+
+    -fx-background-color: darkgrey; /* Grey */
+    -fx-text-fill: white;
+
+    -fx-text-alignment: center;
+
+}
+
+.cool-button:hover{
+    -fx-background-color: #e7e7e7 ; /* Grey */
+    -fx-cursor: hand;
+    -fx-text-fill: black;
+}
