@@ -3,10 +3,23 @@
 .admin-container{
     -fx-background-color: #DA291C;
 }
+.container{
+    -fx-background-color: #DA291C;
+}
+
+#balance{
+    -fx-text-fill: #FFCC00;
+    -fx-font-weight: bold;
+}
+
+.cool-text{
+    -fx-text-fill: #FFCC00;
+    -fx-font-size: 14px;
+}
 
 .cool-button {
 
-    -fx-background-color: #FFCC00 ;
+    -fx-background-color: #FFCC00;
     -fx-text-fill: red;
 
     -fx-text-alignment: center;
@@ -16,7 +29,7 @@
 .cool-button:hover{
     -fx-background-color: yellow ; /* Grey */
     -fx-cursor: hand;
-    -fx-text-fill: black;
+    -fx-text-fill: red;
 }
 
 .cool-label{
