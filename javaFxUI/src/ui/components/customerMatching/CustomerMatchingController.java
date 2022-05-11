@@ -2,7 +2,9 @@ package ui.components.customerMatching;
 
 import core.entities.Customer;
 import core.entities.Loan;
+import core.tasks.match.GetMatchingLoansService;
 import core.utils.utils;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,15 +14,20 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import ui.components.SubController;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class CustomerMatchingController extends SubController {
 
+    @FXML
+    private StackPane myStackPane;
     @FXML
     private Spinner<Integer> loanAmountInput;
 
@@ -51,6 +58,11 @@ public class CustomerMatchingController extends SubController {
 
     private ObservableList<String> selectedCategories;
     private ObservableList<Loan> selectedLoans;
+
+    private ObservableList<Loan> matchingLoans;
+
+
+
 
     @FXML
     public void initialize(){
@@ -161,15 +173,9 @@ public class CustomerMatchingController extends SubController {
 
         double balance = mainController.getEngine().findCustomerById(customerId).getBalance();
         if (amount > balance){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - trying to overdraft!");
 
-            alert.setContentText("You are trying to withdraw" + amount + " but the customer only has " + balance +
+            mainController.showAlert(Alert.AlertType.WARNING,"Warning - trying to overdraft!","You are trying to withdraw" + amount + " but the customer only has " + balance +
                     " in their account!");
-
-            ButtonType yesButton = new ButtonType("Oh my bad!");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
             return;
         }
 
@@ -181,9 +187,30 @@ public class CustomerMatchingController extends SubController {
         }
 
 
-        List<Loan> availableLoans = mainController.getEngine().findPossibleLoanMatches(customerId, temp, (double) amount, (double) minInterest, minYaz,amountOfOpenLoans,maxPercentageOfLoan);
 
-        loadLendingLoansTable(availableLoans);
+        final GetMatchingLoansService service = new GetMatchingLoansService(mainController.getEngine().getLoans(),customerId, temp, (double) amount, (double) minInterest, minYaz,amountOfOpenLoans,maxPercentageOfLoan);
+
+        Region veil = new Region();
+        veil.setStyle("-fx-background-color: rgba(0,0,0,0.4)");
+        veil.setPrefSize(400,400);
+        ProgressIndicator p = new ProgressIndicator();
+        p.setMaxSize(140,140);
+        p.setStyle("-fx-progress-color: orange");
+
+
+        p.progressProperty().bind(service.progressProperty());
+        veil.visibleProperty().bind(service.runningProperty());
+        p.visibleProperty().bind(service.runningProperty());
+
+
+        this.availableLoansTable.getItems().clear();
+        this.availableLoansTable.getColumns().clear();
+        this.loadLendingLoansTable();
+
+        this.availableLoansTable.itemsProperty().bind(service.valueProperty());
+
+        myStackPane.getChildren().addAll(veil,p);
+        service.start();
 
 
 
@@ -196,12 +223,8 @@ public class CustomerMatchingController extends SubController {
         }
 
     }
-    private void loadLendingLoansTable(List<Loan> availableLoans){
+    private void loadLendingLoansTable(){
 
-        ObservableList<Loan> loans = FXCollections.observableArrayList();
-
-
-        loans.addAll(availableLoans);
 
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
@@ -248,7 +271,7 @@ public class CustomerMatchingController extends SubController {
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
-        availableLoansTable.setItems(loans);
+
         availableLoansTable.getColumns().addAll(idColumn,ownerColumn,categoryColumn,startDateColumn,amountColumn,
                 statusColumn,lengthColumn,interestColumn);
     }

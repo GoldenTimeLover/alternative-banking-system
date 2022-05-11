@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import resources.paths.Paths;
 import ui.components.SubController;
@@ -37,7 +38,7 @@ public class CustomerPanelController extends SubController {
 
 
     // Matching/"Scramble" panel
-    @FXML private BorderPane customerMatchingComponent;
+    @FXML private StackPane customerMatchingComponent;
     @FXML public CustomerMatchingController customerMatchingComponentController;
 
     @FXML
