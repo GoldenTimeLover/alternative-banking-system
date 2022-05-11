@@ -1,5 +1,6 @@
 package ui.components.customerPayment;
 
+import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Loan;
 import core.entities.Notification;
@@ -145,34 +146,21 @@ public class CustomerPaymentController extends SubController {
         ObservableList<Loan> selectedItems = this.unpaidLoansTable.getSelectionModel().getSelectedItems();
 
         if(selectedItems.size() == 0){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - No loan selected!");
-
-            alert.setContentText("You are trying to pay a loan but no loan is selected.\nplease try" +
+            mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","You are trying to pay a loan but no loan is selected.\nplease try" +
                     "selecting one of the loans in the table that need paying.");
-
-            ButtonType yesButton = new ButtonType("Ok");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
         }
-
         else{
-
             this.selectedLoan = selectedItems.get(0);
-
-
             try {
                 mainController.getEngine().payCurrLoan(selectedLoan);
+                prepareTable();
             } catch (NotEnoughMoneyException e) {
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Warning - Not enough money!");
 
-                alert.setContentText("You are trying to make a payment on the loan '" + selectedLoan.getId()+" '" +
-                        " but the amount required is " + e.amountTryingToExtract + "$ and you have only " + e.balance +"$ in your account." );
-
-                ButtonType yesButton = new ButtonType("Ok");
-                alert.getButtonTypes().setAll(yesButton);
-                Optional<ButtonType> result = alert.showAndWait();
+                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!",
+                        "You are trying to make a payment on the loan '" + selectedLoan.getId()+" '" +
+                                " but the amount required is " + e.amountTryingToExtract + "$ and you have only " + e.balance +"$ in your account.");
+            } catch (LoanProccessingException e) {
+                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Can't pay loan now",e.getMessage());
             }
         }
 
@@ -185,36 +173,22 @@ public class CustomerPaymentController extends SubController {
 
         // if no loan was selected from the table
         if(selectedItems.size() == 0){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - No loan selected!");
-
-            alert.setContentText("You are trying to pay a loan but no loan is selected.\nplease try" +
+            mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","You are trying to pay a loan but no loan is selected.\nplease try" +
                     "selecting one of the loans in the table that need paying.");
-
-            ButtonType yesButton = new ButtonType("Ok");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-            return;
         }else {
 
             this.selectedLoan = selectedItems.get(0);
 
             // if the customer doesn't have enough money to cover the loan
             if(selectedLoan.getCompleteAmountToBePaid() - selectedLoan.getAmountPaidUntilNow() > selectedLoan.getBorrower().getBalance()){
-                Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Warning - Not enough money!");
-
-                alert.setContentText("You are trying to pay off the entire loan '" + selectedLoan.getId()+" '" +
+                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!","You are trying to pay off the entire loan '" + selectedLoan.getId()+" '" +
                         " but the amount required is " + (selectedLoan.getCompleteAmountToBePaid() - selectedLoan.getAmountPaidUntilNow())
                         + "$ and you have only " + selectedLoan.getBorrower().getBalance() +"$ in your account." );
-
-                ButtonType yesButton = new ButtonType("Ok");
-                alert.getButtonTypes().setAll(yesButton);
-                Optional<ButtonType> result = alert.showAndWait();
-                return;
             }else{
                 // pay off entire loan
                 mainController.getEngine().payEntireLoan(selectedLoan);
+                mainController.showAlert(Alert.AlertType.CONFIRMATION,"Payed of entire loan","You have successfully paid off the entire loan '" + selectedLoan.getId() + "'.\nThe loan is now FINISHED");
+                prepareTable();
             }
 
         }

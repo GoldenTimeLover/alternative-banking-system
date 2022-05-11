@@ -1,6 +1,7 @@
 package core.engine;
 
 import core.Exceptions.FileFormatException;
+import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Customer;
 import core.entities.Loan;
@@ -259,25 +260,54 @@ public class ABSEngine implements Engine{
         return possibleLoans;
     }
 
-    public void matchLoan(String loanId,double amountOfMoney,String lenderId){
+    public double matchLoan(String loanId,double amountOfMoney,String lenderId,int maxPercentageOfLoan){
 
         Loan theLoan = null;
         Customer lender = findCustomerById(lenderId);
-        for (int i = 0; i < loans.size(); i++) {
-            if (loanId.equals(loans.get(i).getId())){
-                theLoan = loans.get(i);
+        boolean customerCareAboutPercentage = maxPercentageOfLoan > 0;
+
+
+        for (Loan loan : loans) {
+            if (loanId.equals(loan.getId())) {
+                theLoan = loan;
             }
         }
 
 
         if (theLoan == null){
             System.out.println("Null Pointer to Loan Process Canceled");
-            return;
+            return 0.0;
         }
         if (lender == null){
             System.out.println("Null Pointer to Lender Process Canceled");
-            return;
+            return 0.0;
         }
+
+
+        double maxAmountWillingToInvestByPercentage = utils.round(theLoan.getAmount()*(maxPercentageOfLoan/100.0f));
+
+
+        // if the customer has already invested in this loan and cares about their percentage in the loan
+        if (customerCareAboutPercentage && theLoan.getLenderAmounts().containsKey(lenderId)){
+
+            // if the amount the customer already invested and the amount he is trying to invest is greater than the
+            // maximum amount they allow
+            if(theLoan.getLenderAmounts().get(lenderId) + amountOfMoney  > maxAmountWillingToInvestByPercentage){
+                // um... it's um... it's... um.... um... ....
+                maxAmountWillingToInvestByPercentage -= theLoan.getLenderAmounts().get(lenderId);
+            }
+        }
+
+        // if the customer cares about percentage and the amount they are trying to invest is bigger than the percent they allow
+        if(customerCareAboutPercentage && maxAmountWillingToInvestByPercentage < amountOfMoney){
+            amountOfMoney = maxAmountWillingToInvestByPercentage;
+        }
+
+        if (customerCareAboutPercentage && maxAmountWillingToInvestByPercentage == 0.0){
+            return 0.0;
+        }
+
+
 
 
         // add lender to list of lender
@@ -304,6 +334,7 @@ public class ABSEngine implements Engine{
         //add Loan to the list of loan the lender gave
         lender.addLending(theLoan);
 
+        return amountOfMoney;
 
     }
 
@@ -311,17 +342,8 @@ public class ABSEngine implements Engine{
 
     public void moveTimeForward(){
 
-
-
         // function to collect money from loaners
         List<Loan> activeLoans = getActiveLoans();
-
-
-
-
-
-
-
 
         // set current time plus 1
         currentTime+= 1;
@@ -334,9 +356,6 @@ public class ABSEngine implements Engine{
         sendNotifications(activeLoans);
 
         setLoansToUnPaidThisTurn(activeLoans);
-
-
-
     }
 
 
@@ -447,11 +466,14 @@ public class ABSEngine implements Engine{
 
     }
 
-    public void payCurrLoan(Loan loan) throws NotEnoughMoneyException {
+    public void payCurrLoan(Loan loan) throws NotEnoughMoneyException, LoanProccessingException {
 
 
         if(loan.isPaidThisYaz()){
-            return;
+            throw new LoanProccessingException("Customer already made the payment on this turn.",loan);
+        }
+        if(loan.getTimeNextPayment() > 1){
+            throw new LoanProccessingException("Current yaz is not the turn to pay the loan.",loan);
         }
 
         //the customer that needs to pay
@@ -530,6 +552,11 @@ public class ABSEngine implements Engine{
      */
     public void addTransactionToCustomer(String customerName, double amount, Transaction.TransactionType type){
 
+
+        // if the amount entered is zero or less it ain't valid.. ignore it (:
+        if(amount <= 0){
+            return;
+        }
         //iterate over all customers
         for (int i = 0; i < customers.size(); i++) {
                 Customer curCustomer = customers.get(i);

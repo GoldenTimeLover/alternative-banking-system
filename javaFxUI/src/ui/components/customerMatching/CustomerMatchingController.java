@@ -253,6 +253,17 @@ public class CustomerMatchingController extends SubController {
                 statusColumn,lengthColumn,interestColumn);
     }
 
+    private void clearFilters(){
+
+        this.loanAmountInput.getValueFactory().setValue(0);
+        this.categorySpinner.getSelectionModel().clearSelection();
+        this.maxOpenLoansSpinner.getValueFactory().setValue(0);
+        this.maxPercentageSpinner.getValueFactory().setValue(0);
+        this.minLoanYazSpinner.getValueFactory().setValue(0);
+        this.mininumIntrerestSpinner.getValueFactory().setValue(0);
+
+
+    }
 
     @FXML
     void financeLoansButtonPressed(ActionEvent event) {
@@ -267,11 +278,33 @@ public class CustomerMatchingController extends SubController {
 
             Loan loan = selectedLoans.get(i);
             double amountGiven = Math.min(loan.getRemainingAmount(),amountForEach);
-            mainController.getEngine().matchLoan(loan.getId(), amountGiven, customerId);
-            System.out.println("Matched " + amountGiven + "$ To loan '" + loan.getId() +"'");
+            double finalAmountLoaned = mainController.getEngine().matchLoan(loan.getId(), amountGiven, customerId,maxPercentageSpinner.getValue());
+            System.out.println();
+
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Matched loan");
+            alert.setHeaderText("Loan '"+loan.getId()+"' has been matched.");
+
+            if(loan.getStatus().equals(Loan.LoanStatus.ACTIVE)){
+                alert.setContentText("Matched " + finalAmountLoaned + "$ To loan '" + loan.getId() +"'.\nThe" +
+                        "loan has gathered all the required funds and is now ACTIVE.");
+            }else{
+                alert.setContentText("Matched " + finalAmountLoaned + "$ To loan '" + loan.getId() +"'.\n" +
+                        "The loan needs " + loan.getRemainingAmount() +" in order to become active.");
+            }
+
+            ButtonType yesButton = new ButtonType("Ok");
+            alert.getButtonTypes().setAll(yesButton);
+            Optional<ButtonType> result = alert.showAndWait();
 
         }
 
+        clearFilters();
+
+        //clear table
+        this.availableLoansTable.getColumns().clear();
+        this.availableLoansTable.getItems().clear();
 
     }
 }

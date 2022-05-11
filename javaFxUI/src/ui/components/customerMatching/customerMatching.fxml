@@ -32,25 +32,25 @@
                   <VBox>
                      <children>
                         <Label style="-fx-font-weight: bold;" styleClass="cool-label" text="Min amount of interest: (optional)" />
-                        <Spinner fx:id="mininumIntrerestSpinner" />
+                        <Spinner fx:id="mininumIntrerestSpinner" editable="true" />
                      </children>
                   </VBox>
                   <VBox layoutX="396.0" layoutY="20.0">
                      <children>
                         <Label style="-fx-font-weight: bold;" styleClass="cool-label" text="Min Loan YAZ: (optional)" />
-                        <Spinner fx:id="minLoanYazSpinner" />
+                        <Spinner fx:id="minLoanYazSpinner" editable="true" />
                      </children>
                   </VBox>
                   <VBox layoutX="20.0" layoutY="75.0">
                      <children>
                         <Label style="-fx-font-weight: bold;" styleClass="cool-label" text="Max open loans: (optional)" />
-                        <Spinner fx:id="maxOpenLoansSpinner" />
+                        <Spinner fx:id="maxOpenLoansSpinner" editable="true" />
                      </children>
                   </VBox>
                   <VBox layoutX="179.0" layoutY="75.0">
                      <children>
                         <Label style="-fx-font-weight: bold;" styleClass="cool-label" text="Max percentage of loan: (optional)" />
-                        <Spinner fx:id="maxPercentageSpinner" />
+                        <Spinner fx:id="maxPercentageSpinner" editable="true" />
                      </children>
                   </VBox>
                </children>
