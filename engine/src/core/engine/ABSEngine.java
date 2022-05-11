@@ -1,6 +1,7 @@
 package core.engine;
 
 import core.Exceptions.FileFormatException;
+import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Customer;
 import core.entities.Loan;
@@ -465,11 +466,14 @@ public class ABSEngine implements Engine{
 
     }
 
-    public void payCurrLoan(Loan loan) throws NotEnoughMoneyException {
+    public void payCurrLoan(Loan loan) throws NotEnoughMoneyException, LoanProccessingException {
 
 
         if(loan.isPaidThisYaz()){
-            return;
+            throw new LoanProccessingException("Customer already made the payment on this turn.",loan);
+        }
+        if(loan.getTimeNextPayment() > 1){
+            throw new LoanProccessingException("Current yaz is not the turn to pay the loan.",loan);
         }
 
         //the customer that needs to pay

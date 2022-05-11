@@ -273,4 +273,16 @@ public class PrimaryController {
             e.printStackTrace();
         }
     }
+
+    public void showAlert(Alert.AlertType type,String title,String content){
+
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+
+        alert.setContentText(content);
+
+        ButtonType yesButton = new ButtonType("Ok");
+        alert.getButtonTypes().setAll(yesButton);
+        Optional<ButtonType> result = alert.showAndWait();
+    }
 }
