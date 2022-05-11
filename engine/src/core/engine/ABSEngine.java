@@ -13,6 +13,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 
 import java.util.*;
 
@@ -25,6 +26,8 @@ public class ABSEngine implements Engine{
     private boolean dataLoaded= false;
     private final StringProperty currentFilePath = new SimpleStringProperty(this,"currentFilePath","No File Selected");
     private final Map<String,List<Notification>> notifications;
+
+    private Task<Boolean> currentRunningTask;
 
     public Map<String, List<Notification>> getNotifications() {
         return notifications;
@@ -222,43 +225,48 @@ public class ABSEngine implements Engine{
      * @param interest
      * @param time
      */
-    public List<Loan> findPossibleLoanMatches(String customerID,List<String> categoryFilters,double amount,double interest,int time,int amountOfOpenLoans,int maxPercentage){
-        List<Loan> possibleLoans = new ArrayList<>();
-
-        for (int i = 0; i < loans.size(); i++) {
-
-            Loan curLoan = loans.get(i);
-            if (curLoan.getStatus().equals(Loan.LoanStatus.RISK) ||
-                    curLoan.getStatus().equals(Loan.LoanStatus.ACTIVE)||
-                    curLoan.getStatus().equals(Loan.LoanStatus.FINISHED)){
-                continue;
-            }
-            // if current loan isn't owned by customer requesting match
-            // and is one of the categories in the loan
-            // and the interest loan is lower
-            boolean inCategories =  (categoryFilters.contains(curLoan.getCategory()) || categoryFilters.size() == 0);
-            boolean okInterest =  curLoan.getInterestRate() >= interest;
-            boolean okTime = curLoan.getLengthOfTime() >= time;
-            int openLoansCount = 0;
-            for(Loan l : curLoan.getBorrower().getTakingLoans()){
-                if (!l.getStatus().equals(Loan.LoanStatus.FINISHED)){
-                    openLoansCount++;
-                }
-            }
-            boolean okOpenLoanAmount = openLoansCount <= amountOfOpenLoans;
-
-            if(amountOfOpenLoans == 0){
-                okOpenLoanAmount = true;
-            }
-
-
-            if ((!curLoan.getOwnerName().equals(customerID)) && inCategories && okInterest && okTime && okOpenLoanAmount){
-                possibleLoans.add(loans.get(i));
-            }
-
-        }
-        return possibleLoans;
-    }
+//    public void findPossibleLoanMatches(Consumer<List<Loan>> loansDelegate,String customerID,List<String> categoryFilters,double amount,double interest,int time,int amountOfOpenLoans,int maxPercentage){
+//        List<Loan> possibleLoans = new ArrayList<>();
+//
+//        for (int i = 0; i < loans.size(); i++) {
+//
+//            Loan curLoan = loans.get(i);
+//            if (curLoan.getStatus().equals(Loan.LoanStatus.RISK) ||
+//                    curLoan.getStatus().equals(Loan.LoanStatus.ACTIVE)||
+//                    curLoan.getStatus().equals(Loan.LoanStatus.FINISHED)){
+//                continue;
+//            }
+//            // if current loan isn't owned by customer requesting match
+//            // and is one of the categories in the loan
+//            // and the interest loan is lower
+//            boolean inCategories =  (categoryFilters.contains(curLoan.getCategory()) || categoryFilters.size() == 0);
+//            boolean okInterest =  curLoan.getInterestRate() >= interest;
+//            boolean okTime = curLoan.getLengthOfTime() >= time;
+//            int openLoansCount = 0;
+//            for(Loan l : curLoan.getBorrower().getTakingLoans()){
+//                if (!l.getStatus().equals(Loan.LoanStatus.FINISHED)){
+//                    openLoansCount++;
+//                }
+//            }
+//            boolean okOpenLoanAmount = openLoansCount <= amountOfOpenLoans;
+//
+//            if(amountOfOpenLoans == 0){
+//                okOpenLoanAmount = true;
+//            }
+//
+//
+//            if ((!curLoan.getOwnerName().equals(customerID)) && inCategories && okInterest && okTime && okOpenLoanAmount){
+//                possibleLoans.add(loans.get(i));
+//            }
+//
+//        }
+//        return possibleLoans;
+//
+//        currentRunningTask = new MatchLoansTask(loansDelegate,this.loans,customerID,categoryFilters,amount,interest,time,amountOfOpenLoans,maxPercentage);
+//
+//        new Thread(currentRunningTask).start();
+//
+//    }
 
     public double matchLoan(String loanId,double amountOfMoney,String lenderId,int maxPercentageOfLoan){
 
@@ -579,6 +587,8 @@ public class ABSEngine implements Engine{
                 }
         }
     }
+
+
 
 
     public int getCurrentTime() {
