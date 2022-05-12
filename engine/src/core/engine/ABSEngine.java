@@ -219,11 +219,6 @@ public class ABSEngine implements Engine{
      *     <li>The min interest that the lender is willing to accept.</li>
      *     <li>The minimum amount of time the lender is willing the loan to span across.</li>
      * </ul>
-     * @param customerID
-     * @param categoryFilters
-     * @param amount
-     * @param interest
-     * @param time
      */
 //    public void findPossibleLoanMatches(Consumer<List<Loan>> loansDelegate,String customerID,List<String> categoryFilters,double amount,double interest,int time,int amountOfOpenLoans,int maxPercentage){
 //        List<Loan> possibleLoans = new ArrayList<>();
@@ -407,9 +402,7 @@ public class ABSEngine implements Engine{
                 //reset to the amount of time between payments
                 loan.setTimeNextPayment(loan.getTimeBetweenPayments());
 
-                if(currentTime == 12){
-                    System.out.println("i kill you!");
-                }
+
                 // if this was a yaz to be paid and the customer did not pay... set to risk
                 if (!loan.isPaidThisYaz()){
 
@@ -477,12 +470,14 @@ public class ABSEngine implements Engine{
     public void payCurrLoan(Loan loan) throws NotEnoughMoneyException, LoanProccessingException {
 
 
+        boolean exitRisk = false;
         if(loan.isPaidThisYaz()){
             throw new LoanProccessingException("Customer already made the payment on this turn.",loan);
         }
-        if(loan.getTimeNextPayment() > 1){
+        if(loan.getTimeNextPayment() > 1 && !loan.getStatus().equals(Loan.LoanStatus.RISK)){
             throw new LoanProccessingException("Current yaz is not the turn to pay the loan.",loan);
         }
+
 
         //the customer that needs to pay
         Customer c = findCustomerById(loan.getOwnerName());
@@ -491,12 +486,20 @@ public class ABSEngine implements Engine{
         double moneyToReturn = loan.getSinglePaymentTotal();
         moneyToReturn += loan.getUnpaidDebt();
 
+
+        // if missed more payments than original length of time don't keep charging customer
         if(loan.getAmountPaidUntilNow() + loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid()){
             moneyToReturn = loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow();
         }
 
-        if (c.getBalance() >= moneyToReturn){
 
+        // if not customers turn to pay but he wants to exit risk mode
+        if (loan.getStatus().equals(Loan.LoanStatus.RISK) && loan.getTimeNextPayment() > 1){
+            moneyToReturn = loan.getUnpaidDebt();
+            exitRisk = true;
+        }
+
+        if (c.getBalance() >= moneyToReturn){
 
 
             //set did pay this yaz to true
@@ -521,9 +524,14 @@ public class ABSEngine implements Engine{
 
             loan.setAmountPaidUntilNow(loan.getAmountPaidUntilNow() + moneyToReturn);
 
+            if (exitRisk){
+                loan.setUnpaidDebt(0);
+            }
             if(loan.getAmountPaidUntilNow() == loan.getCompleteAmountToBePaid()){
                 loan.setStatus(Loan.LoanStatus.FINISHED);
             }
+
+
         }
         else{
             throw new NotEnoughMoneyException("seems like you don't have enough money in your account",c.getBalance(),moneyToReturn);
@@ -531,6 +539,8 @@ public class ABSEngine implements Engine{
 
 
     }
+
+
 
 
     /**
