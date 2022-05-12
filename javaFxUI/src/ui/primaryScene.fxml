@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -8,6 +9,8 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
@@ -29,6 +32,15 @@
                         <RadioMenuItem fx:id="mcDonaldModeTheme" mnemonicParsing="false" onAction="#mcDonaldModeThemePressed" styleClass="PrimaryToolbarItemOption" text="Mcdonald's mode" toggleGroup="$templates" />
                      </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="Animation">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Animations">
+                           <graphic>
+                              <CheckBox fx:id="animationCheckBox" mnemonicParsing="false" onAction="#animationCheckBoxPressed" />
+                           </graphic>
+                        </MenuItem>
+                    </items>
+                  </Menu>
                 <Menu fx:id="info" mnemonicParsing="false" styleClass="PrimaryToolbarItem" text="Info">
                   <items>
                     <MenuItem fx:id="aboutButton" mnemonicParsing="false" onAction="#aboutButtonPressed" styleClass="PrimaryToolbarItemOption" text="About" />
@@ -38,6 +50,14 @@
             </MenuBar>
             <FlowPane hgap="20.0" prefHeight="100.0" prefWidth="200.0" styleClass="selection-area-container">
                <children>
+                  <ImageView fx:id="logoImage" fitHeight="100.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../resources/logo.png" />
+                     </image>
+                     <FlowPane.margin>
+                        <Insets />
+                     </FlowPane.margin>
+                  </ImageView>
                   <VBox styleClass="combo-box-selection-area">
                      <children>
                         <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="Selected User:" />
