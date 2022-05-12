@@ -2,6 +2,10 @@ package ui;
 
 import core.engine.ABSEngine;
 import core.entities.Customer;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.ScaleTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
 import javafx.collections.FXCollections;
@@ -16,10 +20,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import resources.paths.Paths;
 import ui.components.adminPanel.AdminPanelController;
 import ui.components.customerPanel.CustomerPanelController;
 
+import javafx.scene.image.ImageView ;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -54,16 +60,6 @@ public class PrimaryController {
 
 
     @FXML
-    public void initialize(){
-        if(adminPanelComponentController != null){
-            adminPanelComponentController.setMainController(this);
-        }
-        else{
-            System.out.println("The loading of the controller in primary controller did not work");
-        }
-    }
-
-    @FXML
     private BorderPane mainBorderPane;
 
     @FXML
@@ -89,6 +85,73 @@ public class PrimaryController {
 
     @FXML
     private MenuItem aboutButton;
+
+    @FXML
+    private CheckBox animationCheckBox;
+
+    @FXML
+    private ImageView logoImage;
+
+
+    private FadeTransition fadeTransition;
+    private ScaleTransition scaleTransition;
+    private ScaleTransition scaleTransition2;
+
+    @FXML
+    public void initialize(){
+        if(adminPanelComponentController != null){
+            adminPanelComponentController.setMainController(this);
+        }
+        else{
+            System.out.println("The loading of the controller in primary controller did not work");
+        }
+    }
+
+    @FXML
+    void animationCheckBoxPressed(ActionEvent event) {
+
+        //animation not activated
+        if (!this.animationCheckBox.isSelected()) {
+
+            this.scaleTransition.jumpTo(Duration.ZERO);
+            this.scaleTransition2.jumpTo(Duration.ZERO);
+            this.scaleTransition2.stop();
+            this.scaleTransition.stop();
+            this.fadeTransition.stop();
+
+            logoImage.setOpacity(1);
+            return;
+        }
+        //animation activated
+
+        this.fadeTransition = new FadeTransition();
+        this.fadeTransition.setNode(this.logoImage);
+
+
+
+
+        this.fadeTransition.setDuration(Duration.millis(2000));
+        this.fadeTransition.setCycleCount(Animation.INDEFINITE);
+        this.fadeTransition.setAutoReverse(true);
+        this.fadeTransition.setInterpolator(Interpolator.LINEAR);
+        this.fadeTransition.setFromValue(0);
+        this.fadeTransition.setToValue(1);
+
+        this.scaleTransition = new ScaleTransition(Duration.seconds(1), this.currentYazText);
+        this.scaleTransition.setCycleCount(Animation.INDEFINITE);
+        this.scaleTransition.setToX(-1);
+
+        this.scaleTransition2 = new ScaleTransition(Duration.seconds(1),this.filePathText);
+        this.scaleTransition2.setCycleCount(Animation.INDEFINITE);
+        this.scaleTransition2.setToY(-1);
+//        this.scaleTransition.setToY(-1);
+
+        this.fadeTransition.play();
+        this.scaleTransition.play();
+        this.scaleTransition2.play();
+
+
+    }
 
 
     public ComboBox<Customer> getUserSelectorCB() {
