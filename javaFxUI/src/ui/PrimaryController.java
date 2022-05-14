@@ -15,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
@@ -26,6 +27,8 @@ import ui.components.adminPanel.AdminPanelController;
 import ui.components.customerPanel.CustomerPanelController;
 
 import javafx.scene.image.ImageView ;
+
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -93,9 +96,9 @@ public class PrimaryController {
     private ImageView logoImage;
 
 
-    private FadeTransition fadeTransition;
-    private ScaleTransition scaleTransition;
-    private ScaleTransition scaleTransition2;
+    private FadeTransition fadeTransition = new FadeTransition();
+    private ScaleTransition scaleTransition = new ScaleTransition();
+    private ScaleTransition scaleTransition2 = new ScaleTransition();
 
     @FXML
     public void initialize(){
@@ -124,31 +127,31 @@ public class PrimaryController {
         }
         //animation activated
 
-        this.fadeTransition = new FadeTransition();
-        this.fadeTransition.setNode(this.logoImage);
-
-
-
-
-        this.fadeTransition.setDuration(Duration.millis(2000));
-        this.fadeTransition.setCycleCount(Animation.INDEFINITE);
-        this.fadeTransition.setAutoReverse(true);
-        this.fadeTransition.setInterpolator(Interpolator.LINEAR);
-        this.fadeTransition.setFromValue(0);
-        this.fadeTransition.setToValue(1);
-
-        this.scaleTransition = new ScaleTransition(Duration.seconds(1), this.currentYazText);
-        this.scaleTransition.setCycleCount(Animation.INDEFINITE);
-        this.scaleTransition.setToX(-1);
-
-        this.scaleTransition2 = new ScaleTransition(Duration.seconds(1),this.filePathText);
-        this.scaleTransition2.setCycleCount(Animation.INDEFINITE);
-        this.scaleTransition2.setToY(-1);
-//        this.scaleTransition.setToY(-1);
-
-        this.fadeTransition.play();
-        this.scaleTransition.play();
-        this.scaleTransition2.play();
+//        this.fadeTransition = new FadeTransition();
+//        this.fadeTransition.setNode(this.logoImage);
+//
+//
+//
+//
+//        this.fadeTransition.setDuration(Duration.millis(2000));
+//        this.fadeTransition.setCycleCount(Animation.INDEFINITE);
+//        this.fadeTransition.setAutoReverse(true);
+//        this.fadeTransition.setInterpolator(Interpolator.LINEAR);
+//        this.fadeTransition.setFromValue(0);
+//        this.fadeTransition.setToValue(1);
+//
+//        this.scaleTransition = new ScaleTransition(Duration.seconds(1), this.currentYazText);
+//        this.scaleTransition.setCycleCount(Animation.INDEFINITE);
+//        this.scaleTransition.setToX(-1);
+//
+//        this.scaleTransition2 = new ScaleTransition(Duration.seconds(1),this.filePathText);
+//        this.scaleTransition2.setCycleCount(Animation.INDEFINITE);
+//        this.scaleTransition2.setToY(-1);
+////        this.scaleTransition.setToY(-1);
+//
+//        this.fadeTransition.play();
+//        this.scaleTransition.play();
+//        this.scaleTransition2.play();
 
 
     }
@@ -158,6 +161,53 @@ public class PrimaryController {
         return userSelectorCB;
     }
 
+    @FXML
+    void yazClicked(MouseEvent event){
+        if (animationCheckBox.isSelected() && scaleTransition.getCurrentRate()==0.0d) {
+            scaleTransition.setNode(this.currentYazText);
+            scaleTransition.setDuration(Duration.millis(500));
+            this.scaleTransition.setCycleCount(12);
+            this.scaleTransition.setAutoReverse(true);
+            this.scaleTransition.setToX(-1);
+            this.scaleTransition.play();
+        }
+
+    }
+    @FXML
+    void fileClicked(MouseEvent event){
+
+        if (animationCheckBox.isSelected() && scaleTransition2.getCurrentRate()==0.0d) {
+            scaleTransition2.setDuration(Duration.millis(500));
+            scaleTransition2.setNode(this.filePathText);
+            this.scaleTransition2.setCycleCount(12);
+            this.scaleTransition2.setAutoReverse(true);
+            this.scaleTransition2.setToY(-1);
+            this.scaleTransition2.play();
+        }
+
+
+
+
+    }
+
+    @FXML
+    void logoClicked(MouseEvent event){
+
+        if (animationCheckBox.isSelected() && fadeTransition.getCurrentRate()==0.0d) {
+
+            this.fadeTransition.setNode(this.logoImage);
+
+
+            this.fadeTransition.setDuration(Duration.millis(500));
+            this.fadeTransition.setCycleCount(13);
+            this.fadeTransition.setAutoReverse(true);
+            this.fadeTransition.setInterpolator(Interpolator.EASE_IN);
+            this.fadeTransition.setFromValue(0);
+            this.fadeTransition.setToValue(1);
+            fadeTransition.play();
+
+        }
+    }
     @FXML
     void aboutButtonPressed(ActionEvent event) {
 
