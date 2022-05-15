@@ -122,6 +122,12 @@ public class CustomerInfoController extends SubController {
 
 
         amountSpinner.setValueFactory(valueFactory);
+
+        amountSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                amountSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
     }
 
     private void loadGivingLoansTable(Customer customer){
@@ -132,7 +138,6 @@ public class CustomerInfoController extends SubController {
         for (int i = 0; i <size; i++) {
             loans.add(temp.get(i));
         }
-
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
         idColumn.setMinWidth(100);
@@ -178,9 +183,21 @@ public class CustomerInfoController extends SubController {
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
+        //Time between each payment
+        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        timeBetweenCol.setMinWidth(100);
+        timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
+
+
+
         lenderLoansTable.setItems(loans);
-        lenderLoansTable.getColumns().addAll(idColumn,ownerColumn,categoryColumn,startDateColumn,amountColumn,
-                statusColumn,lengthColumn,interestColumn);
+        lenderLoansTable.getColumns().addAll(idColumn,
+                ownerColumn,amountColumn,
+                lengthColumn , interestColumn,
+                timeBetweenCol, categoryColumn,
+                statusColumn );
+
+
     }
     private void loadLendingLoansTable(Customer customer){
 
@@ -237,9 +254,19 @@ public class CustomerInfoController extends SubController {
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
+        //Time between each payment
+        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        timeBetweenCol.setMinWidth(100);
+        timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
+
+
         loanerLoansTable.setItems(loans);
-        loanerLoansTable.getColumns().addAll(idColumn,ownerColumn,categoryColumn,startDateColumn,amountColumn,
-                statusColumn,lengthColumn,interestColumn);
+        loanerLoansTable.getColumns().addAll(idColumn,
+                ownerColumn,amountColumn,
+                lengthColumn , interestColumn,
+                timeBetweenCol, categoryColumn,
+                statusColumn );
+
     }
     private void loadTransactionTable(Customer customer){
         ObservableList<Transaction> transactions = FXCollections.observableArrayList();

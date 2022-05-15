@@ -91,17 +91,13 @@ public class ABSEngine implements Engine{
         this.currentTime = 1;
         CurrTimeForGui.set(currentTime);
 
-        try {
-            verifyData();
-            //Connect the Loans and The Customers you got from file
-            connectDataLoadedFromFile();
+        verifyData();
+        //Connect the Loans and The Customers you got from file
+        connectDataLoadedFromFile();
 
-            dataLoaded = true;
-            currentFilePath.set(filePath);
-            System.out.println("Data Loaded Successfully!");
-        }catch (FileFormatException e){
-            e.printStackTrace();
-        }
+        dataLoaded = true;
+        currentFilePath.set(filePath);
+        System.out.println("Data Loaded Successfully!");
     }
 
 
@@ -461,6 +457,7 @@ public class ABSEngine implements Engine{
 
 
             loan.setStatus(Loan.LoanStatus.FINISHED);
+            loan.setEndDate(currentTime);
 
 
         }
@@ -529,6 +526,7 @@ public class ABSEngine implements Engine{
             }
             if(loan.getAmountPaidUntilNow() == loan.getCompleteAmountToBePaid()){
                 loan.setStatus(Loan.LoanStatus.FINISHED);
+                loan.setEndDate(currentTime);
             }
 
 

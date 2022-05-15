@@ -92,6 +92,13 @@ public class LoanDetailsComp extends SubController {
                 mybox.getChildren().add(investorsLabel);
                 mybox.getChildren().add(investors);
 
+                Text nextPaymentDateLabel = new Text("Next payment date:");
+                investorsLabel.setStyle("-fx-font-weight: bold");
+                Text nextPaymentDate = new Text(String.valueOf(loan.getTimeNextPayment() + mainController.getEngine().getCurrentTime()));
+                mybox.getChildren().add(nextPaymentDateLabel);
+                mybox.getChildren().add(nextPaymentDate);
+
+
             }
 
             if(loan.getStatus().equals(Loan.LoanStatus.ACTIVE) ||
@@ -122,6 +129,14 @@ public class LoanDetailsComp extends SubController {
                 Text needsTobePaid = new Text(String.valueOf(loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()));
                 mybox.getChildren().add(needsTobePaidLabel);
                 mybox.getChildren().add(needsTobePaid);
+            }
+
+            if (loan.getStatus().equals(Loan.LoanStatus.FINISHED)){
+                Text investorsLabel = new Text("Investors:");
+                investorsLabel.setStyle("-fx-font-weight: bold");
+                Text investors = new Text(loan.getInvestorString());
+                mybox.getChildren().add(investorsLabel);
+                mybox.getChildren().add(investors);
             }
 
             mybox.setAlignment(Pos.TOP_CENTER);

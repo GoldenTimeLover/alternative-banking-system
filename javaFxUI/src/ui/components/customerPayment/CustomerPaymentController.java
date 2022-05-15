@@ -86,57 +86,72 @@ public class CustomerPaymentController extends SubController {
 
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
-        idColumn.setMinWidth(100);
+        idColumn.setMinWidth(150);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
 
 
         //owner
         TableColumn<Loan,String> ownerColumn = new TableColumn<>("Owner");
-        ownerColumn.setMinWidth(100);
+        ownerColumn.setMinWidth(150);
         ownerColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getOwnerName()));
 
         //category
         TableColumn<Loan,String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setMinWidth(100);
+        categoryColumn.setMinWidth(150);
         categoryColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getCategory()));
 
         //start date
         TableColumn<Loan,Integer> startDateColumn = new TableColumn<>("Start Date");
-        startDateColumn.setMinWidth(100);
+        startDateColumn.setMinWidth(150);
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
 
 
         //amount
         TableColumn<Loan,Double> amountColumn = new TableColumn<>("Amount");
-        amountColumn.setMinWidth(100);
+        amountColumn.setMinWidth(150);
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
 
         //status
         TableColumn<Loan,String> statusColumn = new TableColumn<>("Status");
-        statusColumn.setMinWidth(100);
+        statusColumn.setMinWidth(150);
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         //length of time
         TableColumn<Loan,Integer> lengthColumn = new TableColumn<>("Time Length");
-        lengthColumn.setMinWidth(100);
+        lengthColumn.setMinWidth(150);
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("lengthOfTime"));
 
         //Intreset Rate
         TableColumn<Loan,Integer> interestColumn = new TableColumn<>("Interest Rate");
-        interestColumn.setMinWidth(100);
+        interestColumn.setMinWidth(150);
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
         //Time between each payment
         TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
-        timeBetweenCol.setMinWidth(100);
+        timeBetweenCol.setMinWidth(150);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
+
+        TableColumn<Loan,Double> aaaa = new TableColumn<>("Total to be paid");
+        aaaa.setMinWidth(150);
+        aaaa.setCellValueFactory(new PropertyValueFactory<>("completeAmountToBePaid"));
+
+
+        TableColumn<Loan,Double> bbb = new TableColumn<>("paid so far");
+        bbb.setMinWidth(150);
+        bbb.setCellValueFactory(new PropertyValueFactory<>("amountPaidUntilNow"));
+
+
+
+        TableColumn<Loan, Boolean> ccc = new TableColumn<>("did pay this yazs");
+        ccc.setMinWidth(150);
+        ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
 
         unpaidLoansTable.setItems(myActiveLoans);
         unpaidLoansTable.getColumns().addAll(idColumn,timeBetweenCol,startDateColumn,amountColumn,
-                statusColumn,lengthColumn,interestColumn);
+                statusColumn,lengthColumn,interestColumn,aaaa,bbb,ccc);
 
 
     }

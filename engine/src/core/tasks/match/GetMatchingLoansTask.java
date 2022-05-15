@@ -22,7 +22,7 @@ public class GetMatchingLoansTask extends Task<ObservableList<Loan>> {
     private int maxPercentage;
 
 
-    private final int SLEEP_TIME = 500;
+    private final int SLEEP_TIME = 300;
 
     public GetMatchingLoansTask(List<Loan> loans, String customerID, List<String> categoryFilters, double amount, double interest, int time, int amountOfOpenLoans, int maxPercentage) {
         this.loans = loans;
@@ -45,10 +45,6 @@ public class GetMatchingLoansTask extends Task<ObservableList<Loan>> {
         Thread.sleep(SLEEP_TIME);
 
 
-        updateMessage("Fetching Loans...");
-
-
-        updateMessage("Filtering Loans...");
         updateProgress(100,500);
 
         for (int i = 0; i < loans.size(); i++) {
@@ -71,18 +67,22 @@ public class GetMatchingLoansTask extends Task<ObservableList<Loan>> {
                     openLoansCount++;
                 }
             }
-            boolean okOpenLoanAmount = openLoansCount <= amountOfOpenLoans;
 
-            if(amountOfOpenLoans == 0){
+            // if the amount of loans the customer has open is bigger than the amount of loans
+            //the lender is accepting
+            boolean okOpenLoanAmount;
+            if(openLoansCount > amountOfOpenLoans && amountOfOpenLoans != 0){
+                okOpenLoanAmount = false;
+            }else{
                 okOpenLoanAmount = true;
             }
-
 
             if ((!curLoan.getOwnerName().equals(customerID)) && inCategories && okInterest && okTime && okOpenLoanAmount){
                 possibleLoans.add(loans.get(i));
             }
 
         }
+        updateProgress(200,500);
         Thread.sleep(SLEEP_TIME);
         updateProgress(300,500);
 

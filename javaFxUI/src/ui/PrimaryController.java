@@ -1,8 +1,8 @@
 package ui;
 
+import core.Exceptions.FileFormatException;
 import core.engine.ABSEngine;
 import core.entities.Customer;
-import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
@@ -18,7 +18,6 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -39,13 +38,13 @@ import java.util.Optional;
 
 /*
 
-    The "Master" controller that all other controllers are subordinates to and know him throught
+    The "Master" controller that all other controllers are subordinates to and know him through
     their inheritance of "SubController" class.
  */
 public class PrimaryController {
 
 
-    enum Theme {DARK,LIGHT,MCDONADLS};
+    enum Theme {DARK,LIGHT,MCDONADLS}
 
     private Stage primaryStage;
     private ABSEngine engine;
@@ -125,34 +124,6 @@ public class PrimaryController {
             logoImage.setOpacity(1);
             return;
         }
-        //animation activated
-
-//        this.fadeTransition = new FadeTransition();
-//        this.fadeTransition.setNode(this.logoImage);
-//
-//
-//
-//
-//        this.fadeTransition.setDuration(Duration.millis(2000));
-//        this.fadeTransition.setCycleCount(Animation.INDEFINITE);
-//        this.fadeTransition.setAutoReverse(true);
-//        this.fadeTransition.setInterpolator(Interpolator.LINEAR);
-//        this.fadeTransition.setFromValue(0);
-//        this.fadeTransition.setToValue(1);
-//
-//        this.scaleTransition = new ScaleTransition(Duration.seconds(1), this.currentYazText);
-//        this.scaleTransition.setCycleCount(Animation.INDEFINITE);
-//        this.scaleTransition.setToX(-1);
-//
-//        this.scaleTransition2 = new ScaleTransition(Duration.seconds(1),this.filePathText);
-//        this.scaleTransition2.setCycleCount(Animation.INDEFINITE);
-//        this.scaleTransition2.setToY(-1);
-////        this.scaleTransition.setToY(-1);
-//
-//        this.fadeTransition.play();
-//        this.scaleTransition.play();
-//        this.scaleTransition2.play();
-
 
     }
 
@@ -165,8 +136,8 @@ public class PrimaryController {
     void yazClicked(MouseEvent event){
         if (animationCheckBox.isSelected() && scaleTransition.getCurrentRate()==0.0d) {
             scaleTransition.setNode(this.currentYazText);
-            scaleTransition.setDuration(Duration.millis(500));
-            this.scaleTransition.setCycleCount(12);
+            scaleTransition.setDuration(Duration.millis(200));
+            this.scaleTransition.setCycleCount(6);
             this.scaleTransition.setAutoReverse(true);
             this.scaleTransition.setToX(-1);
             this.scaleTransition.play();
@@ -177,9 +148,9 @@ public class PrimaryController {
     void fileClicked(MouseEvent event){
 
         if (animationCheckBox.isSelected() && scaleTransition2.getCurrentRate()==0.0d) {
-            scaleTransition2.setDuration(Duration.millis(500));
+            scaleTransition2.setDuration(Duration.millis(200));
             scaleTransition2.setNode(this.filePathText);
-            this.scaleTransition2.setCycleCount(12);
+            this.scaleTransition2.setCycleCount(8);
             this.scaleTransition2.setAutoReverse(true);
             this.scaleTransition2.setToY(-1);
             this.scaleTransition2.play();
@@ -198,8 +169,8 @@ public class PrimaryController {
             this.fadeTransition.setNode(this.logoImage);
 
 
-            this.fadeTransition.setDuration(Duration.millis(500));
-            this.fadeTransition.setCycleCount(13);
+            this.fadeTransition.setDuration(Duration.millis(400));
+            this.fadeTransition.setCycleCount(5);
             this.fadeTransition.setAutoReverse(true);
             this.fadeTransition.setInterpolator(Interpolator.EASE_IN);
             this.fadeTransition.setFromValue(0);
@@ -357,7 +328,7 @@ public class PrimaryController {
             initCustomerPanel();
 
         }
-        catch(Exception ex)
+        catch(FileFormatException ex)
         {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");

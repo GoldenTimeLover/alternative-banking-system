@@ -77,7 +77,9 @@ public class AdminPanelController extends SubController {
 
     @FXML
     void increaseYazButtonPressed(ActionEvent event) {
+
             this.mainController.IncreaseYaz(event);
+            this.loadDataIntoTables();
     }
 
     @FXML
@@ -264,34 +266,21 @@ public class AdminPanelController extends SubController {
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
 
-        TableColumn<Loan,Double> aaaa = new TableColumn<>("Total to be paid");
-        aaaa.setMinWidth(100);
-        aaaa.setCellValueFactory(new PropertyValueFactory<>("completeAmountToBePaid"));
 
-
-        TableColumn<Loan,Double> bbb = new TableColumn<>("paid so far");
-        bbb.setMinWidth(100);
-        bbb.setCellValueFactory(new PropertyValueFactory<>("amountPaidUntilNow"));
-
-
-
-        TableColumn<Loan, Boolean> ccc = new TableColumn<>("did pay this yazs");
-        ccc.setMinWidth(100);
-        ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
-
-
-
-        TableColumn<Loan,String> investorsCol =  new TableColumn<>("Investors");
-        investorsCol.setMinWidth(100);
-        investorsCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInvestorString()));
-
-        TableColumn<Loan,Double> amountRaised = new TableColumn<>("money needed to activate");
-        amountRaised.setMinWidth(100);
-        amountRaised.setCellValueFactory(new PropertyValueFactory<>("remainingAmount"));
+//        TableColumn<Loan,String> investorsCol =  new TableColumn<>("Investors");
+//        investorsCol.setMinWidth(100);
+//        investorsCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInvestorString()));
+//
+//        TableColumn<Loan,Double> amountRaised = new TableColumn<>("money needed to activate");
+//        amountRaised.setMinWidth(100);
+//        amountRaised.setCellValueFactory(new PropertyValueFactory<>("remainingAmount"));
 
         loansTableView.setItems(loans);
-        loansTableView.getColumns().addAll(idColumn, investorsCol,amountRaised, aaaa, bbb, ccc, ownerColumn, categoryColumn, timeBetweenCol, startDateColumn, amountColumn,
-                statusColumn, lengthColumn, interestColumn);
+        loansTableView.getColumns().addAll(idColumn,
+                ownerColumn,amountColumn,
+                lengthColumn , interestColumn,
+                timeBetweenCol, categoryColumn,
+                statusColumn );
     }
 
     private void createShowLoanComponent(Loan l){

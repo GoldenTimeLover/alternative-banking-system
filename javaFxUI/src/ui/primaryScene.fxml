@@ -16,12 +16,11 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.PrimaryController">
    <content>
       <BorderPane fx:id="mainBorderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="700.0" styleClass="whole-body">
          <top>
-            <VBox styleClass="banner" BorderPane.alignment="CENTER">
+            <VBox minHeight="100.0" styleClass="banner" BorderPane.alignment="CENTER">
                <children>
                   <MenuBar styleClass="PrimaryToolbar" VBox.vgrow="ALWAYS">
                     <menus>
