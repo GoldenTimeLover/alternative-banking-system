@@ -30,8 +30,15 @@ public class CustomerPaymentController extends SubController {
     private Button payCurrButton;
     @FXML
     private Button payEntireLoanButton;
+
+    @FXML
+    private Button payRiskDebt;
     @FXML
     private TableView<Loan> unpaidLoansTable;
+    @FXML
+    private Spinner<Integer> riskDebtSpinner;
+
+
 
     private Loan selectedLoan;
 
@@ -45,6 +52,16 @@ public class CustomerPaymentController extends SubController {
         else{
             System.out.println("The loading of the controller in CustomerPaymentController did not work");
         }
+
+        SpinnerValueFactory<Integer> riskDebtSpinnerValueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10000,0);
+        riskDebtSpinner.setValueFactory(riskDebtSpinnerValueFactory);
+
+        riskDebtSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                riskDebtSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
     }
 
 
@@ -68,6 +85,7 @@ public class CustomerPaymentController extends SubController {
     private void unlockPaymentButtons(){
         this.payCurrButton.setDisable(false);
         this.payEntireLoanButton.setDisable(false);
+        this.payRiskDebt.setDisable(false);
     }
 
     private void prepareTable(){
@@ -180,7 +198,38 @@ public class CustomerPaymentController extends SubController {
         }
 
     }
+    @FXML
+    void payRiskDebtPressed(ActionEvent event) {
+        ObservableList<Loan> selectedItems = this.unpaidLoansTable.getSelectionModel().getSelectedItems();
+        // if no loan was selected from the table
+        if(selectedItems.size() == 0){
+            mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","You are trying to pay a loan but no loan is selected.\nplease try" +
+                    "selecting one of the loans in the table that need paying.");
+        }
+        else if(!selectedItems.get(0).getStatus().equals(Loan.LoanStatus.RISK)){
+            mainController.showAlert(Alert.AlertType.WARNING,"Warning - Loan not at risk!","You are trying to pay a " +
+                    " to pay the debt of a loan that is not in risk mode!");
+        }
+        else{
+            this.selectedLoan = selectedItems.get(0);
 
+            if(riskDebtSpinner.getValue().equals(0)){
+                return;
+            }
+            // if the customer doesn't have enough money to cover the debt
+            if(riskDebtSpinner.getValue() > selectedLoan.getBorrower().getBalance()){
+                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!","You are trying to pay the debt of '" + selectedLoan.getId()+" '" +
+                        " but the amount entered is higher than your balance");
+            }else{
+                // pay off entire loan
+                mainController.getEngine().payLoanDebtAmount(selectedLoan,riskDebtSpinner.getValue());
+                riskDebtSpinner.getValueFactory().setValue(0);
+                prepareTable();
+            }
+
+        }
+
+    }
     @FXML
     void payEntireLoanButtonPressed(ActionEvent event) {
         ObservableList<Loan> selectedItems = this.unpaidLoansTable.getSelectionModel().getSelectedItems();
