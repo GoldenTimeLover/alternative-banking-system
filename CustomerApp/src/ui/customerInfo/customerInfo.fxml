@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="container" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.customerInfo.CustomerInfoController">
+    <content>
+        <!-- do not put bounds on the FlowPane size -->
+        <FlowPane alignment="TOP_CENTER" hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="container" vgap="10.0">
+            <children>
+                <VBox>
+                    <children>
+                        <Label style="-fx-font-weight: bold;" styleClass="cool-label" text="Loaner loans table:" />
+                        <TableView fx:id="loanerLoansTable" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" />
+                    </children>
+                </VBox>
+                <VBox>
+                    <children>
+                        <Label styleClass="cool-label" text="Lender loans table:" />
+                        <TableView fx:id="lenderLoansTable" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" />
+                    </children>
+                </VBox>
+                <VBox layoutX="210.0" layoutY="10.0">
+                    <children>
+                        <Label styleClass="cool-label" text="Account transactions:" />
+                        <TableView fx:id="accountTransactionsTable" prefHeight="200.0" prefWidth="300.0" />
+                  <HBox spacing="50.0">
+                     <children>
+                        <Button id="deposit-button" fx:id="depositButton" mnemonicParsing="false" onAction="#depositButtonPressed" text="Deposit" />
+                        <Button id="withdraw-button" fx:id="withdrawButton" mnemonicParsing="false" onAction="#withdrawButtonPressed" text="Withdraw" />
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                     <padding>
+                        <Insets left="20.0" top="10.0" />
+                     </padding>
+                  </HBox>
+                  <Spinner fx:id="amountSpinner" accessibleRole="LIST_VIEW" editable="true">
+                     <VBox.margin>
+                        <Insets left="30.0" top="5.0" />
+                     </VBox.margin>
+                  </Spinner>
+                    </children>
+                </VBox>
+            </children>
+        </FlowPane>
+    </content>
+</ScrollPane>

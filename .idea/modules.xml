@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Gson/Gson.iml" filepath="$PROJECT_DIR$/Gson/Gson.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AdminApp/AdminApp.iml" filepath="$PROJECT_DIR$/AdminApp/AdminApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CustomerApp/CustomerApp.iml" filepath="$PROJECT_DIR$/CustomerApp/CustomerApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
       <module fileurl="file://$PROJECT_DIR$/javaFxUI/javaFxUI.iml" filepath="$PROJECT_DIR$/javaFxUI/javaFxUI.iml" />
-      <module fileurl="file://$PROJECT_DIR$/okhttp/okhttp.iml" filepath="$PROJECT_DIR$/okhttp/okhttp.iml" />
       <module fileurl="file://$PROJECT_DIR$/web/web.iml" filepath="$PROJECT_DIR$/web/web.iml" />
     </modules>
   </component>

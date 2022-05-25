@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.*?>
+<ScrollPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.loanDetails.LoanDetailsComp">
+   <content>
+      <VBox fx:id="mybox" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" spacing="5.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Loan ID:">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Text>
+            <Text fx:id="loanId" layoutX="288.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PlaceHolderLoanID" />
+            <Text layoutX="138.0" layoutY="23.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Loan Owner:">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Text>
+            <Text fx:id="loanOwner" layoutX="127.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="PlaceHolderLoanOwner" />
+            <Text layoutX="98.0" layoutY="74.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Loan length of time:">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Text>
+            <Text fx:id="lengthOfTime" layoutX="98.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="placeholderlengthoftime" />
+            <Text layoutX="107.0" layoutY="91.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Loan Interest:">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Text>
+            <Text fx:id="interest" layoutX="107.0" layoutY="125.0" strokeType="OUTSIDE" strokeWidth="0.0" text="placeholder interest" />
+            <Text layoutX="107.0" layoutY="142.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Loan Status:">
+               <font>
+                  <Font name="System Bold" size="13.0" />
+               </font>
+            </Text>
+            <Text fx:id="status" layoutX="107.0" layoutY="181.0" strokeType="OUTSIDE" strokeWidth="0.0" text="placeholder loan status" />
+         </children>
+         <padding>
+            <Insets bottom="20.0" />
+         </padding>
+      </VBox>
+   </content>
+</ScrollPane>

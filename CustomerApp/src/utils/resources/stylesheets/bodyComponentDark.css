@@ -1,0 +1,117 @@
+
+
+
+/*Tables*/
+.table-view .corner {
+    -fx-background-color: transparent;
+}
+
+.table-view .virtual-flow .scroll-bar:vertical,
+.table-view .virtual-flow .scroll-bar:vertical .track,
+.table-view .virtual-flow .scroll-bar:vertical .track-background,
+.table-view .virtual-flow .scroll-bar:horizontal,
+.table-view .virtual-flow .scroll-bar:horizontal .track,
+.table-view .virtual-flow .scroll-bar:horizontal .track-background {
+    -fx-background-color: black;
+}
+
+.table-view .column-header-background{
+    -fx-background-color: #1a181aff;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-text-background-color: white;
+}
+
+
+.table-row-cell:odd{
+    -fx-background-color: #666464;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+    -fx-text-background-color: white;
+}
+.table-row-cell:even{
+    -fx-background-color: #b1b6b1;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-padding: 0.0em;
+    -fx-text-background-color:#666464;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #02024d;
+    -fx-text-background-color: white;
+
+}
+
+
+/*buttons*/
+#withdraw-button{
+
+    -fx-background-color: darkred;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+#deposit-button{
+    -fx-background-color: darkgreen;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.cool-button {
+
+    -fx-background-color: grey ;
+    -fx-text-fill: white;
+
+    -fx-text-alignment: center;
+
+}
+
+.cool-button:hover{
+    -fx-background-color: #505050ff ; /* Grey */
+    -fx-cursor: hand;
+    -fx-text-fill: white;
+}
+
+
+/*backgrounds*/
+.admin-container{
+    -fx-background-color: #1a181aff;
+}
+.container{
+    -fx-background-color: #1a181aff;
+}
+
+
+/*text*/
+#balance{
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.text-under-primary-label{
+    -fx-text-fill: white;
+
+
+}
+
+.cool-text{
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -fx-font-size: 14px;
+}
+
+
+.cool-label{
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+/*spinners*/
+
+
+.spinner {
+    -fx-background-color: grey;
+}
