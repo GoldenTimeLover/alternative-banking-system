@@ -1,46 +1,70 @@
 package users;
 
+import core.engine.ABSEngine;
 import core.entities.Customer;
 
 import java.util.*;
 
+
+/***
+ * class for managing user login logouts
+ * check if users exist in the system ect..
+ */
 public class UserManager {
 
-    private final List<String> usersList;
-    private final Map<String, Customer> customerMap;
-    private String adminName = null;
+    private final Map<String, UserInfo> userMap;
+
+    private String adminName = "";
+
+    public void setAdminName(String adminName) {
+        this.adminName = adminName;
+    }
 
     public UserManager() {
-        usersList = new ArrayList<>();
-        customerMap = new HashMap<>();
+        userMap = new HashMap<>();
     }
 
-    public synchronized void addAdmin(String adminUsername) {
+    public synchronized void addAdmin(String adminUsername, ABSEngine engine) {
+        if(!userMap.containsKey(adminUsername)){
+            engine.getCustomers().add(new Customer(adminUsername,true));
+        }
+        userMap.put(adminUsername,new UserInfo(adminUsername,true,true));
         adminName = adminUsername;
     }
+
     public synchronized String getAdminName() {
         return adminName;
     }
 
-    public synchronized Map<String,Customer> getCustomerMap() {
-        return customerMap;
+
+
+    public synchronized void addCustomer(String username,ABSEngine engine) {
+            if(!userMap.containsKey(username)){
+                engine.getCustomers().add(new Customer(username,false));
+            }
+            userMap.put(username,new UserInfo(username,false,true));
     }
 
-    public synchronized void addCustomer(String username) {
-        usersList.add(username);
-        if(!customerMap.containsKey(username)) {
-            customerMap.put(username, new Customer("not sure why this is here..",1,null,null,null));
+    public synchronized void logoutUser(String username) {
+        if(userMap.containsKey(username)){
+            boolean isA = userMap.get(username).isAdmin;
+            userMap.put(username,new UserInfo(username,isA,false));
+            if(isA){
+                adminName = "";
+            }
         }
-    }
-
-    public synchronized void removeUser(String username) {
-        if(usersList.contains(username))
-            usersList.remove(username);
 
     }
 
-    public boolean isUserExists(String username) {
-        return (adminName.equals(username)||usersList.contains(username));
+
+    public synchronized boolean isUserExists(String username) {
+        return adminName.equals(username)||
+                userMap.containsKey(username);
+    }
+
+
+    public synchronized boolean isUserLoggedIn(String userName){
+        return userMap.containsKey(userName) && userMap.get(userName).isLoggedIn;
     }
 
 

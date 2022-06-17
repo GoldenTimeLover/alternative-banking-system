@@ -1,15 +1,16 @@
 package ui;
 
 import core.Exceptions.FileFormatException;
+import core.dtos.LoansDTO;
 import core.engine.ABSEngine;
-import core.entities.Customer;
+
+import core.entities.Loan;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,7 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -37,12 +38,13 @@ public class PrimaryController {
     enum Theme {DARK,LIGHT,MCDONADLS}
 
     private Stage primaryStage;
-    private ABSEngine engine;
+
     private Theme currentTheme;
 
 
-
-
+    public Stage getPrimaryStage() {
+        return primaryStage;
+    }
 
     @FXML private BorderPane customerPanelComponent;
     @FXML private CustomerPanelController customerPanelComponentController;
@@ -51,12 +53,9 @@ public class PrimaryController {
     @FXML
     private BorderPane mainBorderPane;
 
-    @FXML
-    private ComboBox<Customer> userSelectorCB;
 
     @FXML
-    private Label filePathText;
-
+    private Label currentUserNameText;
     @FXML
     private Label currentYazText;
 
@@ -86,10 +85,15 @@ public class PrimaryController {
     private ScaleTransition scaleTransition = new ScaleTransition();
     private ScaleTransition scaleTransition2 = new ScaleTransition();
 
+    public LoansDTO loansDTO;
     @FXML
-    public void initialize(Stage primaryStage){
+    public void initialize(Stage primaryStage,String currentUser){
 
         this.primaryStage = primaryStage;
+        this.currentUserNameText.setText(currentUser);
+    }
+    public String getUsername(){
+        return this.currentUserNameText.getText();
     }
 
     @FXML
@@ -111,8 +115,8 @@ public class PrimaryController {
     }
 
 
-    public ComboBox<Customer> getUserSelectorCB() {
-        return userSelectorCB;
+    public String getCustomerId(){
+        return "Binky Barns";
     }
 
     @FXML
@@ -127,22 +131,7 @@ public class PrimaryController {
         }
 
     }
-    @FXML
-    void fileClicked(MouseEvent event){
 
-        if (animationCheckBox.isSelected() && scaleTransition2.getCurrentRate()==0.0d) {
-            scaleTransition2.setDuration(Duration.millis(200));
-            scaleTransition2.setNode(this.filePathText);
-            this.scaleTransition2.setCycleCount(8);
-            this.scaleTransition2.setAutoReverse(true);
-            this.scaleTransition2.setToY(-1);
-            this.scaleTransition2.play();
-        }
-
-
-
-
-    }
 
     @FXML
     void logoClicked(MouseEvent event){
@@ -191,20 +180,8 @@ public class PrimaryController {
 
     }
 
-    public void IncreaseYaz(ActionEvent event){
-
-        engine.moveTimeForward();
-
-    }
-    public void insertUsersToComboBox(){
 
 
-        ObservableList<Customer> customers = FXCollections.observableArrayList(engine.getCustomers());
-        customers.add(0,new Customer("Admin",0,null,null,null));
-        userSelectorCB.setItems(customers);
-        userSelectorCB.getSelectionModel().select(0);
-        userSelectorCB.setDisable(false);
-    }
     @FXML
     void darkModeThemePressed(ActionEvent event) {
 
@@ -244,72 +221,14 @@ public class PrimaryController {
 
     }
 
-    @FXML
-    void userSelectorCBPressed(ActionEvent event) {
 
 
-    }
 
-
-    private void unlockAdminButtons(){
-
-
-    }
     public void setPrimaryStage(Stage stage){
         this.primaryStage = stage;
     }
 
-    public ABSEngine getEngine() {
-        return engine;
-    }
 
-    public void loadXMLButtonPressed(ActionEvent event){
-
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile;
-        fileChooser.setTitle("Select a file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
-        selectedFile = fileChooser.showOpenDialog(primaryStage);
-
-
-        if(selectedFile == null)
-            return;
-
-        try{
-            engine = new ABSEngine();
-            engine.loadDataFromFile(selectedFile.getPath());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("File loaded Successfully");
-            alert.setContentText(null);
-
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-
-            insertUsersToComboBox();
-            unlockAdminButtons();
-            filePathText.textProperty().bind(engine.currentFilePathProperty());
-
-            StringExpression sb = Bindings.concat("Current YAZ: ", engine.currTimeForGuiProperty());
-
-            currentYazText.textProperty().bind(sb);
-
-
-        }
-        catch(FileFormatException ex)
-        {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error loading File!");
-            alert.setContentText(ex.getMessage());
-            System.out.println(ex.getMessage());
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-
-        }
-    }
 
 
     public void customerPanel(){
@@ -332,7 +251,9 @@ public class PrimaryController {
             e.printStackTrace();
         }
     }
-
+    public ABSEngine getEngine(){
+        return new ABSEngine();
+    }
 
     public void showAlert(Alert.AlertType type,String title,String content){
 
@@ -344,5 +265,10 @@ public class PrimaryController {
         ButtonType yesButton = new ButtonType("Ok");
         alert.getButtonTypes().setAll(yesButton);
         Optional<ButtonType> result = alert.showAndWait();
+    }
+
+    public void SpeardInfoToAll(LoansDTO loansDTO){
+        this.loansDTO = loansDTO;
+        customerPanelComponentController.updateAllPanels();
     }
 }

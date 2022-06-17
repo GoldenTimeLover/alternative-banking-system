@@ -14,6 +14,7 @@ public class Customer {
     private ArrayList<Loan> givingLoans;
     private ArrayList<Loan> takingLoans;
     private ArrayList<Transaction> transactions;
+    private boolean isAdmin;
 
     public Customer(String id, int balance, ArrayList<Loan> givingLoans,
                     ArrayList<Loan> takingLoans,ArrayList<Transaction> transactions) {
@@ -22,9 +23,15 @@ public class Customer {
         this.givingLoans = givingLoans;
         this.takingLoans = takingLoans;
         this.transactions = transactions;
-
-
-
+        this.isAdmin = false;
+    }
+    public Customer(String id,boolean isAdmin){
+        this.id = id;
+        this.isAdmin = isAdmin;
+        this.balance.set(0);
+        this.givingLoans = new ArrayList<>();
+        this.takingLoans = new ArrayList<>();
+        this.transactions = new ArrayList<>();
     }
 
 

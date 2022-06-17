@@ -1,5 +1,6 @@
 package ui.login;
 
+import core.engine.ABSEngine;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -119,11 +120,14 @@ public class CustomerLoginController {
 
                             // show the app again
                             primaryStage.show();
-                            primaryController.initialize(primaryStage);
+                            System.out.println("i am in log in page!");
+                            primaryController.initialize(primaryStage,currentUser);
                             primaryController.customerPanel();
 
                         }
-                        catch(Exception ignore) {}
+                        catch(Exception e) {
+                            e.printStackTrace();
+                        }
                     });
                 }
                 Objects.requireNonNull(response.body()).close();

@@ -87,14 +87,14 @@ public class CustomerPaymentController extends CustomerSubController {
         unpaidLoansTable.getItems().clear();
         unpaidLoansTable.getColumns().clear();
 
-        String id = mainController.getUserSelectorCB().getValue().getId();
+        String id = mainController.getCustomerId();
         ObservableList<Loan> myActiveLoans = FXCollections.observableArrayList();
-        for(Loan loan : mainController.getEngine().getActiveLoans()){
-
-            if (loan.getOwnerName().equals(id)){
-                myActiveLoans.add(loan);
-            }
-        }
+//        for(Loan loan : mainController.info.loanList){
+//
+//            if (loan.getOwnerName().equals(id)){
+//                myActiveLoans.add(loan);
+//            }
+//        }
 
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
@@ -178,17 +178,17 @@ public class CustomerPaymentController extends CustomerSubController {
         }
         else{
             this.selectedLoan = selectedItems.get(0);
-            try {
-                mainController.getEngine().payCurrLoan(selectedLoan);
-                prepareTable();
-            } catch (NotEnoughMoneyException e) {
-
-                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!",
-                        "You are trying to make a payment on the loan '" + selectedLoan.getId()+" '" +
-                                " but the amount required is " + e.amountTryingToExtract + "$ and you have only " + e.balance +"$ in your account.");
-            } catch (LoanProccessingException e) {
-                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Can't pay loan now",e.getMessage());
-            }
+//            try {
+////                mainController.getEngine().payCurrLoan(selectedLoan);
+//                prepareTable();
+//            } catch (NotEnoughMoneyException e) {
+//
+//                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!",
+//                        "You are trying to make a payment on the loan '" + selectedLoan.getId()+" '" +
+//                                " but the amount required is " + e.amountTryingToExtract + "$ and you have only " + e.balance +"$ in your account.");
+//            } catch (LoanProccessingException e) {
+//                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Can't pay loan now",e.getMessage());
+//            }
         }
 
     }
@@ -216,7 +216,7 @@ public class CustomerPaymentController extends CustomerSubController {
                         " but the amount entered is higher than your balance");
             }else{
                 // pay off entire loan
-                mainController.getEngine().payLoanDebtAmount(selectedLoan,riskDebtSpinner.getValue());
+//                mainController.getEngine().payLoanDebtAmount(selectedLoan,riskDebtSpinner.getValue());
                 riskDebtSpinner.getValueFactory().setValue(0);
                 prepareTable();
             }
@@ -244,7 +244,7 @@ public class CustomerPaymentController extends CustomerSubController {
                         + "$ and you have only " + selectedLoan.getBorrower().getBalance() +"$ in your account." );
             }else{
                 // pay off entire loan
-                mainController.getEngine().payEntireLoan(selectedLoan);
+//                mainController.getEngine().payEntireLoan(selectedLoan);
                 mainController.showAlert(Alert.AlertType.CONFIRMATION,"Payed of entire loan","You have successfully paid off the entire loan '" + selectedLoan.getId() + "'.\nThe loan is now FINISHED");
                 prepareTable();
             }

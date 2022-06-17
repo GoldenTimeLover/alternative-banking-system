@@ -68,8 +68,6 @@ public class ABSXmlParser {
                     Loan.LoanStatus.NEW,category,interestPerPayment,ownerName,totalYaz,payEveryYaz));
             }
 
-
-
         return res;
     }
 

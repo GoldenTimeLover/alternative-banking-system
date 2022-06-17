@@ -1,5 +1,6 @@
 package ui.customerPanel;
 
+import core.dtos.LoansDTO;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import ui.customerAddLoanPanel.CustomerAddLoanPanelController;
 import ui.customerInfo.CustomerInfoController;
 import ui.customerMatching.CustomerMatchingController;
 import ui.customerPayment.CustomerPaymentController;
@@ -27,6 +29,9 @@ public class CustomerPanelController extends CustomerSubController {
     @FXML private ScrollPane customerInfoComponent;
     @FXML private CustomerInfoController customerInfoComponentController;
 
+    // addLoanComponent panel
+    @FXML private ScrollPane addLoanComponent;
+    @FXML private CustomerAddLoanPanelController addLoanComponentController;
 
     // Payment panel
     @FXML private BorderPane customerPaymentComponent;
@@ -52,12 +57,15 @@ public class CustomerPanelController extends CustomerSubController {
     @FXML
     private Label balanceText;
 
+    @FXML
+    private Button addLoanButton;
 
     @FXML
     public void initcomps(){
         initCustomerInfoComponent();
         initCustomerPaymentComponent();
         initCustomerMatchingComponent();
+        initCustomerAddLoanComponent();
         centerContent.setContent(customerInfoComponent);
     }
     /*
@@ -74,6 +82,10 @@ public class CustomerPanelController extends CustomerSubController {
 
     }
 
+    @FXML
+    void addLoanButtonPressed(ActionEvent event) {
+        centerContent.setContent(addLoanComponent);
+    }
 
     /*
     Response to the pressing of the payment button in the Customer Panel.
@@ -100,19 +112,19 @@ public class CustomerPanelController extends CustomerSubController {
     }
 
 
-    public void setPanelForCustomer(){
+    public void updateAllPanels(){
 
         initCustomerInfoComponent();
         initCustomerPaymentComponent();
         initCustomerMatchingComponent();
+        initCustomerAddLoanComponent();
         customerInfoComponentController.setInfoForCustomerIntoTables();
-        centerContent.setContent(customerInfoComponent);
 
-        String id = mainController.getUserSelectorCB().getValue().getId();
-        StringExpression sb = Bindings.concat("$", mainController.getEngine().findCustomerById(id).balanceProperty());
-        balanceText.textProperty().bind(sb);
+
+        String id = mainController.getCustomerId();
+//        balanceText.setText(String.valueOf(this.mainController.info.balance));
         balanceText.setId("balance");
-
+        System.out.println("Updated ALL Panels with info about " + mainController.loansDTO.loanList.get(0).id);
 
     }
 
@@ -168,6 +180,20 @@ public class CustomerPanelController extends CustomerSubController {
             customerMatchingComponent = loader.load(url.openStream());
             customerMatchingComponentController = loader.getController();
             customerMatchingComponentController.setMainController(mainController);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private  void initCustomerAddLoanComponent(){
+        FXMLLoader loader = new FXMLLoader();
+        URL url = getClass().getResource(CustomerPaths.CUSTOMER_ADD_LOAN);
+        loader.setLocation(url);
+        try {
+            assert url != null;
+            addLoanComponent = loader.load(url.openStream());
+            addLoanComponentController = loader.getController();
+            addLoanComponentController.setMainController(mainController);
         } catch (IOException e) {
             e.printStackTrace();
         }

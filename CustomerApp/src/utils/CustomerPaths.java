@@ -11,7 +11,7 @@ public class CustomerPaths {
     public static String CUSTOMER_MATCHING = "/ui/customerMatching/customerMatching.fxml";
     public static String CUSTOMER_PAYMENT = "/ui/customerPayment/customerPayment.fxml";
     public static String CUSTOMER_INFO = "/ui/customerInfo/customerInfo.fxml";
-
+    public static String CUSTOMER_ADD_LOAN = "/ui/customerAddLoanPanel/customerAddLoanPanel.fxml";
 
     public static String LOAN_INFO = "/ui/components/loanDetails/loanDetail.fxml";
     public static String SINGLE_NOTIFICATION = "/ui/notificationArea/notification.fxml";
@@ -32,6 +32,8 @@ public class CustomerPaths {
     public final static String BASE_DOMAIN = "localhost";
     public final static String APPLICATION_NAME = "/web_Web_exploded";
     public final static String FULL_SERVER_PATH = "http://" + BASE_DOMAIN + ":8080" + APPLICATION_NAME;
+
+    public final static String ADD_LOAN_PATH = FULL_SERVER_PATH + "/loan/add";
 
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/user/login";
 

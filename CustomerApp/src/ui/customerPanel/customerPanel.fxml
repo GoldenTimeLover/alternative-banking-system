@@ -16,6 +16,7 @@
             <Button fx:id="informationButton" mnemonicParsing="false" onAction="#informationButtonPressed" styleClass="cool-button" text="Information" />
             <Button fx:id="scrambleButton" mnemonicParsing="false" onAction="#scrambleButtonPressed" styleClass="cool-button" text="Scramble" />
             <Button fx:id="paymentButton" mnemonicParsing="false" onAction="#paymentButtonPressed" styleClass="cool-button" text="Payment" />
+            <Button fx:id="addLoanButton" layoutX="204.0" layoutY="25.0" mnemonicParsing="false" onAction="#addLoanButtonPressed" styleClass="cool-button" text="Add Loan" />
             <VBox alignment="TOP_CENTER">
                <children>
                   <Label styleClass="cool-label" text="Current Balance:">

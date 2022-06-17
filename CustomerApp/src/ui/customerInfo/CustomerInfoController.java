@@ -1,5 +1,7 @@
 package ui.customerInfo;
 
+import core.dtos.LoansDTO;
+import core.dtos.SingleLoanDTO;
 import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Transaction;
@@ -44,11 +46,11 @@ public class CustomerInfoController extends CustomerSubController {
         if (amountSpinner.getValue() == 0){
             return;
         }
-        String customerId = mainController.getUserSelectorCB().getValue().getId();
+        String customerId = mainController.getCustomerId();
 
         int amount = amountSpinner.getValue();
         mainController.getEngine().addTransactionToCustomer(customerId,(double) amount, Transaction.TransactionType.DEPOSIT);
-        Customer customer = mainController.getEngine().findCustomerById(mainController.getUserSelectorCB().getValue().getId());
+        Customer customer = mainController.getEngine().findCustomerById(customerId);
 
         accountTransactionsTable.getItems().clear();
         accountTransactionsTable.getColumns().clear();
@@ -78,9 +80,9 @@ public class CustomerInfoController extends CustomerSubController {
         if (amountSpinner.getValue() == 0 ){
             return;
         }
-        String customerId = mainController.getUserSelectorCB().getValue().getId();
+        String customerId = mainController.getCustomerId();
         int amount = amountSpinner.getValue();
-        Customer customer = mainController.getEngine().findCustomerById(mainController.getUserSelectorCB().getValue().getId());
+        Customer customer = mainController.getEngine().findCustomerById(customerId);
 
         if(amount > customer.getBalance()){
             Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -109,11 +111,11 @@ public class CustomerInfoController extends CustomerSubController {
 
         System.out.println("set Info For Customer Into Tables");
 
-//        clearTables();
+        clearTables();
 //
 //        Customer customer = mainController.getEngine().findCustomerById(mainController.getUserSelectorCB().getValue().getId());
-//        loadGivingLoansTable(customer);
-//        loadLendingLoansTable(customer);
+        loadGivingLoansTable();
+        loadLendingLoansTable();
 //        loadTransactionTable(customer);
 
 
@@ -130,14 +132,16 @@ public class CustomerInfoController extends CustomerSubController {
         });
     }
 
-    private void loadGivingLoansTable(Customer customer){
+    private void loadGivingLoansTable(){
         ObservableList<Loan> loans = FXCollections.observableArrayList();
 
-        int size = customer.getGivingLoans().size();
-        List<Loan> temp = customer.getGivingLoans();
-        for (int i = 0; i <size; i++) {
-            loans.add(temp.get(i));
+
+
+        List<SingleLoanDTO> loanList = mainController.loansDTO.loansCustomerGaveToOthers;
+        for (int i = 0; i <loanList.size(); i++) {
+            loans.add(new Loan(loanList.get(i), mainController.getUsername()));
         }
+
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
         idColumn.setMinWidth(100);
@@ -199,14 +203,13 @@ public class CustomerInfoController extends CustomerSubController {
 
 
     }
-    private void loadLendingLoansTable(Customer customer){
+    private void loadLendingLoansTable(){
 
         ObservableList<Loan> loans = FXCollections.observableArrayList();
 
-        int size = customer.getTakingLoans().size();
-        List<Loan> temp = customer.getTakingLoans();
-        for (int i = 0; i <size; i++) {
-            loans.add(temp.get(i));
+        List<SingleLoanDTO> loanList = mainController.loansDTO.loanList;
+        for (int i = 0; i <loanList.size(); i++) {
+            loans.add(new Loan(loanList.get(i), mainController.getUsername()));
         }
 
         //id

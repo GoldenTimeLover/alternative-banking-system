@@ -92,9 +92,9 @@ public class LoanDetailsComp extends CustomerSubController {
 
                 Text nextPaymentDateLabel = new Text("Next payment date:");
                 investorsLabel.setStyle("-fx-font-weight: bold");
-                Text nextPaymentDate = new Text(String.valueOf(loan.getTimeNextPayment() + mainController.getEngine().getCurrentTime()));
+//                Text nextPaymentDate = new Text(String.valueOf(loan.getTimeNextPayment() + mainController.getEngine().getCurrentTime()));
                 mybox.getChildren().add(nextPaymentDateLabel);
-                mybox.getChildren().add(nextPaymentDate);
+//                mybox.getChildren().add(nextPaymentDate);
 
 
             }

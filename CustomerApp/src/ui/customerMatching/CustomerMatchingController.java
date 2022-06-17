@@ -156,7 +156,7 @@ public class CustomerMatchingController extends CustomerSubController {
     void filterLoansButtonPressed(ActionEvent event) {
 
 
-        String customerId = mainController.getUserSelectorCB().getValue().getId();
+        String customerId = mainController.getCustomerId();
         int amount = loanAmountInput.getValue();
         int minYaz = minLoanYazSpinner.getValue();
         int minInterest = mininumIntrerestSpinner.getValue();
@@ -167,7 +167,7 @@ public class CustomerMatchingController extends CustomerSubController {
             return;
         }
 
-        double balance = mainController.getEngine().findCustomerById(customerId).getBalance();
+        double balance = 0;
         if (amount > balance){
 
             mainController.showAlert(Alert.AlertType.WARNING,"Warning - trying to overdraft!","You are trying to withdraw" + amount + " but the customer only has " + balance +
@@ -177,37 +177,37 @@ public class CustomerMatchingController extends CustomerSubController {
 
         List<String> temp;
         if (selectedCategories == null || selectedCategories.size() == 0){
-            temp = mainController.getEngine().getCategories();
+            temp = new ArrayList<>();
         }else{
             temp = new ArrayList<>(selectedCategories);
         }
 
 
 
-        final GetMatchingLoansService service = new GetMatchingLoansService(mainController.getEngine().getLoans(),customerId, temp, (double) amount, (double) minInterest, minYaz,amountOfOpenLoans,maxPercentageOfLoan);
-
-        Region veil = new Region();
-        veil.setStyle("-fx-background-color: rgba(0,0,0,0.4)");
-        veil.setPrefSize(400,400);
-        ProgressIndicator p = new ProgressIndicator();
-        p.setMaxSize(140,140);
-        p.setStyle("-fx-progress-color: orange");
-
-
-        p.progressProperty().bind(service.progressProperty());
-        veil.visibleProperty().bind(service.runningProperty());
-        p.visibleProperty().bind(service.runningProperty());
-
-
-        this.availableLoansTable.getItems().clear();
-        this.availableLoansTable.getColumns().clear();
-        this.loadLendingLoansTable();
-
-        this.availableLoansTable.itemsProperty().bind(service.valueProperty());
-
-        myStackPane.getChildren().addAll(veil,p);
-        service.start();
-
+//        final GetMatchingLoansService service = new GetMatchingLoansService(mainController.getEngine().getLoans(),customerId, temp, (double) amount, (double) minInterest, minYaz,amountOfOpenLoans,maxPercentageOfLoan);
+//
+//        Region veil = new Region();
+//        veil.setStyle("-fx-background-color: rgba(0,0,0,0.4)");
+//        veil.setPrefSize(400,400);
+//        ProgressIndicator p = new ProgressIndicator();
+//        p.setMaxSize(140,140);
+//        p.setStyle("-fx-progress-color: orange");
+//
+//
+//        p.progressProperty().bind(service.progressProperty());
+//        veil.visibleProperty().bind(service.runningProperty());
+//        p.visibleProperty().bind(service.runningProperty());
+//
+//
+//        this.availableLoansTable.getItems().clear();
+//        this.availableLoansTable.getColumns().clear();
+//        this.loadLendingLoansTable();
+//
+//        this.availableLoansTable.itemsProperty().bind(service.valueProperty());
+//
+//        myStackPane.getChildren().addAll(veil,p);
+//        service.start();
+//
 
 
     }
@@ -301,14 +301,15 @@ public class CustomerMatchingController extends CustomerSubController {
         if(selectedLoans == null || selectedLoans.size() == 0){
             return;
         }
-        String customerId = mainController.getUserSelectorCB().getValue().getId();
+        String customerId = mainController.getUsername();
         double amount = (double) loanAmountInput.getValue();
         double amountForEach = utils.round(amount / selectedLoans.size());
         for (int i = 0; i < selectedLoans.size(); i++) {
 
             Loan loan = selectedLoans.get(i);
             double amountGiven = Math.min(loan.getRemainingAmount(),amountForEach);
-            double finalAmountLoaned = mainController.getEngine().matchLoan(loan.getId(), amountGiven, customerId,maxPercentageSpinner.getValue());
+//            double finalAmountLoaned = mainController.getEngine().matchLoan(loan.getId(), amountGiven, customerId,maxPercentageSpinner.getValue());
+            double finalAmountLoaned = 0;
             System.out.println();
 
 
