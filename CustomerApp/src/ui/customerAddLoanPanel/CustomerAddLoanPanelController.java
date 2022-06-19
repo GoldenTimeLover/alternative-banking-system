@@ -210,7 +210,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                 LoansDTO lsdto = new LoansDTO(new ArrayList(),new ArrayList<>(), mainController.getUsername(), 0);
 
                 for (AbsLoan loan : loans) {
-                    lsdto.loanList.add(new SingleLoanDTO(loan.getId(),
+                    lsdto.loanList.add(new SingleLoanDTO(loan.getAbsCategory(),
                             loan.getAbsCapital(), loan.getAbsTotalYazTime(),
                             loan.getAbsPaysEveryYaz(), loan.getAbsIntristPerPayment(),
                             loan.getId()));

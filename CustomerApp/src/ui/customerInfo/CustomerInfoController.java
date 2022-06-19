@@ -1,10 +1,13 @@
 package ui.customerInfo;
 
+import com.google.gson.Gson;
 import core.dtos.LoansDTO;
 import core.dtos.SingleLoanDTO;
+import core.dtos.TransactionsDTO;
 import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Transaction;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,8 +15,17 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import ui.subcontrollers.CustomerSubController;
+import utils.CustomerPaths;
+import utils.http.CustomerHttpClient;
+import utils.xml.ClientXmlParser;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,26 +50,24 @@ public class CustomerInfoController extends CustomerSubController {
     private Spinner<Integer> amountSpinner;
 
 
+    @FXML
+    public void initialize(){
+        SpinnerValueFactory<Integer> valueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
 
+
+        amountSpinner.setValueFactory(valueFactory);
+
+        amountSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                amountSpinner.increment(0); // won't change value, but will commit editor
+            }
+        });
+    }
     @FXML
     void depositButtonPressed(ActionEvent event) {
+        sendTransaction("deposit");
 
-
-        if (amountSpinner.getValue() == 0){
-            return;
-        }
-        String customerId = mainController.getCustomerId();
-
-        int amount = amountSpinner.getValue();
-        mainController.getEngine().addTransactionToCustomer(customerId,(double) amount, Transaction.TransactionType.DEPOSIT);
-        Customer customer = mainController.getEngine().findCustomerById(customerId);
-
-        accountTransactionsTable.getItems().clear();
-        accountTransactionsTable.getColumns().clear();
-
-        amountSpinner.getValueFactory().setValue(0);
-
-        loadTransactionTable(customer);
     }
 
     public void clearTables(){
@@ -77,34 +87,7 @@ public class CustomerInfoController extends CustomerSubController {
     }
     @FXML
     void withdrawButtonPressed(ActionEvent event) {
-        if (amountSpinner.getValue() == 0 ){
-            return;
-        }
-        String customerId = mainController.getCustomerId();
-        int amount = amountSpinner.getValue();
-        Customer customer = mainController.getEngine().findCustomerById(customerId);
-
-        if(amount > customer.getBalance()){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning - trying to overdraft!");
-
-            alert.setContentText("You are trying to withdraw" + amount + " but the customer only has " + customer.getBalance() +
-                    " in their account!");
-
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-            return;
-
-        }
-        mainController.getEngine().addTransactionToCustomer(customerId,(double) amount, Transaction.TransactionType.WITHDRAW);
-
-        accountTransactionsTable.getItems().clear();
-        accountTransactionsTable.getColumns().clear();
-
-        amountSpinner.getValueFactory().setValue(0);
-
-        loadTransactionTable(customer);
+        sendTransaction("withdraw");
     }
 
     public void setInfoForCustomerIntoTables(){
@@ -112,24 +95,67 @@ public class CustomerInfoController extends CustomerSubController {
         System.out.println("set Info For Customer Into Tables");
 
         clearTables();
-//
-//        Customer customer = mainController.getEngine().findCustomerById(mainController.getUserSelectorCB().getValue().getId());
         loadGivingLoansTable();
         loadLendingLoansTable();
-//        loadTransactionTable(customer);
+        loadTransactionTable();
 
 
-        SpinnerValueFactory<Integer> valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
 
+    }
 
-        amountSpinner.setValueFactory(valueFactory);
+    private void sendTransaction(String type){
 
-        amountSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                amountSpinner.increment(0); // won't change value, but will commit editor
-            }
-        });
+        if (amountSpinner.getValue() == 0){
+            return;
+        }
+        String customerId = mainController.getUsername();
+
+        int amount = amountSpinner.getValue();
+        Gson gson = new Gson();
+
+        try{
+            String finalUrl = HttpUrl
+                    .parse(CustomerPaths.ADD_TRANSACTION)
+                    .newBuilder()
+                    .addQueryParameter("type",type)
+                    .addQueryParameter("user",this.mainController.getUsername())
+                    .addQueryParameter("amount", String.valueOf(amountSpinner.getValue()))
+                    .build()
+                    .toString();
+            CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    Platform.runLater(()->{
+                                try {
+                                    String s = response.body().string();
+                                    System.out.println(s);
+                                    TransactionsDTO transactionsDTO = gson.fromJson(s,TransactionsDTO.class);
+                                    mainController.spreadTransactionInfo(transactionsDTO);
+
+                                }
+                                catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                    );
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        accountTransactionsTable.getItems().clear();
+        accountTransactionsTable.getColumns().clear();
+
+        amountSpinner.getValueFactory().setValue(0);
+
+        loadTransactionTable();
     }
 
     private void loadGivingLoansTable(){
@@ -137,6 +163,9 @@ public class CustomerInfoController extends CustomerSubController {
 
 
 
+        if(mainController.loansDTO == null){
+            return;
+        }
         List<SingleLoanDTO> loanList = mainController.loansDTO.loansCustomerGaveToOthers;
         for (int i = 0; i <loanList.size(); i++) {
             loans.add(new Loan(loanList.get(i), mainController.getUsername()));
@@ -206,7 +235,9 @@ public class CustomerInfoController extends CustomerSubController {
     private void loadLendingLoansTable(){
 
         ObservableList<Loan> loans = FXCollections.observableArrayList();
-
+        if(mainController.loansDTO == null){
+            return;
+        }
         List<SingleLoanDTO> loanList = mainController.loansDTO.loanList;
         for (int i = 0; i <loanList.size(); i++) {
             loans.add(new Loan(loanList.get(i), mainController.getUsername()));
@@ -271,11 +302,14 @@ public class CustomerInfoController extends CustomerSubController {
                 statusColumn );
 
     }
-    private void loadTransactionTable(Customer customer){
+    private void loadTransactionTable(){
         ObservableList<Transaction> transactions = FXCollections.observableArrayList();
 
-        int size = customer.getTransactions().size();
-        List<Transaction> temp = customer.getTransactions();
+        if(mainController.transactionsDTO == null){
+            return;
+        }
+        int size = mainController.transactionsDTO.transactions.size();
+        List<Transaction> temp = mainController.transactionsDTO.transactions;
         for (int i = 0; i <size; i++) {
             transactions.add(temp.get(i));
         }

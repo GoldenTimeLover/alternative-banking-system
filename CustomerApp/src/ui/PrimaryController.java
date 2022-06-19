@@ -2,6 +2,7 @@ package ui;
 
 import core.Exceptions.FileFormatException;
 import core.dtos.LoansDTO;
+import core.dtos.TransactionsDTO;
 import core.engine.ABSEngine;
 
 import core.entities.Loan;
@@ -29,6 +30,7 @@ import utils.CustomerPaths;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -86,6 +88,8 @@ public class PrimaryController {
     private ScaleTransition scaleTransition2 = new ScaleTransition();
 
     public LoansDTO loansDTO;
+    public TransactionsDTO transactionsDTO;
+
     @FXML
     public void initialize(Stage primaryStage,String currentUser){
 
@@ -271,4 +275,9 @@ public class PrimaryController {
         this.loansDTO = loansDTO;
         customerPanelComponentController.updateAllPanels();
     }
+    public void spreadTransactionInfo(TransactionsDTO transactionsDTO){
+        this.transactionsDTO = transactionsDTO;
+        customerPanelComponentController.updateAllPanels();
+    }
+
 }

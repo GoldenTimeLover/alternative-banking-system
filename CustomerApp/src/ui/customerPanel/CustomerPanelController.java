@@ -122,10 +122,19 @@ public class CustomerPanelController extends CustomerSubController {
 
 
         String id = mainController.getCustomerId();
-//        balanceText.setText(String.valueOf(this.mainController.info.balance));
-        balanceText.setId("balance");
-        System.out.println("Updated ALL Panels with info about " + mainController.loansDTO.loanList.get(0).id);
+        if(mainController.transactionsDTO == null){
+            balanceText.setText("0.0");
+        }else{
+            balanceText.setText(String.valueOf(this.mainController.transactionsDTO.balance));
+            customerInfoComponentController.setInfoForCustomerIntoTables();
+        }
 
+        balanceText.setId("balance");
+        customerInfoComponentController.setInfoForCustomerIntoTables();
+
+        customerInfoComponentController.clearTables();
+        customerInfoComponentController.setInfoForCustomerIntoTables();
+        centerContent.setContent(customerInfoComponent);
     }
 
     /**

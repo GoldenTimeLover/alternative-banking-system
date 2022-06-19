@@ -34,6 +34,7 @@ public class CustomerPaths {
     public final static String FULL_SERVER_PATH = "http://" + BASE_DOMAIN + ":8080" + APPLICATION_NAME;
 
     public final static String ADD_LOAN_PATH = FULL_SERVER_PATH + "/loan/add";
+    public final static String ADD_TRANSACTION = FULL_SERVER_PATH + "/user/transaction";
 
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/user/login";
 
