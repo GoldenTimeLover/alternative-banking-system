@@ -4,6 +4,7 @@ package ui.customerAddLoanPanel;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
 import core.dtos.SingleLoanDTO;
 import javafx.application.Platform;
@@ -114,13 +115,13 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
 
         String customerId = mainController.getUsername();
         String loanId = LoanIdTextField.getText();
-        String categories = "category";
+        String categories = categoriesTextField.getText();
         int amount = loanAmountInput.getValue();
         int minYaz = minLoanYazSpinner.getValue();
         int minInterest = mininumIntrerestSpinner.getValue();
         int paysEvery = PaysEverySpinner.getValue();
 
-        if (amount == 0 || minYaz == 0 || minInterest == 0 || paysEvery == 0 || Objects.equals(loanId, "")){
+        if (amount == 0 || minYaz == 0 || minInterest == 0 || paysEvery == 0 || Objects.equals(loanId, "") || categories.equals("")){
             return;
         }
 
@@ -143,7 +144,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                     .build()
                     .toString();
 
-            System.out.println(finalUrl);
+
             CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -155,7 +156,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                     Platform.runLater(()->{
                                 try {
                                     String s = response.body().string();
-                                    LoansDTO loansDTO = gson.fromJson(s,LoansDTO.class);
+                                    CustomerSnapshot customerSnapshot = gson.fromJson(s,CustomerSnapshot.class);
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                     alert.setTitle("Success");
                                     alert.setHeaderText("File loaded Successfully");
@@ -163,7 +164,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                                     ButtonType yesButton = new ButtonType("Cool");
                                     alert.getButtonTypes().setAll(yesButton);
                                     Optional<ButtonType> result = alert.showAndWait();
-                                    mainController.SpeardInfoToAll(loansDTO);
+                                    mainController.SpeardInfoToAll(customerSnapshot);
                                 }
                                 catch (IOException e) {
                                     e.printStackTrace();
@@ -229,7 +230,6 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                         .build()
                         .toString();
 
-                System.out.println(finalUrl);
                 CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -241,7 +241,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                         Platform.runLater(()->{
                             try {
                                 String s = response.body().string();
-                                LoansDTO loansDTO = gson.fromJson(s,LoansDTO.class);
+                                CustomerSnapshot customerSnapshot = gson.fromJson(s,CustomerSnapshot.class);
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                 alert.setTitle("Success");
                                 alert.setHeaderText("File loaded Successfully");
@@ -249,7 +249,6 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                                 ButtonType yesButton = new ButtonType("Cool");
                                 alert.getButtonTypes().setAll(yesButton);
                                 Optional<ButtonType> result = alert.showAndWait();
-                                mainController.SpeardInfoToAll(loansDTO);
                             }
                             catch (IOException e) {
                                         e.printStackTrace();

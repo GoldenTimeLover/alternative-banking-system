@@ -1,8 +1,16 @@
 package ui.customerPanel;
 
+import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
+import core.entities.Loan;
+import core.entities.Transaction;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -17,12 +25,18 @@ import ui.customerMatching.CustomerMatchingController;
 import ui.customerPayment.CustomerPaymentController;
 import ui.subcontrollers.CustomerSubController;
 import utils.CustomerPaths;
+import utils.http.UserSnapshotRefresher;
 
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class CustomerPanelController extends CustomerSubController {
+public class CustomerPanelController extends CustomerSubController implements Closeable {
 
 
     // Information panel
@@ -60,6 +74,16 @@ public class CustomerPanelController extends CustomerSubController {
     @FXML
     private Button addLoanButton;
 
+
+    private final StringProperty balanceProperty = new SimpleStringProperty();
+    private Timer timer;
+    private TimerTask balanceRefresher;
+
+    @FXML
+    public void initialize() {
+        balanceProperty.set("0");
+        balanceText.textProperty().bind(Bindings.concat(balanceProperty,"$"));
+    }
     @FXML
     public void initcomps(){
         initCustomerInfoComponent();
@@ -76,8 +100,6 @@ public class CustomerPanelController extends CustomerSubController {
      */
     @FXML
     void informationButtonPressed(ActionEvent event) {
-        customerInfoComponentController.clearTables();
-        customerInfoComponentController.setInfoForCustomerIntoTables();
         centerContent.setContent(customerInfoComponent);
 
     }
@@ -111,6 +133,47 @@ public class CustomerPanelController extends CustomerSubController {
 
     }
 
+    private void updateSnapshot(CustomerSnapshot snapshot) {
+        Platform.runLater(() -> {
+
+            if(snapshot == null || snapshot.loansDTO == null){
+                balanceProperty.setValue("0");
+            }else{
+                balanceProperty.set(String.valueOf(snapshot.loansDTO.balance));
+
+                List<Loan> loansCustomerIsAskingFor = new ArrayList<>();
+                for (int i = 0; i < snapshot.loansDTO.loanList.size(); i++) {
+                    System.out.println(snapshot.loansDTO.loanList.get(i).id);
+                    loansCustomerIsAskingFor.add(new Loan(snapshot.loansDTO.loanList.get(i),snapshot.loansDTO.loanList.get(i).owenerName));
+                }
+
+                List<Loan> loansTheCustomerGave = new ArrayList<>();
+                for (int i = 0; i < snapshot.loansDTO.loansCustomerGaveToOthers.size(); i++) {
+                    loansTheCustomerGave.add(new Loan(snapshot.loansDTO.loansCustomerGaveToOthers.get(i),snapshot.loansDTO.loansCustomerGaveToOthers.get(i).owenerName));
+                }
+
+                List<Transaction> ls3 = new ArrayList<>(snapshot.transactionsDTO.transactions);
+
+
+                customerInfoComponentController.borrowingLoansObservableList.clear();
+                customerInfoComponentController.givingLoansObservableList.clear();
+                customerInfoComponentController.transactionObservableList.clear();
+
+                customerInfoComponentController.borrowingLoansObservableList.addAll(loansCustomerIsAskingFor);
+                customerInfoComponentController.givingLoansObservableList.addAll(loansTheCustomerGave);
+                customerInfoComponentController.transactionObservableList.addAll(ls3);
+                mainController.SpeardInfoToAll(snapshot);
+
+            }
+        });
+    }
+
+    public void startListRefresher() {
+        balanceRefresher= new UserSnapshotRefresher(mainController.getUsername(),
+                this::updateSnapshot);
+        timer = new Timer();
+        timer.schedule(balanceRefresher, 500, 500);
+    }
 
     public void updateAllPanels(){
 
@@ -120,21 +183,9 @@ public class CustomerPanelController extends CustomerSubController {
         initCustomerAddLoanComponent();
         customerInfoComponentController.setInfoForCustomerIntoTables();
 
-
-        String id = mainController.getCustomerId();
-        if(mainController.transactionsDTO == null){
-            balanceText.setText("0.0");
-        }else{
-            balanceText.setText(String.valueOf(this.mainController.transactionsDTO.balance));
-            customerInfoComponentController.setInfoForCustomerIntoTables();
-        }
-
         balanceText.setId("balance");
-        customerInfoComponentController.setInfoForCustomerIntoTables();
 
-        customerInfoComponentController.clearTables();
-        customerInfoComponentController.setInfoForCustomerIntoTables();
-        centerContent.setContent(customerInfoComponent);
+
     }
 
     /**
@@ -147,11 +198,12 @@ public class CustomerPanelController extends CustomerSubController {
         URL url = getClass().getResource(CustomerPaths.CUSTOMER_INFO);
         loader.setLocation(url);
         try {
-            System.out.println("helloooo vietnam!!");
             assert url != null;
             customerInfoComponent = loader.load(url.openStream());
             customerInfoComponentController = loader.getController();
             customerInfoComponentController.setMainController(mainController);
+            customerInfoComponentController.setInfoForCustomerIntoTables();
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -208,4 +260,12 @@ public class CustomerPanelController extends CustomerSubController {
         }
     }
 
+
+    @Override
+    public void close() throws IOException {
+        balanceProperty.set("0");
+        if ( timer != null) {
+            timer.cancel();
+        }
+    }
 }

@@ -67,7 +67,6 @@ public class CustomerLoginController {
         System.out.println("hello world");
         String userName = userNameTextField.getText();
         if (userName.isEmpty()) {
-            System.out.println("empty login info ");
             errorMsgProperty.set("User name is empty. You can't login with empty user name");
             return;
         }

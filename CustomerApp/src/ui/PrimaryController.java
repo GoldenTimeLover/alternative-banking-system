@@ -1,16 +1,13 @@
 package ui;
 
-import core.Exceptions.FileFormatException;
+import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
 import core.dtos.TransactionsDTO;
 import core.engine.ABSEngine;
 
-import core.entities.Loan;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringExpression;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,16 +18,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ui.customerPanel.CustomerPanelController;
 import utils.CustomerPaths;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -89,6 +83,7 @@ public class PrimaryController {
 
     public LoansDTO loansDTO;
     public TransactionsDTO transactionsDTO;
+    public CustomerSnapshot customerSnapshot;
 
     @FXML
     public void initialize(Stage primaryStage,String currentUser){
@@ -120,7 +115,7 @@ public class PrimaryController {
 
 
     public String getCustomerId(){
-        return "Binky Barns";
+        return this.currentUserNameText.getText();
     }
 
     @FXML
@@ -240,15 +235,16 @@ public class PrimaryController {
         FXMLLoader loader = new FXMLLoader();
         URL url = getClass().getResource(CustomerPaths.CUSTOMER_PANEL);
         loader.setLocation(url);
-        System.out.println("hello admin");
+
         try {
-            System.out.println("try this!");
+
             assert url != null;
             customerPanelComponent = loader.load(url.openStream());
             customerPanelComponentController = loader.getController();
             customerPanelComponentController.setMainController(this);
             mainBorderPane.setCenter(customerPanelComponent);
             customerPanelComponentController.initcomps();
+            customerPanelComponentController.startListRefresher();
 
         } catch (IOException e) {
             System.out.println("nope");
@@ -271,13 +267,12 @@ public class PrimaryController {
         Optional<ButtonType> result = alert.showAndWait();
     }
 
-    public void SpeardInfoToAll(LoansDTO loansDTO){
-        this.loansDTO = loansDTO;
-        customerPanelComponentController.updateAllPanels();
+    public void SpeardInfoToAll(CustomerSnapshot customerSnapshot){
+        this.loansDTO = customerSnapshot.loansDTO;
+        this.transactionsDTO = customerSnapshot.transactionsDTO;
+        this.customerSnapshot = customerSnapshot;
+
     }
-    public void spreadTransactionInfo(TransactionsDTO transactionsDTO){
-        this.transactionsDTO = transactionsDTO;
-        customerPanelComponentController.updateAllPanels();
-    }
+
 
 }

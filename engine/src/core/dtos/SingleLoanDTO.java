@@ -17,6 +17,7 @@ public class SingleLoanDTO {
     public String id;
     private List<String> lenders;
     private Loan.LoanStatus status;
+    public String owenerName;
     double unpaidDebt;
     double paymentPerYaz ;
     double singlePayment;
@@ -41,7 +42,8 @@ public class SingleLoanDTO {
         this.absPaysEveryYaz = l.getTimeBetweenPayments();
         this.absIntristPerPayment = l.getInterestRate();
         this.id = l.getId();
-
+        this.owenerName = l.getOwnerName();
+        this.status = l.getStatus();
     }
 
     public String getAbsCategory() {

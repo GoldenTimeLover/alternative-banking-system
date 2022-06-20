@@ -20,11 +20,13 @@ public class LogoutServlet extends HttpServlet {
         // if customer remove from list
         if (username != null) {
             userManager.logoutUser(username);
+            request.getSession().invalidate();
             response.getWriter().println("The user " +username+" logged out.");
         }
         //if the user trying to log out is the admin
         if(username != null && userManager.getAdminName().equals(username)){
             userManager.setAdminName("");
+            request.getSession().invalidate();
             response.getWriter().println("The admin logged out.");
         }
     }

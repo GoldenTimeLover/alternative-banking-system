@@ -1,12 +1,15 @@
 package servlets.loan;
 
 import com.google.gson.Gson;
+import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
 import core.dtos.SingleLoanDTO;
+import core.dtos.TransactionsDTO;
 import core.engine.ABSEngine;
 import core.engine.Engine;
 import core.entities.Customer;
 import core.entities.Loan;
+import core.entities.Transaction;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +31,11 @@ public class AddLoanServlet extends HttpServlet {
     @Override protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
 
-        System.out.println("hello");
 
 
         String loanData = req.getParameter("loanData");
         String user = req.getParameter("user");
-        System.out.println(loanData);
+
         Gson g = new Gson();
 
 
@@ -42,32 +44,49 @@ public class AddLoanServlet extends HttpServlet {
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
 
 
+        List<SingleLoanDTO> singleLoanDTOS = new ArrayList<>();
+
+        for (SingleLoanDTO l: loansDTO.loanList) {
+
+            if(engine.getLoanById(l.id) != null)
+                continue;
 
 
+            singleLoanDTOS.add(l);
 
-        Gson gson = new Gson();
-
-        List<Loan> res = new ArrayList<>();
-        for (SingleLoanDTO absloan : loansDTO.loanList){
-
-            engine.getLoans().add(new Loan(absloan.getId(),1,absloan.getAbsCapital(),
-                    engine.findCustomerById(user), new ArrayList<>(),
-                    Loan.LoanStatus.NEW,absloan.getAbsCategory(),
-                    absloan.getAbsIntristPerPayment(),
-                    user,absloan.getAbsTotalYazTime(),absloan.getAbsPaysEveryYaz()));
-
-
-            res.add(new Loan(absloan.getId(),1,absloan.getAbsCapital(),
-                    engine.findCustomerById(user), new ArrayList<>(),
-                    Loan.LoanStatus.NEW,absloan.getAbsCategory(),
-                    absloan.getAbsIntristPerPayment(),
-                    user,absloan.getAbsTotalYazTime(),absloan.getAbsPaysEveryYaz()));
         }
 
+        Gson gson = new Gson();
+        List<Loan> loanList = new ArrayList<>();
+        for (SingleLoanDTO absloan : singleLoanDTOS){
+
+            if(engine.getLoanById(absloan.id) != null)
+                continue;
+            Loan l = new Loan(absloan.getId(),1,absloan.getAbsCapital(),
+                    engine.findCustomerById(user), new ArrayList<>(),
+                    Loan.LoanStatus.NEW,absloan.getAbsCategory(),
+                    absloan.getAbsIntristPerPayment(),
+                    user,absloan.getAbsTotalYazTime(),absloan.getAbsPaysEveryYaz());
+
+            System.out.println(absloan.id);
+
+            engine.getLoans().add(l);
+            loanList.add(l);
+
+            if(!engine.getCategories().contains(absloan.getAbsCategory())){
+                engine.getCategories().add(absloan.getAbsCategory());
+            }
+
+        }
+
+        engine.addOwnerToLoanInEngine(loanList);
 
 
-        LoansDTO outputData = new LoansDTO(new ArrayList<>(),new ArrayList<>(),user,engine.findCustomerById(user).getBalance());
+        LoansDTO outputData = new LoansDTO(new ArrayList<>(),new ArrayList<>(),
+                user,engine.findCustomerById(user).getBalance());
+
         for (Loan l: engine.getLoans()){
+
             Customer customer = engine.findCustomerById(user);
 
             if(l.getBorrower().getId().equals(user)){
@@ -76,11 +95,14 @@ public class AddLoanServlet extends HttpServlet {
             if(l.getLenders().contains(customer)){
                 outputData.loansCustomerGaveToOthers.add(new SingleLoanDTO(l));
             }
-
         }
 
-        String loanInfo = gson.toJson(outputData,LoansDTO.class);
+        TransactionsDTO transactionsDTO = new TransactionsDTO(engine.findCustomerById (user).getBalance(),new ArrayList<>());
+        transactionsDTO.transactions.addAll(engine.findCustomerById(user).getTransactions());
 
+        CustomerSnapshot customerSnapshot = new CustomerSnapshot(outputData,transactionsDTO);
+
+        String loanInfo = gson.toJson(customerSnapshot,CustomerSnapshot.class);
         resp.getWriter().println(loanInfo);
         resp.setStatus(200);
 

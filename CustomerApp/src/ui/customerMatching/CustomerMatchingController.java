@@ -1,9 +1,16 @@
 package ui.customerMatching;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import core.dtos.LoansDTO;
 import core.entities.Loan;
-import core.tasks.match.GetMatchingLoansService;
+
+import core.entities.Transaction;
 import core.utils.utils;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -11,11 +18,18 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.Region;
+import utils.CustomerPaths;
 import javafx.scene.layout.StackPane;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import ui.subcontrollers.CustomerSubController;
+import utils.http.CustomerHttpClient;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,8 +76,6 @@ public class CustomerMatchingController extends CustomerSubController {
 
     @FXML
     public void initialize(){
-        System.out.println("initialize Matching controller");
-
 
         //amount field
         SpinnerValueFactory<Integer> amountValueFactory =
@@ -166,8 +178,14 @@ public class CustomerMatchingController extends CustomerSubController {
         if (amount == 0){
             return;
         }
-
-        double balance = 0;
+        double balance;
+        try{
+        balance = mainController.customerSnapshot.loansDTO.balance;
+            System.out.println("not exception");
+        }catch (NullPointerException e){
+            System.out.println("exception");
+            balance = 0.0;
+        }
         if (amount > balance){
 
             mainController.showAlert(Alert.AlertType.WARNING,"Warning - trying to overdraft!","You are trying to withdraw" + amount + " but the customer only has " + balance +
@@ -184,42 +202,105 @@ public class CustomerMatchingController extends CustomerSubController {
 
 
 
-//        final GetMatchingLoansService service = new GetMatchingLoansService(mainController.getEngine().getLoans(),customerId, temp, (double) amount, (double) minInterest, minYaz,amountOfOpenLoans,maxPercentageOfLoan);
-//
-//        Region veil = new Region();
-//        veil.setStyle("-fx-background-color: rgba(0,0,0,0.4)");
-//        veil.setPrefSize(400,400);
-//        ProgressIndicator p = new ProgressIndicator();
-//        p.setMaxSize(140,140);
-//        p.setStyle("-fx-progress-color: orange");
-//
-//
-//        p.progressProperty().bind(service.progressProperty());
-//        veil.visibleProperty().bind(service.runningProperty());
-//        p.visibleProperty().bind(service.runningProperty());
-//
-//
-//        this.availableLoansTable.getItems().clear();
-//        this.availableLoansTable.getColumns().clear();
-//        this.loadLendingLoansTable();
-//
-//        this.availableLoansTable.itemsProperty().bind(service.valueProperty());
-//
-//        myStackPane.getChildren().addAll(veil,p);
-//        service.start();
-//
+        try{
+            Gson gson = new Gson();
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("customerId",mainController.getUsername());
+            jsonObject.addProperty("amount", amount);
+            jsonObject.addProperty("interest", minInterest);
+            jsonObject.addProperty("time", minYaz);
+            jsonObject.addProperty("amountOpen", amountOfOpenLoans);
+            jsonObject.addProperty("maxPercent", maxPercentageOfLoan);
+
+            String finalUrl = HttpUrl
+                    .parse(CustomerPaths.FILTER_LOANS)
+                    .newBuilder()
+                    .addQueryParameter("filters",jsonObject.toString())
+                    .addQueryParameter("categories",gson.toJson(temp))
+                    .build()
+                    .toString();
+            CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    Platform.runLater(()->{
+                                try {
+                                    String s = response.body().string();
+                                    Gson gson = new Gson();
+                                    LoansDTO loansDTO = gson.fromJson(s,LoansDTO.class);
+
+                                    availableLoansTable.getItems().clear();
+                                    availableLoansTable.getColumns().clear();
+                                    loadLendingLoansTable(loansDTO);
+                                }
+                                catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                    );
+
+                }
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
 
 
     }
 
     public void setCategories(){
 
-//        for (String cat : mainController.getEngine().getCategories()){
-//            this.categorySpinner.getItems().add(cat);
-//        }
+        String finalUrl = HttpUrl
+                .parse(CustomerPaths.GET_CATEGORIES)
+                .newBuilder()
+                .build()
+                .toString();
 
+        CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                Platform.runLater(()->{
+                            try {
+                                String s = response.body().string();
+                                Gson gson = new Gson();
+                                List<String> ls = gson.fromJson(s, new TypeToken<List<String>>(){}.getType());
+
+                                for (String cat : ls){
+                                    categorySpinner.getItems().add(cat);
+                                }
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                );
+
+            }
+        });
     }
-    private void loadLendingLoansTable(){
+
+
+
+    private void loadLendingLoansTable(LoansDTO loansDTO){
+
+        ObservableList<Loan> loans = FXCollections.observableArrayList();
+
+        int size = loansDTO.loanList.size();
+        for (int i = 0; i <size; i++) {
+            loans.add(new Loan(loansDTO.loanList.get(i),loansDTO.loanList.get(i).owenerName));
+        }
+
 
 
         //id
@@ -273,7 +354,7 @@ public class CustomerMatchingController extends CustomerSubController {
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
 
-
+        availableLoansTable.setItems(loans);
         availableLoansTable.getColumns().addAll(idColumn,
                 ownerColumn,amountColumn,
                 lengthColumn , interestColumn,
@@ -301,16 +382,53 @@ public class CustomerMatchingController extends CustomerSubController {
         if(selectedLoans == null || selectedLoans.size() == 0){
             return;
         }
+
         String customerId = mainController.getUsername();
         double amount = (double) loanAmountInput.getValue();
         double amountForEach = utils.round(amount / selectedLoans.size());
+
         for (int i = 0; i < selectedLoans.size(); i++) {
+
+            Loan curLoan = selectedLoans.get(i);
+
+            String finalUrl = HttpUrl
+                    .parse(CustomerPaths.FINANCE_LOAN)
+                    .newBuilder()
+                    .addQueryParameter("loanId",curLoan.getId())
+                    .addQueryParameter("amount", String.valueOf(amountForEach))
+                    .addQueryParameter("loanOwner", curLoan.getOwnerName())
+                    .addQueryParameter("lenderName", customerId)
+                    .addQueryParameter("maxPercentage", String.valueOf(maxPercentageSpinner.getValue()))
+                    .build()
+                    .toString();
+
+            CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    Platform.runLater(()->{
+                                try {
+                                    String s = response.body().string();
+                                }
+                                catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                    );
+
+                }
+            });
+
 
             Loan loan = selectedLoans.get(i);
             double amountGiven = Math.min(loan.getRemainingAmount(),amountForEach);
 //            double finalAmountLoaned = mainController.getEngine().matchLoan(loan.getId(), amountGiven, customerId,maxPercentageSpinner.getValue());
             double finalAmountLoaned = 0;
-            System.out.println();
+
 
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

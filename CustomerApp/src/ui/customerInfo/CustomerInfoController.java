@@ -50,6 +50,10 @@ public class CustomerInfoController extends CustomerSubController {
     private Spinner<Integer> amountSpinner;
 
 
+    public ObservableList<Loan> givingLoansObservableList;
+    public ObservableList<Loan> borrowingLoansObservableList;
+    public ObservableList<Transaction> transactionObservableList;
+
     @FXML
     public void initialize(){
         SpinnerValueFactory<Integer> valueFactory =
@@ -63,7 +67,13 @@ public class CustomerInfoController extends CustomerSubController {
                 amountSpinner.increment(0); // won't change value, but will commit editor
             }
         });
+
+        borrowingLoansObservableList = loanerLoansTable.getItems();
+        givingLoansObservableList = lenderLoansTable.getItems();
+        transactionObservableList = accountTransactionsTable.getItems();
     }
+
+
     @FXML
     void depositButtonPressed(ActionEvent event) {
         sendTransaction("deposit");
@@ -85,6 +95,7 @@ public class CustomerInfoController extends CustomerSubController {
         lenderLoansTable.refresh();
         accountTransactionsTable.refresh();
     }
+
     @FXML
     void withdrawButtonPressed(ActionEvent event) {
         sendTransaction("withdraw");
@@ -92,13 +103,11 @@ public class CustomerInfoController extends CustomerSubController {
 
     public void setInfoForCustomerIntoTables(){
 
-        System.out.println("set Info For Customer Into Tables");
 
         clearTables();
         loadGivingLoansTable();
         loadLendingLoansTable();
         loadTransactionTable();
-
 
 
     }
@@ -130,19 +139,7 @@ public class CustomerInfoController extends CustomerSubController {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
-                    Platform.runLater(()->{
-                                try {
-                                    String s = response.body().string();
-                                    System.out.println(s);
-                                    TransactionsDTO transactionsDTO = gson.fromJson(s,TransactionsDTO.class);
-                                    mainController.spreadTransactionInfo(transactionsDTO);
 
-                                }
-                                catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                    );
 
                 }
             });
@@ -150,8 +147,6 @@ public class CustomerInfoController extends CustomerSubController {
             e.printStackTrace();
         }
 
-        accountTransactionsTable.getItems().clear();
-        accountTransactionsTable.getColumns().clear();
 
         amountSpinner.getValueFactory().setValue(0);
 
@@ -159,17 +154,6 @@ public class CustomerInfoController extends CustomerSubController {
     }
 
     private void loadGivingLoansTable(){
-        ObservableList<Loan> loans = FXCollections.observableArrayList();
-
-
-
-        if(mainController.loansDTO == null){
-            return;
-        }
-        List<SingleLoanDTO> loanList = mainController.loansDTO.loansCustomerGaveToOthers;
-        for (int i = 0; i <loanList.size(); i++) {
-            loans.add(new Loan(loanList.get(i), mainController.getUsername()));
-        }
 
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
@@ -223,7 +207,6 @@ public class CustomerInfoController extends CustomerSubController {
 
 
 
-        lenderLoansTable.setItems(loans);
         lenderLoansTable.getColumns().addAll(idColumn,
                 ownerColumn,amountColumn,
                 lengthColumn , interestColumn,
@@ -234,14 +217,6 @@ public class CustomerInfoController extends CustomerSubController {
     }
     private void loadLendingLoansTable(){
 
-        ObservableList<Loan> loans = FXCollections.observableArrayList();
-        if(mainController.loansDTO == null){
-            return;
-        }
-        List<SingleLoanDTO> loanList = mainController.loansDTO.loanList;
-        for (int i = 0; i <loanList.size(); i++) {
-            loans.add(new Loan(loanList.get(i), mainController.getUsername()));
-        }
 
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
@@ -294,7 +269,6 @@ public class CustomerInfoController extends CustomerSubController {
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
 
-        loanerLoansTable.setItems(loans);
         loanerLoansTable.getColumns().addAll(idColumn,
                 ownerColumn,amountColumn,
                 lengthColumn , interestColumn,
@@ -303,16 +277,6 @@ public class CustomerInfoController extends CustomerSubController {
 
     }
     private void loadTransactionTable(){
-        ObservableList<Transaction> transactions = FXCollections.observableArrayList();
-
-        if(mainController.transactionsDTO == null){
-            return;
-        }
-        int size = mainController.transactionsDTO.transactions.size();
-        List<Transaction> temp = mainController.transactionsDTO.transactions;
-        for (int i = 0; i <size; i++) {
-            transactions.add(temp.get(i));
-        }
 
         //id
         TableColumn<Transaction,Double> amountCol = new TableColumn<>("Amount");
@@ -344,9 +308,6 @@ public class CustomerInfoController extends CustomerSubController {
 
 
 
-
-
-        accountTransactionsTable.setItems(transactions);
         accountTransactionsTable.getColumns().addAll(amountCol,dateCol,typeCol,beforeCol,afterCol);
     }
 }

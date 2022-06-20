@@ -66,7 +66,7 @@ public class AdminLoginController {
     @FXML
     void loginButtonClicked(ActionEvent event) {
 
-        System.out.println("hello world");
+
         String userName = userNameTextField.getText();
         if (userName.isEmpty()) {
             System.out.println("empty login info ");

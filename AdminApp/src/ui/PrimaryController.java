@@ -328,7 +328,7 @@ public class PrimaryController {
         FXMLLoader loader = new FXMLLoader();
         URL url = getClass().getResource(AdminPaths.ADMIN_PANEL);
         loader.setLocation(url);
-        System.out.println("hello admin");
+
         try {
             System.out.println("try this!");
             assert url != null;
