@@ -2,6 +2,7 @@ package ui;
 
 import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
+import core.dtos.NotificationDTO;
 import core.dtos.TransactionsDTO;
 import core.engine.ABSEngine;
 
@@ -9,6 +10,9 @@ import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -83,13 +87,20 @@ public class PrimaryController {
 
     public LoansDTO loansDTO;
     public TransactionsDTO transactionsDTO;
+    public NotificationDTO notificationDTO;
     public CustomerSnapshot customerSnapshot;
+
+
+    private final StringProperty currentYazProperty = new SimpleStringProperty();
 
     @FXML
     public void initialize(Stage primaryStage,String currentUser){
 
         this.primaryStage = primaryStage;
         this.currentUserNameText.setText(currentUser);
+
+        currentYazProperty.set("1");
+        currentYazText.textProperty().bind(Bindings.concat(currentYazProperty,""));
     }
     public String getUsername(){
         return this.currentUserNameText.getText();
@@ -268,9 +279,12 @@ public class PrimaryController {
     }
 
     public void SpeardInfoToAll(CustomerSnapshot customerSnapshot){
+
+        currentYazProperty.set(String.valueOf(customerSnapshot.currentYaz));
         this.loansDTO = customerSnapshot.loansDTO;
         this.transactionsDTO = customerSnapshot.transactionsDTO;
         this.customerSnapshot = customerSnapshot;
+        this.notificationDTO = customerSnapshot.notificationDTO;
 
     }
 

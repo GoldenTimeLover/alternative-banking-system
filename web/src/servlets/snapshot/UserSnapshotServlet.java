@@ -3,9 +3,11 @@ package servlets.snapshot;
 import com.google.gson.Gson;
 import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
+import core.dtos.NotificationDTO;
 import core.dtos.TransactionsDTO;
 import core.engine.ABSEngine;
 import core.entities.Customer;
+import core.entities.Notification;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +18,7 @@ import utils.ServerUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @WebServlet(name = "usersnapshot",urlPatterns = "/user/snapshot")
 public class UserSnapshotServlet extends HttpServlet {
@@ -39,11 +42,30 @@ public class UserSnapshotServlet extends HttpServlet {
             loansDTO = new LoansDTO(customer);
         }
 
-        CustomerSnapshot customerSnapshot = new CustomerSnapshot(loansDTO,
-                new TransactionsDTO(loansDTO.balance,engine.findCustomerById(usernameFromSession).getTransactions()));
-        String s = gson.toJson(customerSnapshot);
+
+
+        NotificationDTO notificationDTO = new NotificationDTO(engine.getNotifications().get(usernameFromSession));
+        System.out.println("notification dto");
+        System.out.println(notificationDTO);
+
+        if(notificationDTO.notificationList.size() != 0){
+            System.out.println("fuck this");
+        }
+
+        CustomerSnapshot customerSnapshot =
+                new CustomerSnapshot(
+                        loansDTO,
+                new TransactionsDTO(loansDTO.balance,engine.findCustomerById(usernameFromSession).getTransactions()),
+                engine.getCurrentTime(),
+                notificationDTO);
+
+
+        String s = gson.toJson(customerSnapshot,CustomerSnapshot.class);
+
 
         resp.getWriter().println(s);
+        System.out.println("The string returned is: ");
+        System.out.println(s);
         resp.setStatus(200);
     }
 

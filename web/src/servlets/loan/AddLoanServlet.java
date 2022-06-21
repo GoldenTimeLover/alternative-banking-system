@@ -1,10 +1,7 @@
 package servlets.loan;
 
 import com.google.gson.Gson;
-import core.dtos.CustomerSnapshot;
-import core.dtos.LoansDTO;
-import core.dtos.SingleLoanDTO;
-import core.dtos.TransactionsDTO;
+import core.dtos.*;
 import core.engine.ABSEngine;
 import core.engine.Engine;
 import core.entities.Customer;
@@ -100,7 +97,13 @@ public class AddLoanServlet extends HttpServlet {
         TransactionsDTO transactionsDTO = new TransactionsDTO(engine.findCustomerById (user).getBalance(),new ArrayList<>());
         transactionsDTO.transactions.addAll(engine.findCustomerById(user).getTransactions());
 
-        CustomerSnapshot customerSnapshot = new CustomerSnapshot(outputData,transactionsDTO);
+        NotificationDTO notificationDTO = new NotificationDTO(engine.getNotifications().get(user));
+
+        CustomerSnapshot customerSnapshot =
+                new CustomerSnapshot(outputData,
+                transactionsDTO,
+                engine.getCurrentTime(),
+                notificationDTO);
 
         String loanInfo = gson.toJson(customerSnapshot,CustomerSnapshot.class);
         resp.getWriter().println(loanInfo);

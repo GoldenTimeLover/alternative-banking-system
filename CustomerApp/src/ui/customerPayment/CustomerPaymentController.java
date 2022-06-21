@@ -4,25 +4,38 @@ import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Loan;
 import core.entities.Notification;
+import core.entities.Transaction;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import ui.notificationArea.NotificationAreaController;
+import ui.notificationArea.singleNotificationController;
 import ui.subcontrollers.CustomerSubController;
+import utils.CustomerPaths;
+import utils.http.CustomerHttpClient;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 public class CustomerPaymentController extends CustomerSubController {
 
 
-//    @FXML private VBox notificationArea;
-//    @FXML private NotificationAreaController notificationAreaController;
+    @FXML private VBox notificationArea;
+    @FXML private NotificationAreaController notificationAreaController;
 
 
     @FXML
@@ -37,11 +50,13 @@ public class CustomerPaymentController extends CustomerSubController {
     @FXML
     private Spinner<Integer> riskDebtSpinner;
 
-
+    public ObservableList<Loan> paytingLoansObservableList;
 
     private Loan selectedLoan;
 
-
+    @FXML
+    private VBox notificationBox;
+    private int amountOfNotifications;
 
     @FXML
     public void initialize(){
@@ -56,45 +71,57 @@ public class CustomerPaymentController extends CustomerSubController {
                 riskDebtSpinner.increment(0); // won't change value, but will commit editor
             }
         });
+
+        paytingLoansObservableList = unpaidLoansTable.getItems();
+        amountOfNotifications = 0;
     }
+
 
 
     public void prepareNotificationArea(){
 
-//        notificationAreaController.clear();
-//        String id = mainController.getUserSelectorCB().getValue().getId();
-//
-//
-//        List<Notification> notifications = mainController.getEngine().getNotifications().get(id);
-//
-//        for (Notification n: notifications) {
-//            notificationAreaController.createNotification(n.getTitle(),n.getDate(),n.getContent());
-//        }
 
 
-//        prepareTable();
-        unlockPaymentButtons();
+
+        if(mainController.notificationDTO != null && mainController.notificationDTO.notificationList != null){
+            for (Notification n: mainController.notificationDTO.notificationList) {
+
+                    createNotification(n.getTitle(),n.getDate(),n.getContent());
+            }
+
+        }
+
+
+
     }
 
-    private void unlockPaymentButtons(){
+    public void createNotification(String title,int date,String content) {
+
+        notificationBox.getChildren().clear();
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource(CustomerPaths.SINGLE_NOTIFICATION));
+            Node singleWordTile = loader.load();
+
+
+            singleNotificationController singleNotController = loader.getController();
+            singleNotController.titleText.setText(title);
+            singleNotController.dateText.setText("Date: " + date);
+            singleNotController.contentText.setText(content);
+            notificationBox.getChildren().add(singleWordTile);
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    public void unlockPaymentButtons(){
         this.payCurrButton.setDisable(false);
         this.payEntireLoanButton.setDisable(false);
         this.payRiskDebt.setDisable(false);
     }
 
-    private void prepareTable(){
+    public void prepareTable(){
 
-        unpaidLoansTable.getItems().clear();
-        unpaidLoansTable.getColumns().clear();
-
-        String id = mainController.getCustomerId();
-        ObservableList<Loan> myActiveLoans = FXCollections.observableArrayList();
-//        for(Loan loan : mainController.info.loanList){
-//
-//            if (loan.getOwnerName().equals(id)){
-//                myActiveLoans.add(loan);
-//            }
-//        }
 
         //id
         TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
@@ -161,7 +188,7 @@ public class CustomerPaymentController extends CustomerSubController {
         ccc.setMinWidth(150);
         ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
 
-        unpaidLoansTable.setItems(myActiveLoans);
+
         unpaidLoansTable.getColumns().addAll(idColumn,timeBetweenCol,startDateColumn,amountColumn,
                 statusColumn,lengthColumn,interestColumn,aaaa,bbb,ccc);
 
@@ -170,27 +197,7 @@ public class CustomerPaymentController extends CustomerSubController {
 
     @FXML
     void payCurrButtonPressed(ActionEvent event) {
-        ObservableList<Loan> selectedItems = this.unpaidLoansTable.getSelectionModel().getSelectedItems();
-
-        if(selectedItems.size() == 0){
-            mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","You are trying to pay a loan but no loan is selected.\nplease try" +
-                    "selecting one of the loans in the table that need paying.");
-        }
-        else{
-            this.selectedLoan = selectedItems.get(0);
-//            try {
-////                mainController.getEngine().payCurrLoan(selectedLoan);
-//                prepareTable();
-//            } catch (NotEnoughMoneyException e) {
-//
-//                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!",
-//                        "You are trying to make a payment on the loan '" + selectedLoan.getId()+" '" +
-//                                " but the amount required is " + e.amountTryingToExtract + "$ and you have only " + e.balance +"$ in your account.");
-//            } catch (LoanProccessingException e) {
-//                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Can't pay loan now",e.getMessage());
-//            }
-        }
-
+        sendPaymentRequest("payCur",0);
     }
     @FXML
     void payRiskDebtPressed(ActionEvent event) {
@@ -211,14 +218,11 @@ public class CustomerPaymentController extends CustomerSubController {
                 return;
             }
             // if the customer doesn't have enough money to cover the debt
-            if(riskDebtSpinner.getValue() > selectedLoan.getBorrower().getBalance()){
+            if(riskDebtSpinner.getValue() > mainController.customerSnapshot.loansDTO.balance){
                 mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!","You are trying to pay the debt of '" + selectedLoan.getId()+" '" +
                         " but the amount entered is higher than your balance");
             }else{
-                // pay off entire loan
-//                mainController.getEngine().payLoanDebtAmount(selectedLoan,riskDebtSpinner.getValue());
-                riskDebtSpinner.getValueFactory().setValue(0);
-                prepareTable();
+                    sendPaymentRequest("payRisk",riskDebtSpinner.getValue());
             }
 
         }
@@ -226,29 +230,43 @@ public class CustomerPaymentController extends CustomerSubController {
     }
     @FXML
     void payEntireLoanButtonPressed(ActionEvent event) {
+            sendPaymentRequest("payEntire",0);
+
+    }
+
+
+    private void sendPaymentRequest(String type,int amount){
+
         ObservableList<Loan> selectedItems = this.unpaidLoansTable.getSelectionModel().getSelectedItems();
 
-
-        // if no loan was selected from the table
         if(selectedItems.size() == 0){
             mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","You are trying to pay a loan but no loan is selected.\nplease try" +
                     "selecting one of the loans in the table that need paying.");
-        }else {
-
+        }
+        else{
             this.selectedLoan = selectedItems.get(0);
 
-            // if the customer doesn't have enough money to cover the loan
-            if(selectedLoan.getCompleteAmountToBePaid() - selectedLoan.getAmountPaidUntilNow() > selectedLoan.getBorrower().getBalance()){
-                mainController.showAlert(Alert.AlertType.WARNING,"Warning - Not enough money!","You are trying to pay off the entire loan '" + selectedLoan.getId()+" '" +
-                        " but the amount required is " + (selectedLoan.getCompleteAmountToBePaid() - selectedLoan.getAmountPaidUntilNow())
-                        + "$ and you have only " + selectedLoan.getBorrower().getBalance() +"$ in your account." );
-            }else{
-                // pay off entire loan
-//                mainController.getEngine().payEntireLoan(selectedLoan);
-                mainController.showAlert(Alert.AlertType.CONFIRMATION,"Payed of entire loan","You have successfully paid off the entire loan '" + selectedLoan.getId() + "'.\nThe loan is now FINISHED");
-                prepareTable();
-            }
+            String finalUrl = HttpUrl
+                    .parse(CustomerPaths.PAY_LOAN)
+                    .newBuilder()
+                    .addQueryParameter("type",type)
+                    .addQueryParameter("user",this.mainController.getUsername())
+                    .addQueryParameter("loanId", selectedLoan.getId())
+                    .addQueryParameter("amount", String.valueOf(amount))
+                    .build()
+                    .toString();
+            CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
 
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+
+
+                }
+            });
         }
     }
 }

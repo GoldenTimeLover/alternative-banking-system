@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.*?>
-<VBox minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" styleClass="container" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.components.notificationArea.singleNotificationController">
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox minHeight="-Infinity" minWidth="-Infinity" prefWidth="150.0" styleClass="container" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.notificationArea.singleNotificationController">
    <children>
       <Text fx:id="titleText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="cool-text" text="Notification Title:">
          <font>

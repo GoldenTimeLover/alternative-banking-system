@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -43,4 +44,16 @@
          </children>
       </VBox>
    </center>
+   <right>
+      <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="cool-label" text="Notifications:" />
+            <ScrollPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+               <content>
+                  <VBox fx:id="notificationBox" prefHeight="200.0" prefWidth="199.0" />
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </right>
 </BorderPane>

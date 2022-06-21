@@ -41,6 +41,7 @@ public class UserManager {
     public synchronized void addCustomer(String username,ABSEngine engine) {
             if(!userMap.containsKey(username)){
                 engine.getCustomers().add(new Customer(username,false));
+                engine.getNotifications().put(username,new ArrayList<>());
             }
             userMap.put(username,new UserInfo(username,false,true));
     }

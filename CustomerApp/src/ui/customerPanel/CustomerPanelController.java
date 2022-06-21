@@ -142,8 +142,13 @@ public class CustomerPanelController extends CustomerSubController implements Cl
                 balanceProperty.set(String.valueOf(snapshot.loansDTO.balance));
 
                 List<Loan> loansCustomerIsAskingFor = new ArrayList<>();
+                List<Loan> activeLoansPayingFor = new ArrayList<>();
                 for (int i = 0; i < snapshot.loansDTO.loanList.size(); i++) {
                     loansCustomerIsAskingFor.add(new Loan(snapshot.loansDTO.loanList.get(i),snapshot.loansDTO.loanList.get(i).owenerName));
+                    if (snapshot.loansDTO.loanList.get(i).status.equals(Loan.LoanStatus.RISK) ||
+                            snapshot.loansDTO.loanList.get(i).status.equals(Loan.LoanStatus.ACTIVE)){
+                        activeLoansPayingFor.add(new Loan(snapshot.loansDTO.loanList.get(i),snapshot.loansDTO.loanList.get(i).owenerName));
+                    }
                 }
 
                 List<Loan> loansTheCustomerGave = new ArrayList<>();
@@ -151,17 +156,34 @@ public class CustomerPanelController extends CustomerSubController implements Cl
                     loansTheCustomerGave.add(new Loan(snapshot.loansDTO.loansCustomerGaveToOthers.get(i),snapshot.loansDTO.loansCustomerGaveToOthers.get(i).owenerName));
                 }
 
-                List<Transaction> ls3 = new ArrayList<>(snapshot.transactionsDTO.transactions);
+
+
+
+                List<Transaction> transactions = new ArrayList<>(snapshot.transactionsDTO.transactions);
 
 
                 customerInfoComponentController.borrowingLoansObservableList.clear();
                 customerInfoComponentController.givingLoansObservableList.clear();
                 customerInfoComponentController.transactionObservableList.clear();
 
+
                 customerInfoComponentController.borrowingLoansObservableList.addAll(loansCustomerIsAskingFor);
                 customerInfoComponentController.givingLoansObservableList.addAll(loansTheCustomerGave);
-                customerInfoComponentController.transactionObservableList.addAll(ls3);
+                customerInfoComponentController.transactionObservableList.addAll(transactions);
+
+
+                //java gods forgive me
+                if(activeLoansPayingFor.size() != customerPaymentComponentController.paytingLoansObservableList.size()){
+                    customerPaymentComponentController.paytingLoansObservableList.clear();
+                    customerPaymentComponentController.paytingLoansObservableList.addAll(activeLoansPayingFor);
+                }
+
+
+
+
                 mainController.SpeardInfoToAll(snapshot);
+
+                customerPaymentComponentController.prepareNotificationArea();
 
             }
         });
@@ -222,6 +244,8 @@ public class CustomerPanelController extends CustomerSubController implements Cl
             customerPaymentComponent = loader.load(url.openStream());
             customerPaymentComponentController = loader.getController();
             customerPaymentComponentController.setMainController(mainController);
+            customerPaymentComponentController.prepareTable();
+            customerPaymentComponentController.unlockPaymentButtons();
         } catch (IOException e) {
             e.printStackTrace();
         }

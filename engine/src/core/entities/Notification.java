@@ -11,7 +11,7 @@ public class Notification{
     private String title;
     private int date;
     private String content;
-    private SimpleBooleanProperty read = new SimpleBooleanProperty(this,"read",false);
+
 
 
     public Notification(String title,int date,String content) {
@@ -31,18 +31,6 @@ public class Notification{
 
     public String getContent() {
         return content;
-    }
-
-    public boolean isRead() {
-        return read.get();
-    }
-
-    public SimpleBooleanProperty readProperty() {
-        return read;
-    }
-
-    public void setRead(boolean read) {
-        this.read.set(read);
     }
 
 

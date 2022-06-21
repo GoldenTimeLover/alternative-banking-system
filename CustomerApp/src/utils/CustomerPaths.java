@@ -40,4 +40,5 @@ public class CustomerPaths {
     public final static String GET_CATEGORIES = FULL_SERVER_PATH + "/loan/categories";
     public final static String FINANCE_LOAN = FULL_SERVER_PATH + "/loan/finance";
     public final static String GET_SNAPSHOT = FULL_SERVER_PATH + "/user/snapshot";
+    public final static String PAY_LOAN = FULL_SERVER_PATH + "/loan/payback";
 }
