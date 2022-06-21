@@ -20,6 +20,9 @@ public class Paths {
     public static String DARK_BODY_THEME = "/resources/stylesheets/bodyComponentDark.css";
 
 
+
+
+
 //    public static String DARK_CENTER_THEME = "/userInterface/Stylesheets/CenterDarkMode.css";
 //    public static String RAINBOW_MAIN_THEME = "/userInterface/Stylesheets/RainbowMode.css";
 //    public static String RAINBOW_CENTER_THEME = "/userInterface/Stylesheets/CenterRainbowMode.css";

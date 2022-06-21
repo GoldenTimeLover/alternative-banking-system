@@ -1,5 +1,6 @@
 package core.entities;
 
+import core.dtos.SingleLoanDTO;
 import core.utils.utils;
 
 import java.util.ArrayList;
@@ -63,6 +64,31 @@ public class Loan implements Comparable{
         this.payments = new ArrayList<>();
     }
 
+    public Loan(SingleLoanDTO loanDTO,String userName){
+        this.id = loanDTO.getId();
+        //TODO
+        this.startDate = 1;
+
+        this.amount = loanDTO.getAbsCapital();
+        this.remainingAmount = amount;
+        this.borrower = new Customer(userName,false);
+        this.lenders = new ArrayList<>();
+        this.status = loanDTO.status;
+        this.category = loanDTO.getAbsCategory();
+        this.interestRate = loanDTO.getAbsIntristPerPayment();
+        this.ownerName = userName;
+        this.lengthOfTime = loanDTO.getAbsTotalYazTime();
+        this.timeBetweenPayments = loanDTO.getAbsPaysEveryYaz();
+        this.lenderAmounts = new HashMap<>();
+        this.timeNextPayment = timeBetweenPayments;
+
+        this.paymentPerYaz = amount / lengthOfTime;
+        this.singlePayment = paymentPerYaz * timeBetweenPayments;
+        this.singlePaymentTotal = singlePayment + (singlePayment * interestRate / 100);
+        this.completeAmountToBePaid = singlePaymentTotal * (lengthOfTime / timeBetweenPayments);
+        this.amountPaidUntilNow = 0.0;
+        this.payments = new ArrayList<>();
+    }
     @Override
     public int compareTo(Object o) {
         int compareData=((Loan)o).getStartDate();

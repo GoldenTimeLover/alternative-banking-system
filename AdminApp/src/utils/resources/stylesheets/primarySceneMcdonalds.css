@@ -1,0 +1,52 @@
+.banner {
+    -fx-background-color: #DA291C;
+
+}
+
+.PrimaryToolbar{
+    -fx-background-color: #FFCC00;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+
+.PrimaryToolbarItemOption{
+    -fx-text-fill: white;
+}
+
+.primary-container-label{
+    -fx-text-fill: #FFCC00;
+}
+.banner Label {
+    -fx-font-size: 16px;
+
+}
+
+.whole-body{
+    -fx-background-color: #DA291C;
+}
+
+.combo-box{
+    -fx-background-color: #FFCC00 ;
+}
+
+.text-under-primary-label{
+    -fx-text-fill: #FFCC00 ;
+}
+#you {
+    -fx-text-fill: #FFCC00 ;
+}
+
+
+#withdraw-button{
+
+    -fx-background-color: #FFCC00;
+    -fx-text-fill: black;
+    -fx-cursor: hand;
+}
+
+#deposit-button{
+    -fx-background-color: green;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
