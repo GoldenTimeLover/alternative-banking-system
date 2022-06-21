@@ -16,7 +16,7 @@ public class SingleLoanDTO {
     public int absIntristPerPayment;
     public String id;
     private List<String> lenders;
-    private Loan.LoanStatus status;
+    public Loan.LoanStatus status;
     public String owenerName;
     double unpaidDebt;
     double paymentPerYaz ;
@@ -27,13 +27,14 @@ public class SingleLoanDTO {
     List<Transaction> payments;
     boolean paidThisYaz = false;
 
-    public SingleLoanDTO(String absCategory, int absCapital, int absTotalYazTime, int absPaysEveryYaz, int absIntristPerPayment, String id) {
+    public SingleLoanDTO(String absCategory, int absCapital, int absTotalYazTime, int absPaysEveryYaz, int absIntristPerPayment, String id,Loan.LoanStatus status) {
         this.absCategory = absCategory;
         this.absCapital = absCapital;
         this.absTotalYazTime = absTotalYazTime;
         this.absPaysEveryYaz = absPaysEveryYaz;
         this.absIntristPerPayment = absIntristPerPayment;
         this.id = id;
+        this.status = status;
     }
     public SingleLoanDTO(Loan l){
         this.absCategory = l.getCategory();

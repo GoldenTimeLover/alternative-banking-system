@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
 import core.dtos.SingleLoanDTO;
+import core.entities.Loan;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
@@ -130,7 +131,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
 
         try{
             LoansDTO loansDTO = new LoansDTO(new ArrayList<>(),new ArrayList<>(), mainController.getUsername(), 0);
-            loansDTO.loanList.add(new SingleLoanDTO(categories,amount,minYaz,paysEvery,minInterest,loanId));
+            loansDTO.loanList.add(new SingleLoanDTO(categories,amount,minYaz,paysEvery,minInterest,loanId, Loan.LoanStatus.NEW));
 
             Gson gson = new Gson();
             String s = gson.toJson(loansDTO,LoansDTO.class);
@@ -214,7 +215,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                     lsdto.loanList.add(new SingleLoanDTO(loan.getAbsCategory(),
                             loan.getAbsCapital(), loan.getAbsTotalYazTime(),
                             loan.getAbsPaysEveryYaz(), loan.getAbsIntristPerPayment(),
-                            loan.getId()));
+                            loan.getId(), Loan.LoanStatus.NEW));
 
                 }
 

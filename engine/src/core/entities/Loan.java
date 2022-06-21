@@ -73,7 +73,7 @@ public class Loan implements Comparable{
         this.remainingAmount = amount;
         this.borrower = new Customer(userName,false);
         this.lenders = new ArrayList<>();
-        this.status = LoanStatus.ACTIVE;
+        this.status = loanDTO.status;
         this.category = loanDTO.getAbsCategory();
         this.interestRate = loanDTO.getAbsIntristPerPayment();
         this.ownerName = userName;

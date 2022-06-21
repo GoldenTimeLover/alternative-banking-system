@@ -143,7 +143,6 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
                 List<Loan> loansCustomerIsAskingFor = new ArrayList<>();
                 for (int i = 0; i < snapshot.loansDTO.loanList.size(); i++) {
-                    System.out.println(snapshot.loansDTO.loanList.get(i).id);
                     loansCustomerIsAskingFor.add(new Loan(snapshot.loansDTO.loanList.get(i),snapshot.loansDTO.loanList.get(i).owenerName));
                 }
 
