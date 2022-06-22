@@ -65,7 +65,6 @@ public class AddLoanServlet extends HttpServlet {
                     absloan.getAbsIntristPerPayment(),
                     user,absloan.getAbsTotalYazTime(),absloan.getAbsPaysEveryYaz());
 
-            System.out.println(absloan.id);
 
             engine.getLoans().add(l);
             loanList.add(l);

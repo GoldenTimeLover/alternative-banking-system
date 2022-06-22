@@ -14,7 +14,7 @@ public class LogoutServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        System.out.println("In the logout servlet");
+
         String username = request.getParameter("username");
         UserManager userManager = ServerUtils.getUserManager(getServletContext());
 

@@ -3,6 +3,7 @@ package core.engine;
 import core.Exceptions.FileFormatException;
 import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
+import core.dtos.EngineSnapshot;
 import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Notification;
@@ -26,9 +27,11 @@ public class ABSEngine implements Engine{
     private List<String> categories;
     private int currentTime = 1;
     private boolean dataLoaded= false;
-    private final StringProperty currentFilePath = new SimpleStringProperty(this,"currentFilePath","No File Selected");
-    private final Map<String,List<Notification>> notifications;
+    private Map<String,List<Notification>> notifications;
+    private List<EngineSnapshot> timeLine;
+    private EngineSnapshot latestSnapshot;
 
+    private boolean isRewind = false;
     private Task<Boolean> currentRunningTask;
 
     public Map<String, List<Notification>> getNotifications() {
@@ -36,11 +39,7 @@ public class ABSEngine implements Engine{
     }
 
 
-    public IntegerProperty currTimeForGuiProperty() {
-        return CurrTimeForGui;
-    }
 
-    IntegerProperty CurrTimeForGui = new SimpleIntegerProperty(1);
 
     public ABSEngine(){
 
@@ -49,6 +48,8 @@ public class ABSEngine implements Engine{
         this.loans = new ArrayList<>();
         this.categories = new ArrayList<>();
         this.notifications = new HashMap<>();
+        this.timeLine = new ArrayList<>();
+
 
     }
 
@@ -62,17 +63,8 @@ public class ABSEngine implements Engine{
         return null;
     }
 
-    public String getCurrentFilePath() {
-        return currentFilePath.get();
-    }
 
-    public StringProperty currentFilePathProperty() {
-        return currentFilePath;
-    }
 
-    public void setCurrentFilePath(String currentFilePath) {
-        this.currentFilePath.set(currentFilePath);
-    }
 
     public Loan getLoanById(String loanName){
 
@@ -99,14 +91,14 @@ public class ABSEngine implements Engine{
 
         //Set Current Time to 1 whenever you load new Data
         this.currentTime = 1;
-        CurrTimeForGui.set(currentTime);
+
 
         verifyData();
         //Connect the Loans and The Customers you got from file
         connectDataLoadedFromFile();
 
         dataLoaded = true;
-        currentFilePath.set(filePath);
+
         System.out.println("Data Loaded Successfully!");
     }
 
@@ -378,16 +370,18 @@ public class ABSEngine implements Engine{
 
     }
 
-
+    public void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
+    }
 
     public void moveTimeForward(){
 
         // function to collect money from loaners
         List<Loan> activeLoans = getActiveLoans();
+        timeLine.add(new EngineSnapshot(loans,customers,categories,notifications,currentTime));
 
         // set current time plus 1
         currentTime+= 1;
-        CurrTimeForGui.set(currentTime);
 
         // reduce time until next payment, if not paid update status to risk
         reduceTimeNextPayment(activeLoans);
@@ -684,10 +678,59 @@ public class ABSEngine implements Engine{
         }
     }
 
-
-
-
     public int getCurrentTime() {
         return currentTime;
+    }
+
+
+    public boolean isRewind() {
+        return isRewind;
+    }
+
+    public void setRewind(boolean rewind) {
+        isRewind = rewind;
+    }
+    public void enterRewindMode(){
+
+        latestSnapshot = new EngineSnapshot(loans,customers,categories,notifications,currentTime);
+        isRewind = true;
+
+    }
+
+    public void exitRewindMode(){
+        categories = latestSnapshot.categories;
+        currentTime = latestSnapshot.currentTime;
+        customers = latestSnapshot.customers;
+        loans = latestSnapshot.loans;
+        notifications = latestSnapshot.notifications;
+        isRewind = false;
+    }
+
+    public void rewindDecreaseTime(){
+
+        if(currentTime <= 1){
+            return;
+        }
+        currentTime -= 1;
+        EngineSnapshot engineSnapshot = timeLine.get(currentTime - 1);
+        categories = engineSnapshot.categories;
+        currentTime = engineSnapshot.currentTime;
+        customers = engineSnapshot.customers;
+        loans = engineSnapshot.loans;
+        notifications = engineSnapshot.notifications;
+
+    }
+
+    public void rewindIncreaseTime(){
+        if(currentTime >= latestSnapshot.currentTime){
+            return;
+        }
+        currentTime += 1;
+        EngineSnapshot engineSnapshot = timeLine.get(currentTime - 1);
+        categories = engineSnapshot.categories;
+        currentTime = engineSnapshot.currentTime;
+        customers = engineSnapshot.customers;
+        loans = engineSnapshot.loans;
+        notifications = engineSnapshot.notifications;
     }
 }

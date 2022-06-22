@@ -21,7 +21,7 @@ public class AdvanceTimeServlet extends HttpServlet {
 
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
         engine.moveTimeForward();
-        System.out.println("Beep Boop advancing time by one unit");
+
         resp.setStatus(200);
     }
 }

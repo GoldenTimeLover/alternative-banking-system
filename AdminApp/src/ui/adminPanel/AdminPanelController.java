@@ -7,6 +7,8 @@ import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Transaction;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -43,6 +45,9 @@ public class AdminPanelController extends AdminSubController {
     private Button increaseYazButton;
 
     @FXML
+    public Button decreaseYazButton;
+
+    @FXML
     private Button loadFileButton;
     @FXML
     private TableView<AdminLoanDTO> loansTableView;
@@ -69,6 +74,7 @@ public class AdminPanelController extends AdminSubController {
 
         customerLoansObservableList = loansTableView.getItems();
         customerObservableList = customersTableView.getItems();
+
     }
 
 
@@ -100,37 +106,10 @@ public class AdminPanelController extends AdminSubController {
     }
 
 
-    @FXML
-    void increaseYazButtonPressed(ActionEvent event) {
-        String finalUrl = HttpUrl
-                .parse(AdminPaths.ADVANCE_TIME)
-                .newBuilder()
-                .addQueryParameter("userName", mainController.getAdminName())
-                .build()
-                .toString();
-        AdminHttpClient.runAsync(finalUrl,"GET",null ,new Callback() {
-
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-//                        errorMsgProperty.set("Something went wrong ):")
-                                System.out.println("something went wrong")
-                );
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
-                System.out.println("whattt");
-
-                }
-
-        });
-    }
 
     private void updateSnapshot(AdminSnapshot adminSnapshot){
 
-        System.out.println("admin snapshot update!");
+
         if (adminSnapshot != null){
             Platform.runLater(() -> {
                 mainController.currentYazProperty.set(String.valueOf(adminSnapshot.currentYaz));
@@ -152,6 +131,7 @@ public class AdminPanelController extends AdminSubController {
                     customerLoansObservableList.addAll(adminSnapshot.loanList);
                 }
 
+                mainController.isSystemRewindProperty.set(adminSnapshot.isRewind);
             });
         }
     }
@@ -178,37 +158,6 @@ public class AdminPanelController extends AdminSubController {
         timer.schedule(snapshotRefresher,500,500);
     }
 
-
-    public void unlockPanelButtons(){
-
-
-         increaseYazButton.setDisable(false);
-        loadDataIntoTables();
-    }
-
-    @SuppressWarnings("unchecked")
-    private void loadDataIntoTables(){
-
-        // clear tableview of previous data
-        loansTableView.getColumns().clear();
-        loansTableView.getItems().clear();
-
-        //load loans into table
-        loadLoansItoTable();
-        //set disable
-        loansTableView.setDisable(false);
-
-        // clear tableview of previous data
-        customersTableView.getColumns().clear();
-        customersTableView.getItems().clear();
-
-        //load customer data into table
-        loadCustomersIntoTable();
-        //set disable
-        customersTableView.setDisable(false);
-
-
-    }
 
     public void loadCustomersIntoTable(){
 
@@ -380,4 +329,102 @@ public class AdminPanelController extends AdminSubController {
         Optional<ButtonType> result = alert.showAndWait();
         return;
     }
+
+    @FXML
+    void decreaseYazButtonPressed(ActionEvent event) {
+
+
+        //noinspection ConstantConditions
+        String finalUrl = HttpUrl
+                .parse(AdminPaths.ADMIN_REWIND_DECREASE)
+                .newBuilder()
+                .addQueryParameter("userName", mainController.getAdminName())
+                .build()
+                .toString();
+
+
+        AdminHttpClient.runAsync(finalUrl,"GET",null ,new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.code() != 200) {
+                } else {
+                    Platform.runLater(() -> {
+                        try{
+                        }
+                        catch(Exception ignore) {}
+                    });
+                }
+                Objects.requireNonNull(response.body()).close();
+                response.close();
+            }
+        });
+    }
+    @FXML
+    void increaseYazButtonPressed(ActionEvent event) {
+
+        if(!mainController.isSystemRewindProperty.get()){
+
+            String finalUrl = HttpUrl
+                    .parse(AdminPaths.ADVANCE_TIME)
+                    .newBuilder()
+                    .addQueryParameter("userName", mainController.getAdminName())
+                    .build()
+                    .toString();
+            AdminHttpClient.runAsync(finalUrl,"GET",null ,new Callback() {
+
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Platform.runLater(() ->
+//                        errorMsgProperty.set("Something went wrong ):")
+                                    System.out.println("something went wrong")
+                    );
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    System.out.println("whattt");
+
+                }
+
+            });
+        }else{
+
+            //noinspection ConstantConditions
+            String finalUrl = HttpUrl
+                    .parse(AdminPaths.ADMIN_REWIND_INCREASE)
+                    .newBuilder()
+                    .addQueryParameter("userName", mainController.getAdminName())
+                    .build()
+                    .toString();
+
+
+            AdminHttpClient.runAsync(finalUrl,"GET",null ,new Callback() {
+
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    if (response.code() != 200) {
+                    } else {
+                        Platform.runLater(() -> {
+                            try{
+                            }
+                            catch(Exception ignore) {}
+                        });
+                    }
+                    Objects.requireNonNull(response.body()).close();
+                    response.close();
+                }
+            });
+        }
+    }
+
 }

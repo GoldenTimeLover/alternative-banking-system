@@ -28,4 +28,7 @@ public class AdminPaths {
     public final static String LOGOUT = FULL_SERVER_PATH + "/user/logout";
     public final  static String ADVANCE_TIME = FULL_SERVER_PATH + "/admin/time/advance";
     public final  static String ADMIN_SNAPSHOT = FULL_SERVER_PATH + "/admin/snapshot";
+    public final  static String ADMIN_REWIND_TOGGLE = FULL_SERVER_PATH + "/admin/rewind/toggle";
+    public final  static String ADMIN_REWIND_INCREASE = FULL_SERVER_PATH + "/admin/rewind/increase";
+    public final  static String ADMIN_REWIND_DECREASE = FULL_SERVER_PATH + "/admin/rewind/decrease";
 }

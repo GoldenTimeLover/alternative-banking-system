@@ -29,9 +29,6 @@ public class FinanceLoansServlet extends HttpServlet {
         double amountGiven = Math.min(loan.getRemainingAmount(),amount);
         double finalAmountLoaned = engine.matchLoan(loan.getId(), amountGiven, lenderName,maxPercentage);
 
-        for (int i = 0; i < loan.getLenders().size(); i++) {
-            System.out.println(loan.getLenders().get(i).getId());
-        }
 
         resp.getWriter().println("Loan to loan " + loan.getId() + " " + finalAmountLoaned);
         resp.setStatus(200);

@@ -28,7 +28,11 @@ public class AdminSnapshotServlet extends HttpServlet{
 
         Gson gson = new Gson();
 
-        AdminSnapshot adminSnapshot = new AdminSnapshot(new ArrayList<>(),usernameFromSession,engine.getCurrentTime(),new ArrayList<>());
+        AdminSnapshot adminSnapshot = new AdminSnapshot(
+                new ArrayList<>(),
+                usernameFromSession,engine.getCurrentTime(),
+                new ArrayList<>(),
+                engine.isRewind());
         for (Customer c : engine.getCustomers()) {
             if (!c.isAdmin()){
                 adminSnapshot.customerSnapshotList.add(new CustomerSnapshot(new LoansDTO(c),
@@ -42,12 +46,9 @@ public class AdminSnapshotServlet extends HttpServlet{
         }
 
 
-        System.out.println("before json");
+
         String s = gson.toJson(adminSnapshot,AdminSnapshot.class);
-        System.out.println("after json");
         resp.getWriter().println(s);
-        System.out.println("returned admin snapshot");
-        System.out.println(s);
         resp.setStatus(200);
     }
 }
