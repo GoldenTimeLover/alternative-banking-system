@@ -124,6 +124,7 @@ public class AdminLoginController {
                             primaryStage.show();
                             primaryController.initialize(primaryStage);
                             primaryController.adminPanel();
+                            primaryController.adminNameProperty.set(userName);
                         }
                         catch(Exception ignore) {}
                     });

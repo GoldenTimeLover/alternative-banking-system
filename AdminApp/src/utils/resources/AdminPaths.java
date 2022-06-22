@@ -25,4 +25,7 @@ public class AdminPaths {
     public final static String FULL_SERVER_PATH = "http://" + BASE_DOMAIN + ":8080" + APPLICATION_NAME;
 
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/user/login";
+    public final static String LOGOUT = FULL_SERVER_PATH + "/user/logout";
+    public final  static String ADVANCE_TIME = FULL_SERVER_PATH + "/admin/time/advance";
+    public final  static String ADMIN_SNAPSHOT = FULL_SERVER_PATH + "/admin/snapshot";
 }

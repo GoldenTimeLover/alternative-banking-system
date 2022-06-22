@@ -9,6 +9,8 @@ import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -60,11 +62,7 @@ public class PrimaryController {
     @FXML
     private BorderPane mainBorderPane;
 
-    @FXML
-    private ComboBox<Customer> userSelectorCB;
 
-    @FXML
-    private Label filePathText;
 
     @FXML
     private Label currentYazText;
@@ -90,15 +88,31 @@ public class PrimaryController {
     @FXML
     private ImageView logoImage;
 
+    @FXML
+    private Label adminNameLabel;
 
     private FadeTransition fadeTransition = new FadeTransition();
     private ScaleTransition scaleTransition = new ScaleTransition();
-    private ScaleTransition scaleTransition2 = new ScaleTransition();
+
+
+    public final StringProperty currentYazProperty = new SimpleStringProperty();
+    public final StringProperty adminNameProperty = new SimpleStringProperty();
+
 
     @FXML
     public void initialize(Stage primaryStage){
 
         this.primaryStage = primaryStage;
+
+        currentYazProperty.set("1");
+        adminNameProperty.set("");
+        currentYazText.textProperty().bind(Bindings.concat(currentYazProperty,""));
+        adminNameLabel.textProperty().bind(Bindings.concat(adminNameProperty,""));
+    }
+
+    public String getAdminName(){
+        System.out.println("admin name returned" + adminNameProperty.get());
+        return adminNameProperty.get();
     }
 
     @FXML
@@ -108,8 +122,6 @@ public class PrimaryController {
         if (!this.animationCheckBox.isSelected()) {
 
             this.scaleTransition.jumpTo(Duration.ZERO);
-            this.scaleTransition2.jumpTo(Duration.ZERO);
-            this.scaleTransition2.stop();
             this.scaleTransition.stop();
             this.fadeTransition.stop();
 
@@ -120,9 +132,6 @@ public class PrimaryController {
     }
 
 
-    public ComboBox<Customer> getUserSelectorCB() {
-        return userSelectorCB;
-    }
 
     @FXML
     void yazClicked(MouseEvent event){
@@ -136,22 +145,7 @@ public class PrimaryController {
         }
 
     }
-    @FXML
-    void fileClicked(MouseEvent event){
 
-        if (animationCheckBox.isSelected() && scaleTransition2.getCurrentRate()==0.0d) {
-            scaleTransition2.setDuration(Duration.millis(200));
-            scaleTransition2.setNode(this.filePathText);
-            this.scaleTransition2.setCycleCount(8);
-            this.scaleTransition2.setAutoReverse(true);
-            this.scaleTransition2.setToY(-1);
-            this.scaleTransition2.play();
-        }
-
-
-
-
-    }
 
     @FXML
     void logoClicked(MouseEvent event){
@@ -205,15 +199,7 @@ public class PrimaryController {
         engine.moveTimeForward();
 
     }
-    public void insertUsersToComboBox(){
 
-
-        ObservableList<Customer> customers = FXCollections.observableArrayList(engine.getCustomers());
-        customers.add(0,new Customer("Admin",0,null,null,null));
-        userSelectorCB.setItems(customers);
-        userSelectorCB.getSelectionModel().select(0);
-        userSelectorCB.setDisable(false);
-    }
     @FXML
     void darkModeThemePressed(ActionEvent event) {
 
@@ -253,73 +239,9 @@ public class PrimaryController {
 
     }
 
-    @FXML
-    void userSelectorCBPressed(ActionEvent event) {
 
-            mainBorderPane.setCenter(adminPanelComponent);
-            adminPanelComponentController.unlockPanelButtons();
-
-    }
-
-
-    private void unlockAdminButtons(){
-        adminPanelComponentController.unlockPanelButtons();
-
-    }
     public void setPrimaryStage(Stage stage){
         this.primaryStage = stage;
-    }
-
-    public ABSEngine getEngine() {
-        return engine;
-    }
-
-    public void loadXMLButtonPressed(ActionEvent event){
-
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile;
-        fileChooser.setTitle("Select a file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
-        selectedFile = fileChooser.showOpenDialog(primaryStage);
-
-
-        if(selectedFile == null)
-            return;
-
-        try{
-            engine = new ABSEngine();
-            engine.loadDataFromFile(selectedFile.getPath());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("File loaded Successfully");
-            alert.setContentText(null);
-
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-
-            insertUsersToComboBox();
-            unlockAdminButtons();
-            filePathText.textProperty().bind(engine.currentFilePathProperty());
-
-            StringExpression sb = Bindings.concat("Current YAZ: ", engine.currTimeForGuiProperty());
-
-            currentYazText.textProperty().bind(sb);
-
-
-        }
-        catch(FileFormatException ex)
-        {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error loading File!");
-            alert.setContentText(ex.getMessage());
-            System.out.println(ex.getMessage());
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-
-        }
     }
 
 
@@ -336,6 +258,10 @@ public class PrimaryController {
             adminPanelComponentController = loader.getController();
             adminPanelComponentController.setMainController(this);
             mainBorderPane.setCenter(adminPanelComponent);
+            adminPanelComponentController.loadCustomersIntoTable();
+            adminPanelComponentController.loadLoansItoTable();
+            adminPanelComponentController.startSnapshotRefresher();
+
         } catch (IOException e) {
             System.out.println("nope");
             e.printStackTrace();

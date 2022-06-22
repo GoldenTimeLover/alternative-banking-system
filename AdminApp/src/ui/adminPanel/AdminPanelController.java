@@ -1,7 +1,12 @@
 package ui.adminPanel;
 
+import core.dtos.AdminLoanDTO;
+import core.dtos.AdminSnapshot;
+import core.dtos.CustomerSnapshot;
 import core.entities.Customer;
 import core.entities.Loan;
+import core.entities.Transaction;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -9,17 +14,27 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import resources.paths.Paths;
+import ui.PrimaryController;
 import ui.components.SubController;
 import ui.components.loanDetails.LoanDetailsComp;
 import ui.subcontroller.AdminSubController;
+import utils.http.AdminHttpClient;
+import utils.http.AdminSnapshotRefresher;
+import utils.resources.AdminPaths;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class AdminPanelController extends AdminSubController {
 
@@ -30,7 +45,7 @@ public class AdminPanelController extends AdminSubController {
     @FXML
     private Button loadFileButton;
     @FXML
-    private TableView<Loan> loansTableView;
+    private TableView<AdminLoanDTO> loansTableView;
 
     @FXML
     private TableView<Customer> customersTableView;
@@ -41,11 +56,25 @@ public class AdminPanelController extends AdminSubController {
     private Loan selectedLoan;
 
 
+    private Timer timer;
+    private TimerTask snapshotRefresher;
+
+    public ObservableList<AdminLoanDTO> customerLoansObservableList;
+    public ObservableList<Customer> customerObservableList;
+
+
+
+    @FXML
+    public void initialize(){
+
+        customerLoansObservableList = loansTableView.getItems();
+        customerObservableList = customersTableView.getItems();
+    }
 
 
     @FXML
     void showLoanDetailsButtonPressed(ActionEvent event) {
-        ObservableList<Loan> selectedItems = this.loansTableView.getSelectionModel().getSelectedItems();
+        ObservableList<AdminLoanDTO> selectedItems = this.loansTableView.getSelectionModel().getSelectedItems();
 
 
         // if no loan was selected from the table
@@ -62,9 +91,9 @@ public class AdminPanelController extends AdminSubController {
             return;
         }else {
 
-            this.selectedLoan = selectedItems.get(0);
-
-            createShowLoanComponent(selectedLoan);
+//            this.selectedLoan = selectedItems.get(0);
+//
+//            createShowLoanComponent(selectedLoan);
 
 
         }
@@ -73,16 +102,82 @@ public class AdminPanelController extends AdminSubController {
 
     @FXML
     void increaseYazButtonPressed(ActionEvent event) {
+        String finalUrl = HttpUrl
+                .parse(AdminPaths.ADVANCE_TIME)
+                .newBuilder()
+                .addQueryParameter("userName", mainController.getAdminName())
+                .build()
+                .toString();
+        AdminHttpClient.runAsync(finalUrl,"GET",null ,new Callback() {
 
-            this.mainController.IncreaseYaz(event);
-            this.loadDataIntoTables();
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+//                        errorMsgProperty.set("Something went wrong ):")
+                                System.out.println("something went wrong")
+                );
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                System.out.println("whattt");
+
+                }
+
+        });
     }
 
-    @FXML
-    void loadFileButtonPressed(ActionEvent event) {
+    private void updateSnapshot(AdminSnapshot adminSnapshot){
 
-        this.mainController.loadXMLButtonPressed(event);
+        System.out.println("admin snapshot update!");
+        if (adminSnapshot != null){
+            Platform.runLater(() -> {
+                mainController.currentYazProperty.set(String.valueOf(adminSnapshot.currentYaz));
+
+
+                List<Customer> customers = new ArrayList<>();
+                List<CustomerSnapshot> cSnapList = adminSnapshot.customerSnapshotList;
+                for (int i = 0; i < adminSnapshot.customerSnapshotList.size(); i++) {
+                    CustomerSnapshot snapshot = cSnapList.get(i);
+                    customers.add(new Customer(snapshot.loansDTO.userName, (int) snapshot.loansDTO.balance,new ArrayList<>(),new ArrayList<>(),new ArrayList<>()));
+
+                }
+
+                customerObservableList.clear();
+                customerObservableList.addAll(customers);
+
+                if (adminSnapshot.loanList.size() != customerLoansObservableList.size() || loansChanged(adminSnapshot.loanList,customerLoansObservableList)){
+                    customerLoansObservableList.clear();
+                    customerLoansObservableList.addAll(adminSnapshot.loanList);
+                }
+
+            });
+        }
     }
+
+    private boolean loansChanged(List<AdminLoanDTO> snapshotList,List<AdminLoanDTO> localList){
+
+        Map<String,String> status = new HashMap<>();
+        for (int i = 0; i < snapshotList.size(); i++) {
+            status.put(snapshotList.get(i).getId(),snapshotList.get(i).getStatus());
+        }
+
+        for (int i=0;i<localList.size();i++){
+            if(!status.get(localList.get(i).getId()).equals(localList.get(i).getStatus())){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    public void startSnapshotRefresher(){
+        snapshotRefresher = new AdminSnapshotRefresher(this::updateSnapshot, mainController.getAdminName()); // new snapshotrefersher
+        timer = new Timer();
+        timer.schedule(snapshotRefresher,500,500);
+    }
+
 
     public void unlockPanelButtons(){
 
@@ -115,15 +210,8 @@ public class AdminPanelController extends AdminSubController {
 
     }
 
-    private void loadCustomersIntoTable(){
-        ObservableList<Customer> customers = FXCollections.observableArrayList();
+    public void loadCustomersIntoTable(){
 
-        int size = mainController.getEngine().getCustomers().size();
-        List<Customer> temp = mainController.getEngine().getCustomers();
-
-        for (int i = 0; i <size; i++) {
-            customers.add(temp.get(i));
-        }
 
         //id
         TableColumn<Customer,String> idColumn = new TableColumn<>("Customer ID");
@@ -194,84 +282,66 @@ public class AdminPanelController extends AdminSubController {
         EEE.setMinWidth(150);
         EEE.setCellValueFactory(c-> new SimpleIntegerProperty(c.getValue().getAmountOfStatusLoan(Loan.LoanStatus.FINISHED,true)).asObject());
 
-        customersTableView.setItems(customers);
+
         customersTableView.getColumns().addAll(idColumn,balanceColumn,givenColumn,aaa,bbb,ccc,ddd,eee,AAA,BBB,CCC,DDD,EEE);
 
 
     }
 
-    private void loadLoansItoTable(){
-        ObservableList<Loan> loans = FXCollections.observableArrayList();
-
-        int size = mainController.getEngine().getLoans().size();
-        List<Loan> temp = mainController.getEngine().getLoans();
-        for (int i = 0; i <size; i++) {
-
-
-            loans.add(temp.get(i));
-        }
+    public void loadLoansItoTable(){
 
         //id
-        TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
+        TableColumn<AdminLoanDTO,String> idColumn = new TableColumn<>("Loan ID");
         idColumn.setMinWidth(100);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
 
 
         //owner
-        TableColumn<Loan,String> ownerColumn = new TableColumn<>("Owner");
+        TableColumn<AdminLoanDTO,String> ownerColumn = new TableColumn<>("Owner");
         ownerColumn.setMinWidth(100);
         ownerColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getOwnerName()));
 
         //category
-        TableColumn<Loan,String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<AdminLoanDTO,String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setMinWidth(100);
         categoryColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getCategory()));
 
         //start date
-        TableColumn<Loan,Integer> startDateColumn = new TableColumn<>("Start Date");
+        TableColumn<AdminLoanDTO,Integer> startDateColumn = new TableColumn<>("Start Date");
         startDateColumn.setMinWidth(100);
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
 
 
         //amount
-        TableColumn<Loan,Double> amountColumn = new TableColumn<>("Amount");
+        TableColumn<AdminLoanDTO,Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setMinWidth(100);
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
 
         //status
-        TableColumn<Loan,String> statusColumn = new TableColumn<>("Status");
+        TableColumn<AdminLoanDTO,String> statusColumn = new TableColumn<>("Status");
         statusColumn.setMinWidth(100);
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         //length of time
-        TableColumn<Loan,Integer> lengthColumn = new TableColumn<>("Time Length");
+        TableColumn<AdminLoanDTO,Integer> lengthColumn = new TableColumn<>("Time Length");
         lengthColumn.setMinWidth(100);
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("lengthOfTime"));
 
         //Intreset Rate
-        TableColumn<Loan,Integer> interestColumn = new TableColumn<>("Interest Rate");
+        TableColumn<AdminLoanDTO,Integer> interestColumn = new TableColumn<>("Interest Rate");
         interestColumn.setMinWidth(100);
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
         //Time between each payment
-        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        TableColumn<AdminLoanDTO,Integer> timeBetweenCol = new TableColumn<>("pays every");
         timeBetweenCol.setMinWidth(100);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
 
 
-//        TableColumn<Loan,String> investorsCol =  new TableColumn<>("Investors");
-//        investorsCol.setMinWidth(100);
-//        investorsCol.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getInvestorString()));
-//
-//        TableColumn<Loan,Double> amountRaised = new TableColumn<>("money needed to activate");
-//        amountRaised.setMinWidth(100);
-//        amountRaised.setCellValueFactory(new PropertyValueFactory<>("remainingAmount"));
-
-        loansTableView.setItems(loans);
         loansTableView.getColumns().addAll(idColumn,
                 ownerColumn,amountColumn,
                 lengthColumn , interestColumn,

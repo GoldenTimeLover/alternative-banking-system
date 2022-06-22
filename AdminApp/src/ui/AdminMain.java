@@ -11,11 +11,18 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import resources.paths.Paths;
 import ui.login.AdminLoginController;
+import utils.http.AdminHttpClient;
 import utils.resources.AdminPaths;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.Optional;
 
 
@@ -50,7 +57,28 @@ primary scene which calls other components as needed.
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
+
                 System.out.println("ohhh weee i'm closing down this app!");
+
+                String finalUrl = HttpUrl
+                        .parse(AdminPaths.LOGOUT)
+                        .newBuilder()
+                        .addQueryParameter("username","admin")
+                        .build()
+                        .toString();
+
+                AdminHttpClient.runAsync(finalUrl,"GET",null, new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        System.out.println("log out success");
+                    }
+                });
+
             }
         });
 

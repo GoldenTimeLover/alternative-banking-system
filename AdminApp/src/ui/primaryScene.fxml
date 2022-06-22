@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
@@ -63,14 +62,8 @@
                         </ImageView>
                         <VBox styleClass="combo-box-selection-area">
                            <children>
-                              <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="Selected User:" />
-                              <ComboBox fx:id="userSelectorCB" disable="true" onAction="#userSelectorCBPressed" prefWidth="150.0" promptText="Select User" styleClass="combo-box" />
-                           </children>
-                        </VBox>
-                        <VBox onMouseClicked="#fileClicked" styleClass="file-display-area">
-                           <children>
-                              <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="File:" />
-                              <Label fx:id="filePathText" styleClass="text-under-primary-label" />
+                              <Label style="-fx-font-weight: bold;" styleClass="primary-container-label" text="Admin:" />
+                              <Label fx:id="adminNameLabel" layoutX="10.0" layoutY="10.0" styleClass="cool-label" text="test" />
                            </children>
                         </VBox>
                         <VBox onMouseClicked="#yazClicked" styleClass="time-display-area">

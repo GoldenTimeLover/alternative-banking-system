@@ -93,6 +93,9 @@ public class Customer {
         return returnedString;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
 
     private String getLoansCustomerGaveString(){
         String res = "";
