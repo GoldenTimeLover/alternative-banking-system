@@ -1,0 +1,4 @@
+to do:
+- validate incoming loans - still need to understand categories..
+- enable loan sales
+- notifications not working

@@ -1,9 +1,12 @@
 package utils.http;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.sun.javafx.fxml.builder.URLBuilder;
 import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
+import core.dtos.NotificationDTO;
+import core.dtos.TransactionsDTO;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -12,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import utils.CustomerPaths;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimerTask;
@@ -49,7 +53,12 @@ public class UserSnapshotRefresher extends TimerTask {
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 String s = response.body().string();
                 Gson gson = new Gson();
-                CustomerSnapshot data = gson.fromJson(s,CustomerSnapshot.class);
+                CustomerSnapshot data;
+                try{
+                 data = gson.fromJson(s,CustomerSnapshot.class);
+                } catch (IllegalStateException | JsonSyntaxException e){
+                     data = new CustomerSnapshot(new LoansDTO(),new TransactionsDTO(0.0,new ArrayList<>()),0,new NotificationDTO(new ArrayList<>()),true,new ArrayList<>());
+                }
                 snapshotConsumer.accept(data);
             }
         });

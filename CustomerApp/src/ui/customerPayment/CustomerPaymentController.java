@@ -197,7 +197,7 @@ public class CustomerPaymentController extends CustomerSubController {
 
     @FXML
     void payCurrButtonPressed(ActionEvent event) {
-        sendPaymentRequest("payCur",0);
+        sendPaymentRequest("payCurr",0);
     }
     @FXML
     void payRiskDebtPressed(ActionEvent event) {
@@ -262,8 +262,7 @@ public class CustomerPaymentController extends CustomerSubController {
                 }
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
-
+                    String s = response.body().string();
 
                 }
             });

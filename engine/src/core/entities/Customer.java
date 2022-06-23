@@ -213,5 +213,7 @@ public class Customer {
         return counter;
     }
 
-
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
 }

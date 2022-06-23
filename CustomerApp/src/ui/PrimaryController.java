@@ -11,6 +11,8 @@ import javafx.animation.Interpolator;
 import javafx.animation.ScaleTransition;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
@@ -27,13 +29,20 @@ import javafx.util.Duration;
 import ui.customerPanel.CustomerPanelController;
 import utils.CustomerPaths;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
-public class PrimaryController {
+public class PrimaryController implements Closeable {
 
+
+
+    @Override
+    public void close() throws IOException {
+        customerPanelComponentController.close();
+    }
 
     enum Theme {DARK,LIGHT,MCDONADLS}
 
@@ -58,6 +67,9 @@ public class PrimaryController {
     private Label currentUserNameText;
     @FXML
     private Label currentYazText;
+
+    @FXML
+    private Label rewindModeText;
 
     @FXML
     private Menu themes;
@@ -92,6 +104,7 @@ public class PrimaryController {
 
 
     private final StringProperty currentYazProperty = new SimpleStringProperty();
+    public final BooleanProperty isRewindModeProperty = new SimpleBooleanProperty(false);
 
     @FXML
     public void initialize(Stage primaryStage,String currentUser){
@@ -101,6 +114,7 @@ public class PrimaryController {
 
         currentYazProperty.set("1");
         currentYazText.textProperty().bind(Bindings.concat(currentYazProperty,""));
+        rewindModeText.visibleProperty().bind(isRewindModeProperty);
     }
     public String getUsername(){
         return this.currentUserNameText.getText();
@@ -256,6 +270,7 @@ public class PrimaryController {
             mainBorderPane.setCenter(customerPanelComponent);
             customerPanelComponentController.initcomps();
             customerPanelComponentController.startListRefresher();
+            customerPanelComponentController.bindButtons();
 
         } catch (IOException e) {
             System.out.println("nope");
@@ -281,6 +296,8 @@ public class PrimaryController {
     public void SpeardInfoToAll(CustomerSnapshot customerSnapshot){
 
         currentYazProperty.set(String.valueOf(customerSnapshot.currentYaz));
+        isRewindModeProperty.set(customerSnapshot.isRewindMode);
+
         this.loansDTO = customerSnapshot.loansDTO;
         this.transactionsDTO = customerSnapshot.transactionsDTO;
         this.customerSnapshot = customerSnapshot;

@@ -40,6 +40,7 @@ import ui.adminPanel.AdminPanelController;
 import utils.http.AdminHttpClient;
 import utils.resources.AdminPaths;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -52,7 +53,9 @@ import java.util.Optional;
     The "Master" controller that all other controllers are subordinates to and know him through
     their inheritance of "SubController" class.
  */
-public class PrimaryController {
+public class PrimaryController implements Closeable {
+
+
 
 
     enum Theme {DARK,LIGHT,MCDONADLS}
@@ -321,5 +324,9 @@ public class PrimaryController {
 
     }
 
+    @Override
+    public void close() throws IOException {
+        adminPanelComponentController.close();
+    }
 
 }

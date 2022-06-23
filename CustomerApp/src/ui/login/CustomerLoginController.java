@@ -32,7 +32,7 @@ public class CustomerLoginController {
 
     private Stage primaryStage;
 
-    private String currentUser = null;
+    public String currentUser = null;
 
     @FXML
     private TextField userNameTextField;
@@ -45,6 +45,7 @@ public class CustomerLoginController {
 
 
     private final StringProperty errorMsgProperty = new SimpleStringProperty();
+    public PrimaryController primaryController;
 
     @FXML
     public void initialize(Stage primaryStage) {
@@ -105,7 +106,7 @@ public class CustomerLoginController {
 
                             FXMLLoader loader = new FXMLLoader(getClass().getResource(CustomerPaths.PRIMARY));
                             Parent root = loader.load();
-                            PrimaryController primaryController = loader.getController();
+                            primaryController = loader.getController();
 
 
 

@@ -1,13 +1,12 @@
 package ui.customerPanel;
 
+import core.dtos.AdminLoanDTO;
 import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
 import core.entities.Loan;
 import core.entities.Transaction;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.StringExpression;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
@@ -20,6 +19,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import ui.customerAddLoanPanel.CustomerAddLoanPanelController;
+import ui.customerBuyLoan.CustomerBuyLoanController;
 import ui.customerInfo.CustomerInfoController;
 import ui.customerMatching.CustomerMatchingController;
 import ui.customerPayment.CustomerPaymentController;
@@ -31,10 +31,7 @@ import utils.http.UserSnapshotRefresher;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class CustomerPanelController extends CustomerSubController implements Closeable {
 
@@ -56,6 +53,10 @@ public class CustomerPanelController extends CustomerSubController implements Cl
     @FXML private StackPane customerMatchingComponent;
     @FXML public CustomerMatchingController customerMatchingComponentController;
 
+    // Buying loan panel
+    @FXML private ScrollPane customerBuyingLoanComponent;
+    @FXML public CustomerBuyLoanController customerBuyingLoanComponentController;
+
     @FXML
     private Button informationButton;
 
@@ -64,6 +65,9 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
     @FXML
     private Button paymentButton;
+
+    @FXML
+    private Button buyLoanButton;
 
     @FXML
     private ScrollPane centerContent;
@@ -75,6 +79,7 @@ public class CustomerPanelController extends CustomerSubController implements Cl
     private Button addLoanButton;
 
 
+
     private final StringProperty balanceProperty = new SimpleStringProperty();
     private Timer timer;
     private TimerTask balanceRefresher;
@@ -83,6 +88,7 @@ public class CustomerPanelController extends CustomerSubController implements Cl
     public void initialize() {
         balanceProperty.set("0");
         balanceText.textProperty().bind(Bindings.concat(balanceProperty,"$"));
+
     }
     @FXML
     public void initcomps(){
@@ -90,7 +96,14 @@ public class CustomerPanelController extends CustomerSubController implements Cl
         initCustomerPaymentComponent();
         initCustomerMatchingComponent();
         initCustomerAddLoanComponent();
+        initCustomerBuyLoanComponent();
         centerContent.setContent(customerInfoComponent);
+    }
+
+    public void bindButtons(){
+        paymentButton.disableProperty().bind(mainController.isRewindModeProperty);
+        addLoanButton.disableProperty().bind(mainController.isRewindModeProperty);
+        scrambleButton.disableProperty().bind(mainController.isRewindModeProperty);
     }
     /*
     Response to the pressing of the information button in the Customer Panel.
@@ -143,6 +156,7 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
                 List<Loan> loansCustomerIsAskingFor = new ArrayList<>();
                 List<Loan> activeLoansPayingFor = new ArrayList<>();
+
                 for (int i = 0; i < snapshot.loansDTO.loanList.size(); i++) {
                     loansCustomerIsAskingFor.add(new Loan(snapshot.loansDTO.loanList.get(i),snapshot.loansDTO.loanList.get(i).owenerName));
                     if (snapshot.loansDTO.loanList.get(i).status.equals(Loan.LoanStatus.RISK) ||
@@ -163,30 +177,73 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
 
                 customerInfoComponentController.borrowingLoansObservableList.clear();
-                customerInfoComponentController.givingLoansObservableList.clear();
+//                customerInfoComponentController.givingLoansObservableList.clear();
                 customerInfoComponentController.transactionObservableList.clear();
 
 
                 customerInfoComponentController.borrowingLoansObservableList.addAll(loansCustomerIsAskingFor);
-                customerInfoComponentController.givingLoansObservableList.addAll(loansTheCustomerGave);
+//                customerInfoComponentController.givingLoansObservableList.addAll(loansTheCustomerGave);
                 customerInfoComponentController.transactionObservableList.addAll(transactions);
 
 
-                //java gods forgive me
-                if(activeLoansPayingFor.size() != customerPaymentComponentController.paytingLoansObservableList.size()){
+                System.out.println("sizes of lists:");
+                System.out.println(loansTheCustomerGave.size());
+                System.out.println(customerInfoComponentController.givingLoansObservableList.size());
+
+                if(loansTheCustomerGave.size() != customerInfoComponentController.givingLoansObservableList.size()||
+                        checkLoansStatusChange(loansTheCustomerGave,customerInfoComponentController.givingLoansObservableList)){
+                    customerInfoComponentController.givingLoansObservableList.clear();
+                    customerInfoComponentController.givingLoansObservableList.addAll(loansTheCustomerGave);
+                }
+
+                if(activeLoansPayingFor.size() != customerPaymentComponentController.paytingLoansObservableList.size()||
+                        checkLoansStatusChange(activeLoansPayingFor,customerPaymentComponentController.paytingLoansObservableList)){
                     customerPaymentComponentController.paytingLoansObservableList.clear();
                     customerPaymentComponentController.paytingLoansObservableList.addAll(activeLoansPayingFor);
                 }
 
 
+                List<Loan> forSale = new ArrayList<>();
+                for (AdminLoanDTO l:snapshot.forSale) {
+                    forSale.add(new Loan(l));
 
+                }
+
+                if(forSale.size() != customerBuyingLoanComponentController.forSaleLoanObservable.size()||
+                        checkLoansStatusChange(forSale,customerBuyingLoanComponentController.forSaleLoanObservable)){
+                    customerBuyingLoanComponentController.forSaleLoanObservable.clear();
+                    customerBuyingLoanComponentController.forSaleLoanObservable.addAll(forSale);
+                }
 
                 mainController.SpeardInfoToAll(snapshot);
 
                 customerPaymentComponentController.prepareNotificationArea();
 
+                if(snapshot.isRewindMode && !centerContent.getContent().equals(customerInfoComponent)){
+                    centerContent.setContent(customerInfoComponent);
+                }
+
+
+
             }
         });
+    }
+
+    public boolean checkLoansStatusChange(List<Loan> activeLoansPayingFor, ObservableList<Loan> payingLoansObservable){
+        Map<String,String> status = new HashMap<>();
+        if(activeLoansPayingFor == null || payingLoansObservable == null){
+            return false;
+        }
+        for (int i = 0; i < activeLoansPayingFor.size(); i++) {
+            status.put(activeLoansPayingFor.get(i).getId(),activeLoansPayingFor.get(i).getStatus().toString());
+        }
+
+        for (int i=0;i<payingLoansObservable.size();i++){
+            if(!status.get(payingLoansObservable.get(i).getId()).equals(payingLoansObservable.get(i).getStatus().toString())){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void startListRefresher() {
@@ -224,6 +281,7 @@ public class CustomerPanelController extends CustomerSubController implements Cl
             customerInfoComponentController = loader.getController();
             customerInfoComponentController.setMainController(mainController);
             customerInfoComponentController.setInfoForCustomerIntoTables();
+            customerInfoComponentController.bindButtons();
 
 
         } catch (IOException e) {
@@ -283,12 +341,34 @@ public class CustomerPanelController extends CustomerSubController implements Cl
         }
     }
 
+    private void initCustomerBuyLoanComponent(){
+
+        FXMLLoader loader = new FXMLLoader();
+        URL url = getClass().getResource(CustomerPaths.CUSTOMER_BUY_LOAN);
+        loader.setLocation(url);
+        try {
+            assert url != null;
+            customerBuyingLoanComponent = loader.load(url.openStream());
+            customerBuyingLoanComponentController = loader.getController();
+            customerBuyingLoanComponentController.setMainController(mainController);
+            customerBuyingLoanComponentController.prepareTable();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @FXML
+    private void buyLoanButtonPressed(ActionEvent event){
+        centerContent.setContent(customerBuyingLoanComponent);
+    }
 
     @Override
     public void close() throws IOException {
         balanceProperty.set("0");
         if ( timer != null) {
             timer.cancel();
+            balanceRefresher.cancel();
         }
     }
 }

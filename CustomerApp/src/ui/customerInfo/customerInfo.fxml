@@ -25,6 +25,7 @@
                     <children>
                         <Label styleClass="cool-label" text="Lender loans table:" />
                         <TableView fx:id="lenderLoansTable" minWidth="-Infinity" prefHeight="200.0" prefWidth="300.0" />
+                  <Button fx:id="toggleSellLoanButton" mnemonicParsing="false" onAction="#toggleSellLoanButtonPressed" text="Put/Remove for sale" />
                     </children>
                 </VBox>
                 <VBox layoutX="210.0" layoutY="10.0">

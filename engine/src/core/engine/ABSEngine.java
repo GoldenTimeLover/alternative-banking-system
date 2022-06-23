@@ -3,6 +3,7 @@ package core.engine;
 import core.Exceptions.FileFormatException;
 import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
+import core.dtos.AdminLoanDTO;
 import core.dtos.EngineSnapshot;
 import core.entities.Customer;
 import core.entities.Loan;
@@ -25,6 +26,7 @@ public class ABSEngine implements Engine{
     private List<Loan> loans;
     private List<Customer> customers;
     private List<String> categories;
+    private List<Loan> loansForSale;
     private int currentTime = 1;
     private boolean dataLoaded= false;
     private Map<String,List<Notification>> notifications;
@@ -49,6 +51,7 @@ public class ABSEngine implements Engine{
         this.categories = new ArrayList<>();
         this.notifications = new HashMap<>();
         this.timeLine = new ArrayList<>();
+        this.loansForSale = new ArrayList<>();
 
 
     }
@@ -550,21 +553,30 @@ public class ABSEngine implements Engine{
 
 
         boolean exitRisk = false;
+
         if(loan.isPaidThisYaz()){
+            System.out.println("Customer already made the payment on this turn.");
             throw new LoanProccessingException("Customer already made the payment on this turn.",loan);
         }
         if(loan.getTimeNextPayment() > 1 && !loan.getStatus().equals(Loan.LoanStatus.RISK)){
+            System.out.println("Current yaz is not the turn to pay the loan.");
             throw new LoanProccessingException("Current yaz is not the turn to pay the loan.",loan);
         }
 
 
         //the customer that needs to pay
         Customer c = findCustomerById(loan.getOwnerName());
+        System.out.println("Customer that needs to pay is " + c.getId());
+
 
         // money that needs to be paid
         double moneyToReturn = loan.getSinglePaymentTotal();
-        moneyToReturn += loan.getUnpaidDebt();
+        System.out.println("A single payment is " + moneyToReturn);
 
+        moneyToReturn += loan.getUnpaidDebt();
+        System.out.println("unPaidDebt is " + loan.getUnpaidDebt());
+
+        System.out.println("So total money to return is  " + moneyToReturn);
 
         // if missed more payments than original length of time don't keep charging customer
         if(loan.getAmountPaidUntilNow() + loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid()){
@@ -577,8 +589,12 @@ public class ABSEngine implements Engine{
             moneyToReturn = loan.getUnpaidDebt();
             exitRisk = true;
         }
+        else if(loan.getStatus().equals(Loan.LoanStatus.RISK) && loan.getTimeNextPayment() == 1){
+            exitRisk = true;
+        }
 
         if (c.getBalance() >= moneyToReturn){
+            System.out.println("Customer has enough money in to pay back");
 
 
             //set did pay this yaz to true
@@ -602,6 +618,7 @@ public class ABSEngine implements Engine{
             loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
 
             loan.setAmountPaidUntilNow(loan.getAmountPaidUntilNow() + moneyToReturn);
+            System.out.println("Customer paid " + loan.getAmountPaidUntilNow() + moneyToReturn +"so far");
 
             if (exitRisk){
                 loan.setUnpaidDebt(0);
@@ -732,5 +749,18 @@ public class ABSEngine implements Engine{
         customers = engineSnapshot.customers;
         loans = engineSnapshot.loans;
         notifications = engineSnapshot.notifications;
+    }
+
+    public List<Loan> getLoansForSale() {
+        return loansForSale;
+    }
+
+    public List<AdminLoanDTO> getLoanForSaleAsDTO(){
+        List<AdminLoanDTO> ls = new ArrayList<>();
+        for (Loan l:
+             loansForSale) {
+            ls.add(new AdminLoanDTO(l));
+        }
+        return ls;
     }
 }

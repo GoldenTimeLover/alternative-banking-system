@@ -34,11 +34,12 @@ import utils.http.AdminHttpClient;
 import utils.http.AdminSnapshotRefresher;
 import utils.resources.AdminPaths;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class AdminPanelController extends AdminSubController {
+public class AdminPanelController extends AdminSubController implements Closeable {
 
 
     @FXML
@@ -427,4 +428,12 @@ public class AdminPanelController extends AdminSubController {
         }
     }
 
+
+    @Override
+    public void close() throws IOException {
+        if ( timer != null && snapshotRefresher != null) {
+            timer.cancel();
+            snapshotRefresher.cancel();
+        }
+    }
 }

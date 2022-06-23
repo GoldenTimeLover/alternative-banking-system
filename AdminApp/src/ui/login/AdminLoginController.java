@@ -33,8 +33,8 @@ public class AdminLoginController {
 
 
     private Stage primaryStage;
-    private PrimaryController adminMainController;
-    private String currentUser = null;
+    public PrimaryController adminMainController;
+    public String currentUser = null;
 
     @FXML
     private TextField userNameTextField;
@@ -108,7 +108,7 @@ public class AdminLoginController {
 
                             FXMLLoader loader = new FXMLLoader(getClass().getResource(AdminPaths.PRIMARY));
                             Parent root = loader.load();
-                            PrimaryController primaryController = loader.getController();
+                            adminMainController = loader.getController();
 
 
 
@@ -122,9 +122,9 @@ public class AdminLoginController {
 
                             // show the app again
                             primaryStage.show();
-                            primaryController.initialize(primaryStage);
-                            primaryController.adminPanel();
-                            primaryController.adminNameProperty.set(userName);
+                            adminMainController.initialize(primaryStage);
+                            adminMainController.adminPanel();
+                            adminMainController.adminNameProperty.set(userName);
                         }
                         catch(Exception ignore) {}
                     });

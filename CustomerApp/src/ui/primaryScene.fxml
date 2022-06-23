@@ -75,6 +75,11 @@
                               <Label fx:id="currentYazText" styleClass="text-under-primary-label" />
                            </children>
                         </VBox>
+                        <VBox layoutX="340.0" layoutY="25.0" onMouseClicked="#yazClicked" styleClass="time-display-area">
+                           <children>
+                              <Label fx:id="rewindModeText" style="-fx-font-weight: bold;" styleClass="primary-container-label" text="The system is in rewind mode. Information is READ ONLY" />
+                           </children>
+                        </VBox>
                      </children>
                      <padding>
                         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />

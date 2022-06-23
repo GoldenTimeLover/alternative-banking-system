@@ -29,7 +29,10 @@ public class EngineSnapshot {
 
         this.customers = new ArrayList<>();
         for (Customer c : customers){
-            this.customers.add(new Customer(c.getId(), (int) c.getBalance(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>()));
+            Customer temp = new Customer(c.getId(), (int) c.getBalance(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
+            temp.setAdmin(c.isAdmin());
+            this.customers.add(temp);
+
         }
 
         connectDataLoadedFromFile();

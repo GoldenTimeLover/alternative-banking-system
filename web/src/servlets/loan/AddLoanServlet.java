@@ -1,22 +1,20 @@
 package servlets.loan;
 
 import com.google.gson.Gson;
+import core.Exceptions.FileFormatException;
 import core.dtos.*;
 import core.engine.ABSEngine;
-import core.engine.Engine;
 import core.entities.Customer;
 import core.entities.Loan;
-import core.entities.Transaction;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import utils.ServerUtils;
-import utils.dtos.AbsLoan;
-import utils.dtos.AbsLoans;
+
 
 import java.io.IOException;
-import java.lang.reflect.Type;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,22 +41,37 @@ public class AddLoanServlet extends HttpServlet {
 
         List<SingleLoanDTO> singleLoanDTOS = new ArrayList<>();
 
+        // verify information
         for (SingleLoanDTO l: loansDTO.loanList) {
 
-            if(engine.getLoanById(l.id) != null)
-                continue;
+            try {
+                engine.checkLoanTimes(new Loan(l,user));
+            } catch (FileFormatException e) {
+                resp.setStatus(400);
+                resp.getWriter().println(e.getMessage());
+                return;
+            }
+            if(engine.getLoanById(l.getId()) != null){
+                resp.setStatus(400);
+                resp.getWriter().println("Loan with name " + l.getId() +" already exists.");
+                return;
+            }
 
-
+            if (loansDTO.categories != null && !loansDTO.categories.contains(l.absCategory)){
+                resp.setStatus(400);
+                resp.getWriter().println("Loan with name " + l.getId() +" categories not matching.");
+                return;
+            }
             singleLoanDTOS.add(l);
 
         }
+
+
 
         Gson gson = new Gson();
         List<Loan> loanList = new ArrayList<>();
         for (SingleLoanDTO absloan : singleLoanDTOS){
 
-            if(engine.getLoanById(absloan.id) != null)
-                continue;
             Loan l = new Loan(absloan.getId(),1,absloan.getAbsCapital(),
                     engine.findCustomerById(user), new ArrayList<>(),
                     Loan.LoanStatus.NEW,absloan.getAbsCategory(),
@@ -102,7 +115,7 @@ public class AddLoanServlet extends HttpServlet {
                 new CustomerSnapshot(outputData,
                 transactionsDTO,
                 engine.getCurrentTime(),
-                notificationDTO);
+                notificationDTO,engine.isRewind(),engine.getLoanForSaleAsDTO());
 
         String loanInfo = gson.toJson(customerSnapshot,CustomerSnapshot.class);
         resp.getWriter().println(loanInfo);

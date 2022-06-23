@@ -54,7 +54,7 @@ public class UserSnapshotServlet extends HttpServlet {
                         loansDTO,
                 new TransactionsDTO(loansDTO.balance,engine.findCustomerById(usernameFromSession).getTransactions()),
                 engine.getCurrentTime(),
-                notificationDTO);
+                notificationDTO,engine.isRewind(),engine.getLoanForSaleAsDTO());
 
 
         String s = gson.toJson(customerSnapshot,CustomerSnapshot.class);

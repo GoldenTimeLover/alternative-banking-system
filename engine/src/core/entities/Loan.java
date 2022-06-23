@@ -1,5 +1,6 @@
 package core.entities;
 
+import core.dtos.AdminLoanDTO;
 import core.dtos.SingleLoanDTO;
 import core.utils.utils;
 
@@ -66,9 +67,7 @@ public class Loan implements Comparable{
 
     public Loan(SingleLoanDTO loanDTO,String userName){
         this.id = loanDTO.getId();
-        //TODO
         this.startDate = 1;
-
         this.amount = loanDTO.getAbsCapital();
         this.remainingAmount = amount;
         this.borrower = new Customer(userName,false);
@@ -89,6 +88,32 @@ public class Loan implements Comparable{
         this.amountPaidUntilNow = 0.0;
         this.payments = new ArrayList<>();
     }
+    public Loan(AdminLoanDTO loanDTO){
+
+        this.id = loanDTO.getId();
+        this.startDate = 1;
+        this.amount = loanDTO.getAmount();
+        this.remainingAmount = loanDTO.getRemainingAmount();
+        this.borrower = new Customer(loanDTO.getOwnerName(),false);
+        this.lenders = new ArrayList<>();
+        this.status = LoanStatus.valueOf(loanDTO.getStatus());
+        this.category = loanDTO.getCategory();
+        this.interestRate = loanDTO.getInterestRate();
+        this.ownerName = loanDTO.getOwnerName();
+        this.lengthOfTime = loanDTO.getLengthOfTime();
+        this.timeBetweenPayments = loanDTO.getTimeBetweenPayments();
+        this.lenderAmounts = new HashMap<>();
+        this.timeNextPayment = loanDTO.getTimeNextPayment();
+
+        this.paymentPerYaz = amount / lengthOfTime;
+        this.singlePayment = paymentPerYaz * timeBetweenPayments;
+        this.singlePaymentTotal = singlePayment + (singlePayment * interestRate / 100);
+        this.completeAmountToBePaid = singlePaymentTotal * (lengthOfTime / timeBetweenPayments);
+        this.amountPaidUntilNow = 0.0;
+        this.payments = new ArrayList<>();
+    }
+
+
     @Override
     public int compareTo(Object o) {
         int compareData=((Loan)o).getStartDate();

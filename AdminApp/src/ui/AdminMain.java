@@ -28,6 +28,8 @@ import java.util.Optional;
 
 public class AdminMain extends Application {
 
+
+    private AdminLoginController adminLoginController;
     /*
 main function for the program, set's initial title calls the fxml loader and launches the
 primary scene which calls other components as needed.
@@ -42,7 +44,7 @@ primary scene which calls other components as needed.
 
 
         //get login controller
-        AdminLoginController adminLoginController = loader.getController();
+        adminLoginController = loader.getController();
 
 
         primaryStage.setScene(new Scene(root, 1050, 600));
@@ -63,7 +65,7 @@ primary scene which calls other components as needed.
                 String finalUrl = HttpUrl
                         .parse(AdminPaths.LOGOUT)
                         .newBuilder()
-                        .addQueryParameter("username","admin")
+                        .addQueryParameter("username",adminLoginController.currentUser)
                         .build()
                         .toString();
 
@@ -79,6 +81,8 @@ primary scene which calls other components as needed.
                     }
                 });
 
+
+
             }
         });
 
@@ -86,6 +90,12 @@ primary scene which calls other components as needed.
 
 
 
+    }
+
+    @Override
+    public void stop() throws Exception {
+        AdminHttpClient.shutdown();
+        adminLoginController.adminMainController.close();
     }
 
     public static void main(String[] args)

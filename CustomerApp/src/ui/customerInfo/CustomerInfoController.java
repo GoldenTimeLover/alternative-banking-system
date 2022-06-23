@@ -1,15 +1,9 @@
 package ui.customerInfo;
 
 import com.google.gson.Gson;
-import core.dtos.LoansDTO;
-import core.dtos.SingleLoanDTO;
-import core.dtos.TransactionsDTO;
-import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Transaction;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,11 +17,10 @@ import org.jetbrains.annotations.NotNull;
 import ui.subcontrollers.CustomerSubController;
 import utils.CustomerPaths;
 import utils.http.CustomerHttpClient;
-import utils.xml.ClientXmlParser;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+
 
 public class CustomerInfoController extends CustomerSubController {
 
@@ -47,17 +40,21 @@ public class CustomerInfoController extends CustomerSubController {
     private Button withdrawButton;
 
     @FXML
+    private Button toggleSellLoanButton;
+
+    @FXML
     private Spinner<Integer> amountSpinner;
 
+    private Loan selectedLoan;
 
     public ObservableList<Loan> givingLoansObservableList;
     public ObservableList<Loan> borrowingLoansObservableList;
     public ObservableList<Transaction> transactionObservableList;
 
     @FXML
-    public void initialize(){
+    public void initialize() {
         SpinnerValueFactory<Integer> valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0,1000000,0);
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000000, 0);
 
 
         amountSpinner.setValueFactory(valueFactory);
@@ -80,7 +77,39 @@ public class CustomerInfoController extends CustomerSubController {
 
     }
 
-    public void clearTables(){
+    @FXML
+    void toggleSellLoanButtonPressed(ActionEvent event){
+
+        ObservableList<Loan> selectedItems = this.lenderLoansTable.getSelectionModel().getSelectedItems();
+        if(selectedItems.size() == 0){
+            mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","No loan is selected.\nplease try" +
+                    "selecting one of the loans in the table.");
+        }
+        else{
+            this.selectedLoan = selectedItems.get(0);
+            String finalUrl = HttpUrl
+                    .parse(CustomerPaths.TOGGLE_BUY_LOAN)
+                    .newBuilder()
+                    .addQueryParameter("user",this.mainController.getUsername())
+                    .addQueryParameter("loanId", selectedLoan.getId())
+                    .build()
+                    .toString();
+
+            CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                }
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                }
+            });
+        }
+
+    }
+
+    public void clearTables() {
 
         loanerLoansTable.getItems().clear();
         lenderLoansTable.getItems().clear();
@@ -101,7 +130,7 @@ public class CustomerInfoController extends CustomerSubController {
         sendTransaction("withdraw");
     }
 
-    public void setInfoForCustomerIntoTables(){
+    public void setInfoForCustomerIntoTables() {
 
 
         clearTables();
@@ -112,9 +141,9 @@ public class CustomerInfoController extends CustomerSubController {
 
     }
 
-    private void sendTransaction(String type){
+    private void sendTransaction(String type) {
 
-        if (amountSpinner.getValue() == 0){
+        if (amountSpinner.getValue() == 0) {
             return;
         }
         String customerId = mainController.getUsername();
@@ -122,12 +151,12 @@ public class CustomerInfoController extends CustomerSubController {
         int amount = amountSpinner.getValue();
         Gson gson = new Gson();
 
-        try{
+        try {
             String finalUrl = HttpUrl
                     .parse(CustomerPaths.ADD_TRANSACTION)
                     .newBuilder()
-                    .addQueryParameter("type",type)
-                    .addQueryParameter("user",this.mainController.getUsername())
+                    .addQueryParameter("type", type)
+                    .addQueryParameter("user", this.mainController.getUsername())
                     .addQueryParameter("amount", String.valueOf(amountSpinner.getValue()))
                     .build()
                     .toString();
@@ -136,14 +165,14 @@ public class CustomerInfoController extends CustomerSubController {
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
 
                 }
+
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
 
-
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -153,161 +182,165 @@ public class CustomerInfoController extends CustomerSubController {
         loadTransactionTable();
     }
 
-    private void loadGivingLoansTable(){
+    private void loadGivingLoansTable() {
 
         //id
-        TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
+        TableColumn<Loan, String> idColumn = new TableColumn<>("Loan ID");
         idColumn.setMinWidth(100);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
 
-
         //owner
-        TableColumn<Loan,String> ownerColumn = new TableColumn<>("Owner");
+        TableColumn<Loan, String> ownerColumn = new TableColumn<>("Owner");
         ownerColumn.setMinWidth(100);
-        ownerColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getOwnerName()));
+        ownerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getOwnerName()));
 
         //category
-        TableColumn<Loan,String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<Loan, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setMinWidth(100);
-        categoryColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getCategory()));
+        categoryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCategory()));
 
         //start date
-        TableColumn<Loan,Integer> startDateColumn = new TableColumn<>("Start Date");
+        TableColumn<Loan, Integer> startDateColumn = new TableColumn<>("Start Date");
         startDateColumn.setMinWidth(100);
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
 
 
         //amount
-        TableColumn<Loan,Double> amountColumn = new TableColumn<>("Amount");
+        TableColumn<Loan, Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setMinWidth(100);
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
 
         //status
-        TableColumn<Loan,String> statusColumn = new TableColumn<>("Status");
+        TableColumn<Loan, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setMinWidth(100);
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         //length of time
-        TableColumn<Loan,Integer> lengthColumn = new TableColumn<>("Time Length");
+        TableColumn<Loan, Integer> lengthColumn = new TableColumn<>("Time Length");
         lengthColumn.setMinWidth(100);
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("lengthOfTime"));
 
         //Intreset Rate
-        TableColumn<Loan,Integer> interestColumn = new TableColumn<>("Interest Rate");
+        TableColumn<Loan, Integer> interestColumn = new TableColumn<>("Interest Rate");
         interestColumn.setMinWidth(100);
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
         //Time between each payment
-        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        TableColumn<Loan, Integer> timeBetweenCol = new TableColumn<>("pays every");
         timeBetweenCol.setMinWidth(100);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
 
-
         lenderLoansTable.getColumns().addAll(idColumn,
-                ownerColumn,amountColumn,
-                lengthColumn , interestColumn,
+                ownerColumn, amountColumn,
+                lengthColumn, interestColumn,
                 timeBetweenCol, categoryColumn,
-                statusColumn );
+                statusColumn);
 
 
     }
-    private void loadLendingLoansTable(){
+
+    private void loadLendingLoansTable() {
 
 
         //id
-        TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
+        TableColumn<Loan, String> idColumn = new TableColumn<>("Loan ID");
         idColumn.setMinWidth(100);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
 
-
         //owner
-        TableColumn<Loan,String> ownerColumn = new TableColumn<>("Owner");
+        TableColumn<Loan, String> ownerColumn = new TableColumn<>("Owner");
         ownerColumn.setMinWidth(100);
-        ownerColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getOwnerName()));
+        ownerColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getOwnerName()));
 
         //category
-        TableColumn<Loan,String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<Loan, String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setMinWidth(100);
-        categoryColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getCategory()));
+        categoryColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCategory()));
 
         //start date
-        TableColumn<Loan,Integer> startDateColumn = new TableColumn<>("Start Date");
+        TableColumn<Loan, Integer> startDateColumn = new TableColumn<>("Start Date");
         startDateColumn.setMinWidth(100);
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
 
 
         //amount
-        TableColumn<Loan,Double> amountColumn = new TableColumn<>("Amount");
+        TableColumn<Loan, Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setMinWidth(100);
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
 
         //status
-        TableColumn<Loan,String> statusColumn = new TableColumn<>("Status");
+        TableColumn<Loan, String> statusColumn = new TableColumn<>("Status");
         statusColumn.setMinWidth(100);
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         //length of time
-        TableColumn<Loan,Integer> lengthColumn = new TableColumn<>("Time Length");
+        TableColumn<Loan, Integer> lengthColumn = new TableColumn<>("Time Length");
         lengthColumn.setMinWidth(100);
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("lengthOfTime"));
 
         //Intreset Rate
-        TableColumn<Loan,Integer> interestColumn = new TableColumn<>("Interest Rate");
+        TableColumn<Loan, Integer> interestColumn = new TableColumn<>("Interest Rate");
         interestColumn.setMinWidth(100);
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
         //Time between each payment
-        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        TableColumn<Loan, Integer> timeBetweenCol = new TableColumn<>("pays every");
         timeBetweenCol.setMinWidth(100);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
 
         loanerLoansTable.getColumns().addAll(idColumn,
-                ownerColumn,amountColumn,
-                lengthColumn , interestColumn,
+                ownerColumn, amountColumn,
+                lengthColumn, interestColumn,
                 timeBetweenCol, categoryColumn,
-                statusColumn );
+                statusColumn);
 
     }
-    private void loadTransactionTable(){
+
+    private void loadTransactionTable() {
 
         //id
-        TableColumn<Transaction,Double> amountCol = new TableColumn<>("Amount");
+        TableColumn<Transaction, Double> amountCol = new TableColumn<>("Amount");
         amountCol.setMinWidth(100);
         amountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
         //date
-        TableColumn<Transaction,Integer> dateCol = new TableColumn<>("Date");
+        TableColumn<Transaction, Integer> dateCol = new TableColumn<>("Date");
         dateCol.setMinWidth(100);
         dateCol.setCellValueFactory(new PropertyValueFactory<>("date"));
 
         //type
-        TableColumn<Transaction,String> typeCol = new TableColumn<>("Type");
+        TableColumn<Transaction, String> typeCol = new TableColumn<>("Type");
         typeCol.setMinWidth(100);
         typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
 
 
         //balance before
 
-        TableColumn<Transaction,Double> beforeCol = new TableColumn<>("Balance Before");
+        TableColumn<Transaction, Double> beforeCol = new TableColumn<>("Balance Before");
         beforeCol.setMinWidth(100);
         beforeCol.setCellValueFactory(new PropertyValueFactory<>("balanceBefore"));
 
         // balance after
-        TableColumn<Transaction,Double> afterCol = new TableColumn<>("Balance After");
+        TableColumn<Transaction, Double> afterCol = new TableColumn<>("Balance After");
         afterCol.setMinWidth(100);
         afterCol.setCellValueFactory(new PropertyValueFactory<>("balanceAfter"));
 
 
+        accountTransactionsTable.getColumns().addAll(amountCol, dateCol, typeCol, beforeCol, afterCol);
+    }
 
+    public void bindButtons() {
+        depositButton.disableProperty().bind(mainController.isRewindModeProperty);
+        withdrawButton.disableProperty().bind(mainController.isRewindModeProperty);
+        amountSpinner.disableProperty().bind(mainController.isRewindModeProperty);
 
-        accountTransactionsTable.getColumns().addAll(amountCol,dateCol,typeCol,beforeCol,afterCol);
     }
 }
