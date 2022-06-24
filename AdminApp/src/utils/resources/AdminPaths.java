@@ -6,7 +6,7 @@ public class AdminPaths {
     public static String PRIMARY = "/ui/primaryScene.fxml";
     public static String ADMIN_PANEL = "/ui/adminPanel/adminPanel.fxml";
     public static String adminLogin = "/ui/login/AdminLogin.fxml";
-    public static String loanInfo = "/ui/components/loanDetails/loanDetail.fxml";
+    public static String loanInfo = "/ui/loanDetail/LoanDetailAlert.fxml";
 
 
     public static String LIGHT_PRIMARY_THEME = "/utils/resources/stylesheets/primarySceneLight.css";

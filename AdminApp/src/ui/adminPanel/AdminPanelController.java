@@ -5,30 +5,25 @@ import core.dtos.AdminSnapshot;
 import core.dtos.CustomerSnapshot;
 import core.entities.Customer;
 import core.entities.Loan;
-import core.entities.Transaction;
+
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
+
 import org.jetbrains.annotations.NotNull;
-import resources.paths.Paths;
-import ui.PrimaryController;
-import ui.components.SubController;
-import ui.components.loanDetails.LoanDetailsComp;
+
+import ui.loanDetail.LoanDetailAlert;
 import ui.subcontroller.AdminSubController;
 import utils.http.AdminHttpClient;
 import utils.http.AdminSnapshotRefresher;
@@ -59,7 +54,7 @@ public class AdminPanelController extends AdminSubController implements Closeabl
     @FXML
     private Button showLoanDetailsButton;
 
-    private Loan selectedLoan;
+    private AdminLoanDTO selectedLoan;
 
 
     private Timer timer;
@@ -98,9 +93,9 @@ public class AdminPanelController extends AdminSubController implements Closeabl
             return;
         }else {
 
-//            this.selectedLoan = selectedItems.get(0);
-//
-//            createShowLoanComponent(selectedLoan);
+            this.selectedLoan = selectedItems.get(0);
+
+            createShowLoanComponent(selectedLoan);
 
 
         }
@@ -299,12 +294,12 @@ public class AdminPanelController extends AdminSubController implements Closeabl
                 statusColumn );
     }
 
-    private void createShowLoanComponent(Loan l){
+    private void createShowLoanComponent(AdminLoanDTO l){
 
         ScrollPane scrollPane = new ScrollPane();
-        LoanDetailsComp loanDetailsComp = new LoanDetailsComp();
+        LoanDetailAlert loanDetailsComp = new LoanDetailAlert();
         FXMLLoader loader = new FXMLLoader();
-        URL url = getClass().getResource(Paths.loanInfo);
+        URL url = getClass().getResource(AdminPaths.loanInfo);
         loader.setLocation(url);
         try {
             assert url != null;

@@ -31,6 +31,7 @@ public class AdminLoanDTO {
     double amountPaidUntilNow;
     boolean paidThisYaz = false;
     String whoSelling = "";
+    public String paymentsString = "";
 
 
     public AdminLoanDTO(String id, int startDate, int endDate, double amount, double remainingAmount, String ownerName, ArrayList<String> lenders, String status, String category, int interestRate, int lengthOfTime, int timeBetweenPayments, int timeNextPayment, double unpaidDebt, double paymentPerYaz, double singlePayment, double singlePaymentTotal, double completeAmountToBePaid, double amountPaidUntilNow, boolean paidThisYaz) {
@@ -81,6 +82,10 @@ public class AdminLoanDTO {
         this.completeAmountToBePaid = l.getCompleteAmountToBePaid();
         this.amountPaidUntilNow = l.getAmountPaidUntilNow();
         this.paidThisYaz = l.isPaidThisYaz();
+        for (Transaction t: l.getPayments()) {
+            paymentsString += t.toString() +" |";
+
+        }
     }
 
     public String getId() {

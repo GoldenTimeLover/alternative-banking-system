@@ -1,7 +1,6 @@
 to do:
 - validate incoming loans - still need to understand categories..
 - notifications not working
-- show loans as admin button not working
 - if loan is risk remove from for sale and notify seller
 - selling loans works but deleted after timeline manipulation for some reason
 - scramble screen double categories bug
