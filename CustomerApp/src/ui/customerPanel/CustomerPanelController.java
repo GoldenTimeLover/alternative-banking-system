@@ -214,7 +214,10 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
                 mainController.SpeardInfoToAll(snapshot);
 
-                customerPaymentComponentController.prepareNotificationArea();
+                if(mainController.notificationDTO != null && mainController.notificationDTO.notificationList != null
+                &&customerPaymentComponentController.notificationObservableList.size() !=mainController.notificationDTO.notificationList.size() ){
+                    customerPaymentComponentController.prepareNotificationArea();
+                }
 
                 if(snapshot.isRewindMode && !centerContent.getContent().equals(customerInfoComponent)){
                     centerContent.setContent(customerInfoComponent);

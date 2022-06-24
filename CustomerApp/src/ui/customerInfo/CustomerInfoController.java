@@ -3,6 +3,7 @@ package ui.customerInfo;
 import com.google.gson.Gson;
 import core.entities.Loan;
 import core.entities.Transaction;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -102,7 +103,30 @@ public class CustomerInfoController extends CustomerSubController {
                 }
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
+                    if(response.code() !=200){
+                        Platform.runLater(()->{
+                            String s = "";
+                            try {
+                                 s = response.body().string();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            mainController.showAlert(Alert.AlertType.ERROR,"Couldn't put loan for sale",
+                                    s);
+                        });
+                    }
+                    else{
+                        Platform.runLater(()->{
+                            String s = "";
+                            try {
+                                s = response.body().string();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            mainController.showAlert(Alert.AlertType.INFORMATION,"Loan share put on sale",
+                                    s);
+                        });
+                    }
                 }
             });
         }

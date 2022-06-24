@@ -458,12 +458,24 @@ public class ABSEngine implements Engine{
                         loan.setUnpaidDebt(loan.getCompleteAmountToBePaid() -loan.getAmountPaidUntilNow());
                     }
                     loan.setStatus(Loan.LoanStatus.RISK);
+                    removeLoanFromForSale(loan);
                 }
             }
         }
     }
 
+    private void removeLoanFromForSale(Loan l){
 
+        for (AdminLoanDTO adminLoanDTO: loansForSale) {
+            if(adminLoanDTO.getId().equals(l.getId())){
+                String notifiedCustomer = adminLoanDTO.getWhoSelling();
+                this.notifications.get(notifiedCustomer).add(new Notification(l.getId() + " removed from for sale",
+                        currentTime,"Hello " + notifiedCustomer + " we regret to inform you that because"+
+                        "the loan '" + l.getId() +"' entered Risk mode it has been removed from the 'for sale section'"));
+                loansForSale.remove(adminLoanDTO);
+            }
+        }
+    }
     public void payLoanDebtAmount(Loan loan, double amount){
 
         //the customer that needs to pay

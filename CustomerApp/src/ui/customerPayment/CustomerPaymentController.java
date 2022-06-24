@@ -5,8 +5,10 @@ import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Loan;
 import core.entities.Notification;
 import core.entities.Transaction;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,7 +31,10 @@ import utils.http.CustomerHttpClient;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class CustomerPaymentController extends CustomerSubController {
 
@@ -52,11 +57,13 @@ public class CustomerPaymentController extends CustomerSubController {
 
     public ObservableList<Loan> paytingLoansObservableList;
 
+    public ObservableList<Notification> notificationObservableList;
+
     private Loan selectedLoan;
 
     @FXML
     private VBox notificationBox;
-    private int amountOfNotifications;
+
 
     @FXML
     public void initialize(){
@@ -73,17 +80,188 @@ public class CustomerPaymentController extends CustomerSubController {
         });
 
         paytingLoansObservableList = unpaidLoansTable.getItems();
-        amountOfNotifications = 0;
+        notificationObservableList = new ObservableList<Notification>() {
+            @Override
+            public void addListener(ListChangeListener<? super Notification> listener) {
+
+            }
+
+            @Override
+            public void removeListener(ListChangeListener<? super Notification> listener) {
+
+            }
+
+            @Override
+            public boolean addAll(Notification... elements) {
+                return false;
+            }
+
+            @Override
+            public boolean setAll(Notification... elements) {
+                return false;
+            }
+
+            @Override
+            public boolean setAll(Collection<? extends Notification> col) {
+                return false;
+            }
+
+            @Override
+            public boolean removeAll(Notification... elements) {
+                return false;
+            }
+
+            @Override
+            public boolean retainAll(Notification... elements) {
+                return false;
+            }
+
+            @Override
+            public void remove(int from, int to) {
+
+            }
+
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return false;
+            }
+
+            @NotNull
+            @Override
+            public Iterator<Notification> iterator() {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public Object[] toArray() {
+                return new Object[0];
+            }
+
+            @NotNull
+            @Override
+            public <T> T[] toArray(@NotNull T[] a) {
+                return null;
+            }
+
+            @Override
+            public boolean add(Notification notification) {
+                return false;
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                return false;
+            }
+
+            @Override
+            public boolean containsAll(@NotNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(@NotNull Collection<? extends Notification> c) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(int index, @NotNull Collection<? extends Notification> c) {
+                return false;
+            }
+
+            @Override
+            public boolean removeAll(@NotNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public boolean retainAll(@NotNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public void clear() {
+
+            }
+
+            @Override
+            public Notification get(int index) {
+                return null;
+            }
+
+            @Override
+            public Notification set(int index, Notification element) {
+                return null;
+            }
+
+            @Override
+            public void add(int index, Notification element) {
+
+            }
+
+            @Override
+            public Notification remove(int index) {
+                return null;
+            }
+
+            @Override
+            public int indexOf(Object o) {
+                return 0;
+            }
+
+            @Override
+            public int lastIndexOf(Object o) {
+                return 0;
+            }
+
+            @NotNull
+            @Override
+            public ListIterator<Notification> listIterator() {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public ListIterator<Notification> listIterator(int index) {
+                return null;
+            }
+
+            @NotNull
+            @Override
+            public List<Notification> subList(int fromIndex, int toIndex) {
+                return null;
+            }
+
+            @Override
+            public void addListener(InvalidationListener listener) {
+
+            }
+
+            @Override
+            public void removeListener(InvalidationListener listener) {
+
+            }
+        };
     }
 
 
 
     public void prepareNotificationArea(){
 
-
-
-
         if(mainController.notificationDTO != null && mainController.notificationDTO.notificationList != null){
+            notificationBox.getChildren().clear();
+            this.notificationObservableList.clear();
+            this.notificationObservableList.addAll(mainController.notificationDTO.notificationList);
             for (Notification n: mainController.notificationDTO.notificationList) {
 
                     createNotification(n.getTitle(),n.getDate(),n.getContent());
@@ -97,7 +275,7 @@ public class CustomerPaymentController extends CustomerSubController {
 
     public void createNotification(String title,int date,String content) {
 
-        notificationBox.getChildren().clear();
+
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource(CustomerPaths.SINGLE_NOTIFICATION));

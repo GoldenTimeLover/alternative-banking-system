@@ -32,11 +32,7 @@ public class BuyLoanServlet extends HttpServlet {
             return;
         }
 
-        if(buyerName.equals(sellerName)){
-            resp.getWriter().println("Cannot buy your own loan");
-            resp.setStatus(400);
-            return;
-        }
+
         System.out.println("Parameters ok");
 
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
@@ -49,7 +45,11 @@ public class BuyLoanServlet extends HttpServlet {
 
         Customer oldOwner = engine.findCustomerById(sellerName);
 
-
+        if(buyerName.equals(sellerName) || loanById.getOwnerName().equals(buyerName)){
+            resp.getWriter().println("Cannot buy your own loan\\share");
+            resp.setStatus(400);
+            return;
+        }
         //remove this part of loan from list of loans for sale
         for (int i = 0; i < engine.getLoansForSale().size(); i++) {
             if(engine.getLoansForSale().get(i).getId().equals(loanId)

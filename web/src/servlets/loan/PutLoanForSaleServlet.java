@@ -34,10 +34,16 @@ public class PutLoanForSaleServlet extends HttpServlet {
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
 
         Loan ln = engine.getLoanById(loanId);
-        if(ln == null){
+        if(ln == null ){
             resp.setStatus(400);
             resp.getWriter().println("No such loan in system");
             return;
+        }
+        if(!ln.getStatus().equals(Loan.LoanStatus.ACTIVE)){
+            resp.setStatus(400);
+            resp.getWriter().println("Can only sell loans that are ACTIVE");
+            return;
+
         }
         System.out.println("Loan found in system");
 
@@ -56,11 +62,11 @@ public class PutLoanForSaleServlet extends HttpServlet {
         if(!wasForSale){
         engine.getLoansForSale().add(loan);
         resp.setStatus(200);
-        System.out.println("Added loan to loans for sale");
+        resp.getWriter().println("Added loan '" + loanId +"' to loans for sale");
         }
         else{
             resp.setStatus(200);
-            System.out.println("Loan was removed");
+            resp.getWriter().println("Removed loan '" + loanId +"' from loans for sale");
         }
     }
 }
