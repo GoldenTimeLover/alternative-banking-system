@@ -154,22 +154,39 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
-                    Platform.runLater(()->{
-                                try {
-                                    String s = response.body().string();
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                    alert.setTitle("Success");
-                                    alert.setHeaderText("File loaded Successfully");
-                                    alert.setContentText(s);
-                                    ButtonType yesButton = new ButtonType("Cool");
-                                    alert.getButtonTypes().setAll(yesButton);
-                                    Optional<ButtonType> result = alert.showAndWait();
+                    if (response.code() == 200) {
+                        Platform.runLater(() -> {
+                                    try {
+                                        String s = response.body().string();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                        alert.setTitle("Success");
+                                        alert.setHeaderText("File loaded Successfully");
+                                        alert.setContentText(s);
+                                        ButtonType yesButton = new ButtonType("Cool");
+                                        alert.getButtonTypes().setAll(yesButton);
+                                        Optional<ButtonType> result = alert.showAndWait();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                                catch (IOException e) {
-                                    e.printStackTrace();
+                        );
+                    }else{
+                        Platform.runLater(() -> {
+                                    try {
+                                        String s = response.body().string();
+                                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                                        alert.setTitle("Failure");
+                                        alert.setHeaderText("File load was unsuccessful");
+                                        alert.setContentText(s);
+                                        ButtonType yesButton = new ButtonType("Cool");
+                                        alert.getButtonTypes().setAll(yesButton);
+                                        Optional<ButtonType> result = alert.showAndWait();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                    );
+                        );
+                    }
 
                 }
             });

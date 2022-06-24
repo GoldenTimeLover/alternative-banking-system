@@ -37,7 +37,7 @@ public class AdminSnapshotServlet extends HttpServlet{
             if (!c.isAdmin()){
                 adminSnapshot.customerSnapshotList.add(new CustomerSnapshot(new LoansDTO(c),
                         new TransactionsDTO(c.getBalance(),c.getTransactions()), engine.getCurrentTime(),
-                        new NotificationDTO(engine.getNotifications().get(c.getId())),engine.isRewind(),engine.getLoanForSaleAsDTO()));
+                        new NotificationDTO(engine.getNotifications().get(c.getId())),engine.isRewind(),engine.getLoansForSale()));
             }
         }
 

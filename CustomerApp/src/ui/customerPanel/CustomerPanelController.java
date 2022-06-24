@@ -203,14 +203,11 @@ public class CustomerPanelController extends CustomerSubController implements Cl
                 }
 
 
-                List<Loan> forSale = new ArrayList<>();
-                for (AdminLoanDTO l:snapshot.forSale) {
-                    forSale.add(new Loan(l));
+                List<AdminLoanDTO> forSale = snapshot.forSale;
 
-                }
 
                 if(forSale.size() != customerBuyingLoanComponentController.forSaleLoanObservable.size()||
-                        checkLoansStatusChange(forSale,customerBuyingLoanComponentController.forSaleLoanObservable)){
+                        checkLoanStatusChangeDTO(forSale,customerBuyingLoanComponentController.forSaleLoanObservable)){
                     customerBuyingLoanComponentController.forSaleLoanObservable.clear();
                     customerBuyingLoanComponentController.forSaleLoanObservable.addAll(forSale);
                 }
@@ -227,6 +224,23 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
             }
         });
+    }
+
+    public boolean checkLoanStatusChangeDTO(List<AdminLoanDTO> activeLoansPayingFor,ObservableList<AdminLoanDTO> payingLoansObservable){
+        Map<String,String> status = new HashMap<>();
+        if(activeLoansPayingFor == null || payingLoansObservable == null){
+            return false;
+        }
+        for (int i = 0; i < activeLoansPayingFor.size(); i++) {
+            status.put(activeLoansPayingFor.get(i).getId(),activeLoansPayingFor.get(i).getStatus().toString());
+        }
+
+        for (int i=0;i<payingLoansObservable.size();i++){
+            if(!status.get(payingLoansObservable.get(i).getId()).equals(payingLoansObservable.get(i).getStatus().toString())){
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean checkLoansStatusChange(List<Loan> activeLoansPayingFor, ObservableList<Loan> payingLoansObservable){

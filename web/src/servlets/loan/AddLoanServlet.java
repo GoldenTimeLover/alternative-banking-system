@@ -89,36 +89,7 @@ public class AddLoanServlet extends HttpServlet {
         }
 
         engine.addOwnerToLoanInEngine(loanList);
-
-
-        LoansDTO outputData = new LoansDTO(new ArrayList<>(),new ArrayList<>(),
-                user,engine.findCustomerById(user).getBalance());
-
-        for (Loan l: engine.getLoans()){
-
-            Customer customer = engine.findCustomerById(user);
-
-            if(l.getBorrower().getId().equals(user)){
-                outputData.loanList.add(new SingleLoanDTO(l));
-            }
-            if(l.getLenders().contains(customer)){
-                outputData.loansCustomerGaveToOthers.add(new SingleLoanDTO(l));
-            }
-        }
-
-        TransactionsDTO transactionsDTO = new TransactionsDTO(engine.findCustomerById (user).getBalance(),new ArrayList<>());
-        transactionsDTO.transactions.addAll(engine.findCustomerById(user).getTransactions());
-
-        NotificationDTO notificationDTO = new NotificationDTO(engine.getNotifications().get(user));
-
-        CustomerSnapshot customerSnapshot =
-                new CustomerSnapshot(outputData,
-                transactionsDTO,
-                engine.getCurrentTime(),
-                notificationDTO,engine.isRewind(),engine.getLoanForSaleAsDTO());
-
-        String loanInfo = gson.toJson(customerSnapshot,CustomerSnapshot.class);
-        resp.getWriter().println(loanInfo);
+        resp.getWriter().println("Loans" + loanList + " have been successfully added to system.");
         resp.setStatus(200);
 
 

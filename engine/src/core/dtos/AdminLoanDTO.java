@@ -30,6 +30,7 @@ public class AdminLoanDTO {
     double completeAmountToBePaid;
     double amountPaidUntilNow;
     boolean paidThisYaz = false;
+    String whoSelling = "";
 
 
     public AdminLoanDTO(String id, int startDate, int endDate, double amount, double remainingAmount, String ownerName, ArrayList<String> lenders, String status, String category, int interestRate, int lengthOfTime, int timeBetweenPayments, int timeNextPayment, double unpaidDebt, double paymentPerYaz, double singlePayment, double singlePaymentTotal, double completeAmountToBePaid, double amountPaidUntilNow, boolean paidThisYaz) {
@@ -160,5 +161,13 @@ public class AdminLoanDTO {
 
     public boolean isPaidThisYaz() {
         return paidThisYaz;
+    }
+
+    public String getWhoSelling() {
+        return whoSelling;
+    }
+
+    public void setWhoSelling(String whoSelling) {
+        this.whoSelling = whoSelling;
     }
 }

@@ -1,6 +1,8 @@
 package ui.customerBuyLoan;
 
+import core.dtos.AdminLoanDTO;
 import core.entities.Loan;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,18 +33,18 @@ public class CustomerBuyLoanController extends CustomerSubController implements 
     private Button buyLoanButton;
 
     @FXML
-    private TableView<Loan> forSaleLoansTable;
+    private TableView<AdminLoanDTO> forSaleLoansTable;
 
 
-    public ObservableList<Loan> forSaleLoanObservable;
-    private Loan selectedLoan;
+    public ObservableList<AdminLoanDTO> forSaleLoanObservable;
+    private AdminLoanDTO selectedLoan;
 
 
 
 
     @FXML
     void buyLoanButtonPressed(ActionEvent event) {
-        ObservableList<Loan> selectedItems = this.forSaleLoansTable.getSelectionModel().getSelectedItems();
+        ObservableList<AdminLoanDTO> selectedItems = this.forSaleLoansTable.getSelectionModel().getSelectedItems();
         if(selectedItems.size() == 0){
             mainController.showAlert(Alert.AlertType.WARNING,"Warning - No loan selected!","No loan is selected.\nplease try" +
                     "selecting one of the loans in the table.");
@@ -54,6 +56,7 @@ public class CustomerBuyLoanController extends CustomerSubController implements 
                     .newBuilder()
                     .addQueryParameter("user",this.mainController.getUsername())
                     .addQueryParameter("loanId", selectedLoan.getId())
+                    .addQueryParameter("seller",selectedLoan.getWhoSelling())
                     .build()
                     .toString();
             CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
@@ -63,8 +66,23 @@ public class CustomerBuyLoanController extends CustomerSubController implements 
                 }
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                    String s = Objects.requireNonNull(response.body()).string();
-                    System.out.println(s);
+
+
+                    if(response.code() != 200){
+                        String s =  response.body().string();
+                        Platform.runLater(() ->{
+                                mainController.showAlert(Alert.AlertType.ERROR,s,s);
+                                }
+                        );
+                    }else{
+                        Platform.runLater(() ->{
+                                    mainController.showAlert(Alert.AlertType.INFORMATION,"Loan purchase","" +
+                                            "Successfully bought loan "+ selectedLoan.getId() + " from " + selectedLoan.getWhoSelling());
+                                }
+                        );
+
+                    }
+                    System.out.println("Returned from buy loan request");
                 }
             });
         }
@@ -80,73 +98,62 @@ public class CustomerBuyLoanController extends CustomerSubController implements 
 
 
         //id
-        TableColumn<Loan,String> idColumn = new TableColumn<>("Loan ID");
+        TableColumn<AdminLoanDTO,String> idColumn = new TableColumn<>("Loan ID");
         idColumn.setMinWidth(150);
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
 
 
         //owner
-        TableColumn<Loan,String> ownerColumn = new TableColumn<>("Owner");
+        TableColumn<AdminLoanDTO,String> ownerColumn = new TableColumn<>("Owner");
         ownerColumn.setMinWidth(150);
         ownerColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getOwnerName()));
 
         //category
-        TableColumn<Loan,String> categoryColumn = new TableColumn<>("Category");
+        TableColumn<AdminLoanDTO,String> categoryColumn = new TableColumn<>("Category");
         categoryColumn.setMinWidth(150);
         categoryColumn.setCellValueFactory(c-> new SimpleStringProperty(c.getValue().getCategory()));
 
         //start date
-        TableColumn<Loan,Integer> startDateColumn = new TableColumn<>("Start Date");
+        TableColumn<AdminLoanDTO,Integer> startDateColumn = new TableColumn<>("Start Date");
         startDateColumn.setMinWidth(150);
         startDateColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
 
 
         //amount
-        TableColumn<Loan,Double> amountColumn = new TableColumn<>("Amount");
+        TableColumn<AdminLoanDTO,Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setMinWidth(150);
         amountColumn.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
 
-        //status
-        TableColumn<Loan,String> statusColumn = new TableColumn<>("Status");
-        statusColumn.setMinWidth(150);
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-
         //length of time
-        TableColumn<Loan,Integer> lengthColumn = new TableColumn<>("Time Length");
+        TableColumn<AdminLoanDTO,Integer> lengthColumn = new TableColumn<>("Time Length");
         lengthColumn.setMinWidth(150);
         lengthColumn.setCellValueFactory(new PropertyValueFactory<>("lengthOfTime"));
 
         //Intreset Rate
-        TableColumn<Loan,Integer> interestColumn = new TableColumn<>("Interest Rate");
+        TableColumn<AdminLoanDTO,Integer> interestColumn = new TableColumn<>("Interest Rate");
         interestColumn.setMinWidth(150);
         interestColumn.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
 
 
         //Time between each payment
-        TableColumn<Loan,Integer> timeBetweenCol = new TableColumn<>("pays every");
+        TableColumn<AdminLoanDTO,Integer> timeBetweenCol = new TableColumn<>("pays every");
         timeBetweenCol.setMinWidth(150);
         timeBetweenCol.setCellValueFactory(new PropertyValueFactory<>("timeBetweenPayments"));
 
-        TableColumn<Loan,Double> aaaa = new TableColumn<>("Total to be paid");
+        TableColumn<AdminLoanDTO,Double> aaaa = new TableColumn<>("Total to be paid");
         aaaa.setMinWidth(150);
         aaaa.setCellValueFactory(new PropertyValueFactory<>("completeAmountToBePaid"));
 
 
-        TableColumn<Loan,Double> bbb = new TableColumn<>("paid so far");
-        bbb.setMinWidth(150);
-        bbb.setCellValueFactory(new PropertyValueFactory<>("amountPaidUntilNow"));
-
-
-
-        TableColumn<Loan, Boolean> ccc = new TableColumn<>("did pay this yazs");
+        TableColumn<AdminLoanDTO, Boolean> ccc = new TableColumn<>("seller name");
         ccc.setMinWidth(150);
-        ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
+        ccc.setCellValueFactory(new PropertyValueFactory<>("whoSelling"));
 
 
-        forSaleLoansTable.getColumns().addAll(idColumn,timeBetweenCol,startDateColumn,amountColumn,
-                statusColumn,lengthColumn,interestColumn,aaaa,bbb,ccc);
+        forSaleLoansTable.getColumns().addAll(idColumn,ccc,amountColumn,timeBetweenCol,startDateColumn,
+                lengthColumn,interestColumn,aaaa);
 
 
     }

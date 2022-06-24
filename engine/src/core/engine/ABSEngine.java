@@ -26,7 +26,7 @@ public class ABSEngine implements Engine{
     private List<Loan> loans;
     private List<Customer> customers;
     private List<String> categories;
-    private List<Loan> loansForSale;
+    private List<AdminLoanDTO> loansForSale;
     private int currentTime = 1;
     private boolean dataLoaded= false;
     private Map<String,List<Notification>> notifications;
@@ -751,16 +751,9 @@ public class ABSEngine implements Engine{
         notifications = engineSnapshot.notifications;
     }
 
-    public List<Loan> getLoansForSale() {
+    public List<AdminLoanDTO> getLoansForSale() {
         return loansForSale;
     }
 
-    public List<AdminLoanDTO> getLoanForSaleAsDTO(){
-        List<AdminLoanDTO> ls = new ArrayList<>();
-        for (Loan l:
-             loansForSale) {
-            ls.add(new AdminLoanDTO(l));
-        }
-        return ls;
-    }
+
 }

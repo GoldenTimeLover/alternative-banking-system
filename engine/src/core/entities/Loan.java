@@ -163,10 +163,7 @@ public class Loan implements Comparable{
 
     @Override
     public String toString() {
-        return  "Id=" + id +
-                "amount=" + amount +
-                ", loaner=" + borrower +
-                ", category='" + category;
+        return  "Id=" + id;
     }
 
     public Customer getBorrower() {
@@ -363,4 +360,7 @@ public class Loan implements Comparable{
         return res.toString();
     }
 
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
+    }
 }

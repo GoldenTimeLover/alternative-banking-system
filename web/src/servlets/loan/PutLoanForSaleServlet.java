@@ -1,6 +1,7 @@
 package servlets.loan;
 
 
+import core.dtos.AdminLoanDTO;
 import core.engine.ABSEngine;
 import core.entities.Loan;
 import jakarta.servlet.ServletException;
@@ -19,7 +20,7 @@ public class PutLoanForSaleServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
-        System.out.println("did you come here?");
+        System.out.println("In Put loan for sale servlet");
         String user = req.getParameter("user");
         String loanId= req.getParameter("loanId");
 
@@ -28,31 +29,38 @@ public class PutLoanForSaleServlet extends HttpServlet {
             resp.getWriter().println("Needed parameters not provided");
             return;
         }
+
+        System.out.println("Parameters ok");
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
 
-        Loan loan = engine.getLoanById(loanId);
-        if(loan == null){
+        Loan ln = engine.getLoanById(loanId);
+        if(ln == null){
             resp.setStatus(400);
             resp.getWriter().println("No such loan in system");
             return;
         }
+        System.out.println("Loan found in system");
+
+        AdminLoanDTO loan = new AdminLoanDTO(ln);
+        loan.setWhoSelling(user);
 
         boolean wasForSale = false;
-        for (Loan l : engine.getLoansForSale()){
+        for (AdminLoanDTO l : engine.getLoansForSale()){
             if(l.getId().equals(loanId)){
                 engine.getLoansForSale().remove(l);
                 wasForSale = true;
                 break;
             }
         }
+
         if(!wasForSale){
         engine.getLoansForSale().add(loan);
         resp.setStatus(200);
-        resp.getWriter().println("Added loan to loans for sale");
+        System.out.println("Added loan to loans for sale");
         }
         else{
             resp.setStatus(200);
-            resp.getWriter().println("Loan was removed");
+            System.out.println("Loan was removed");
         }
     }
 }
