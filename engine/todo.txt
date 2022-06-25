@@ -1,4 +1,0 @@
-to do:
-- validate incoming loans - still need to understand categories..
-- selling loans works but deleted after timeline manipulation for some reason
-- also being deleted by time travel are giving loans and transactions
