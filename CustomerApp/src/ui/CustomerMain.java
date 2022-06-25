@@ -7,10 +7,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import ui.login.CustomerLoginController;
 import utils.CustomerPaths;
+import utils.http.CustomerHttpClient;
+
+import java.io.IOException;
 
 public class CustomerMain extends Application {
+
+    private CustomerLoginController customerLoginController;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -22,7 +32,7 @@ public class CustomerMain extends Application {
 
 
         //get login controller
-        CustomerLoginController customerLoginController = loader.getController();
+        customerLoginController = loader.getController();
 
 
         primaryStage.setScene(new Scene(root, 1050, 600));
@@ -37,15 +47,47 @@ public class CustomerMain extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
+
                 System.out.println("ohhh weee i'm closing down this app!");
+
+                String finalUrl = HttpUrl
+                        .parse(CustomerPaths.LOGOUT)
+                        .newBuilder()
+                        .addQueryParameter("username",customerLoginController.currentUser)
+                        .build()
+                        .toString();
+
+                CustomerHttpClient.runAsync(finalUrl,"GET",null, new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        System.out.println("log out success");
+                    }
+                });
+
+                try {
+                    stop();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
-
         primaryStage.show();
 
 
 
     }
+
+    @Override
+    public void stop() throws Exception {
+        CustomerHttpClient.shutdown();
+        customerLoginController.primaryController.close();
+    }
+
 
     public static void main(String[] args)
     {

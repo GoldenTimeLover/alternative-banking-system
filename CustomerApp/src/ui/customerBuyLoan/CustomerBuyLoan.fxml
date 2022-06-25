@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.customerBuyLoan.CustomerBuyLoanController">
+   <content>
+      <FlowPane>
+         <children>
+            <VBox>
+               <children>
+                  <HBox spacing="30.0">
+                     <children>
+                        <Label styleClass="cool-label" text="Loans for sale" />
+                        <Button fx:id="buyLoanButton" mnemonicParsing="false" onAction="#buyLoanButtonPressed" text="Buy loan" />
+                     </children>
+                  </HBox>
+                  <TableView fx:id="forSaleLoansTable" />
+               </children>
+            </VBox>
+         </children>
+      </FlowPane>
+   </content>
+</ScrollPane>

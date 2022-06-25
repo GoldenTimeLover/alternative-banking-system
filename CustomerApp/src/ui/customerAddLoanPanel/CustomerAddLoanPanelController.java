@@ -154,24 +154,39 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
-                    Platform.runLater(()->{
-                                try {
-                                    String s = response.body().string();
-                                    CustomerSnapshot customerSnapshot = gson.fromJson(s,CustomerSnapshot.class);
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                    alert.setTitle("Success");
-                                    alert.setHeaderText("File loaded Successfully");
-                                    alert.setContentText(s);
-                                    ButtonType yesButton = new ButtonType("Cool");
-                                    alert.getButtonTypes().setAll(yesButton);
-                                    Optional<ButtonType> result = alert.showAndWait();
-                                    mainController.SpeardInfoToAll(customerSnapshot);
+                    if (response.code() == 200) {
+                        Platform.runLater(() -> {
+                                    try {
+                                        String s = response.body().string();
+                                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                                        alert.setTitle("Success");
+                                        alert.setHeaderText("File loaded Successfully");
+                                        alert.setContentText(s);
+                                        ButtonType yesButton = new ButtonType("Cool");
+                                        alert.getButtonTypes().setAll(yesButton);
+                                        Optional<ButtonType> result = alert.showAndWait();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                                catch (IOException e) {
-                                    e.printStackTrace();
+                        );
+                    }else{
+                        Platform.runLater(() -> {
+                                    try {
+                                        String s = response.body().string();
+                                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                                        alert.setTitle("Failure");
+                                        alert.setHeaderText("File load was unsuccessful");
+                                        alert.setContentText(s);
+                                        ButtonType yesButton = new ButtonType("Cool");
+                                        alert.getButtonTypes().setAll(yesButton);
+                                        Optional<ButtonType> result = alert.showAndWait();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                    );
+                        );
+                    }
 
                 }
             });
@@ -209,7 +224,8 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
             try{
                 ClientXmlParser clientXmlParser = new ClientXmlParser(selectedFile.getAbsolutePath());
                 List<AbsLoan> loans = clientXmlParser.getLoans();
-                LoansDTO lsdto = new LoansDTO(new ArrayList(),new ArrayList<>(), mainController.getUsername(), 0);
+                List<String> categories = clientXmlParser.getCategories();
+                LoansDTO lsdto = new LoansDTO(new ArrayList(),new ArrayList<>(), mainController.getUsername(), 0,categories);
 
                 for (AbsLoan loan : loans) {
                     lsdto.loanList.add(new SingleLoanDTO(loan.getAbsCategory(),
@@ -240,20 +256,27 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
 
                         Platform.runLater(()->{
-                            try {
-                                String s = response.body().string();
-                                CustomerSnapshot customerSnapshot = gson.fromJson(s,CustomerSnapshot.class);
+
+
+                                String s = "";
+                                try {
+                                    s = response.body().string();
+                                } catch (IOException e) {
+                                    s = "";
+                                }
                                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                alert.setTitle("Success");
-                                alert.setHeaderText("File loaded Successfully");
+                                if(response.code() == 200){
+                                    alert.setTitle("Success");
+                                    alert.setHeaderText("File loaded Successfully");
+                                }else{
+                                    alert.setTitle("Rejection");
+                                    alert.setHeaderText("File was not loaded");
+                                }
                                 alert.setContentText(s);
-                                ButtonType yesButton = new ButtonType("Cool");
+                                ButtonType yesButton = new ButtonType("Ok");
                                 alert.getButtonTypes().setAll(yesButton);
                                 Optional<ButtonType> result = alert.showAndWait();
-                            }
-                            catch (IOException e) {
-                                        e.printStackTrace();
-                            }
+
                         }
                         );
 

@@ -12,6 +12,7 @@ public class CustomerPaths {
     public static String CUSTOMER_PAYMENT = "/ui/customerPayment/customerPayment.fxml";
     public static String CUSTOMER_INFO = "/ui/customerInfo/customerInfo.fxml";
     public static String CUSTOMER_ADD_LOAN = "/ui/customerAddLoanPanel/customerAddLoanPanel.fxml";
+    public static String CUSTOMER_BUY_LOAN = "/ui/customerBuyLoan/CustomerBuyLoan.fxml";
 
     public static String LOAN_INFO = "/ui/components/loanDetails/loanDetail.fxml";
     public static String SINGLE_NOTIFICATION = "/ui/notificationArea/notification.fxml";
@@ -37,8 +38,11 @@ public class CustomerPaths {
     public final static String ADD_TRANSACTION = FULL_SERVER_PATH + "/user/transaction";
     public final static String FILTER_LOANS = FULL_SERVER_PATH + "/loan/filter";
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/user/login";
+    public final static String LOGOUT = FULL_SERVER_PATH + "/user/logout";
     public final static String GET_CATEGORIES = FULL_SERVER_PATH + "/loan/categories";
     public final static String FINANCE_LOAN = FULL_SERVER_PATH + "/loan/finance";
     public final static String GET_SNAPSHOT = FULL_SERVER_PATH + "/user/snapshot";
     public final static String PAY_LOAN = FULL_SERVER_PATH + "/loan/payback";
+    public final static String BUY_LOAN = FULL_SERVER_PATH + "/loan/buy";
+    public final static String TOGGLE_BUY_LOAN = FULL_SERVER_PATH + "/loan/buy/toggle";
 }

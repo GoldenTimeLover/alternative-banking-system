@@ -48,6 +48,7 @@ public class LoginServlet extends HttpServlet {
                 }
                 else{
 
+                    System.out.println("added admin" + userName);
                     userManager.addAdmin(userName,engine);
                     resp.getWriter().println("hello admin " + userName);
                     req.getSession(true).setAttribute("username", userName);

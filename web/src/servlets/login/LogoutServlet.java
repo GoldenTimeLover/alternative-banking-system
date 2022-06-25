@@ -12,7 +12,9 @@ import java.io.IOException;
 @WebServlet(name = "LogoutServlet" , urlPatterns = "/user/logout")
 public class LogoutServlet extends HttpServlet {
 
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+
         String username = request.getParameter("username");
         UserManager userManager = ServerUtils.getUserManager(getServletContext());
 

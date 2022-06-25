@@ -93,6 +93,9 @@ public class Customer {
         return returnedString;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
 
     private String getLoansCustomerGaveString(){
         String res = "";
@@ -210,5 +213,7 @@ public class Customer {
         return counter;
     }
 
-
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
 }

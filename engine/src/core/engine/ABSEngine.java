@@ -3,6 +3,8 @@ package core.engine;
 import core.Exceptions.FileFormatException;
 import core.Exceptions.LoanProccessingException;
 import core.Exceptions.NotEnoughMoneyException;
+import core.dtos.AdminLoanDTO;
+import core.dtos.EngineSnapshot;
 import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Notification;
@@ -24,11 +26,14 @@ public class ABSEngine implements Engine{
     private List<Loan> loans;
     private List<Customer> customers;
     private List<String> categories;
+    private List<AdminLoanDTO> loansForSale;
     private int currentTime = 1;
     private boolean dataLoaded= false;
-    private final StringProperty currentFilePath = new SimpleStringProperty(this,"currentFilePath","No File Selected");
-    private final Map<String,List<Notification>> notifications;
+    private Map<String,List<Notification>> notifications;
+    private List<EngineSnapshot> timeLine;
+    private EngineSnapshot latestSnapshot;
 
+    private boolean isRewind = false;
     private Task<Boolean> currentRunningTask;
 
     public Map<String, List<Notification>> getNotifications() {
@@ -36,11 +41,7 @@ public class ABSEngine implements Engine{
     }
 
 
-    public IntegerProperty currTimeForGuiProperty() {
-        return CurrTimeForGui;
-    }
 
-    IntegerProperty CurrTimeForGui = new SimpleIntegerProperty(1);
 
     public ABSEngine(){
 
@@ -49,6 +50,9 @@ public class ABSEngine implements Engine{
         this.loans = new ArrayList<>();
         this.categories = new ArrayList<>();
         this.notifications = new HashMap<>();
+        this.timeLine = new ArrayList<>();
+        this.loansForSale = new ArrayList<>();
+
 
     }
 
@@ -62,17 +66,8 @@ public class ABSEngine implements Engine{
         return null;
     }
 
-    public String getCurrentFilePath() {
-        return currentFilePath.get();
-    }
 
-    public StringProperty currentFilePathProperty() {
-        return currentFilePath;
-    }
 
-    public void setCurrentFilePath(String currentFilePath) {
-        this.currentFilePath.set(currentFilePath);
-    }
 
     public Loan getLoanById(String loanName){
 
@@ -99,14 +94,14 @@ public class ABSEngine implements Engine{
 
         //Set Current Time to 1 whenever you load new Data
         this.currentTime = 1;
-        CurrTimeForGui.set(currentTime);
+
 
         verifyData();
         //Connect the Loans and The Customers you got from file
         connectDataLoadedFromFile();
 
         dataLoaded = true;
-        currentFilePath.set(filePath);
+
         System.out.println("Data Loaded Successfully!");
     }
 
@@ -378,16 +373,18 @@ public class ABSEngine implements Engine{
 
     }
 
-
+    public void setCurrentTime(int currentTime) {
+        this.currentTime = currentTime;
+    }
 
     public void moveTimeForward(){
 
         // function to collect money from loaners
         List<Loan> activeLoans = getActiveLoans();
+        timeLine.add(new EngineSnapshot(loans,customers,categories,notifications,currentTime));
 
         // set current time plus 1
         currentTime+= 1;
-        CurrTimeForGui.set(currentTime);
 
         // reduce time until next payment, if not paid update status to risk
         reduceTimeNextPayment(activeLoans);
@@ -461,12 +458,30 @@ public class ABSEngine implements Engine{
                         loan.setUnpaidDebt(loan.getCompleteAmountToBePaid() -loan.getAmountPaidUntilNow());
                     }
                     loan.setStatus(Loan.LoanStatus.RISK);
+                    removeLoanFromForSale(loan);
                 }
             }
         }
     }
 
+    private void removeLoanFromForSale(Loan l){
 
+        Iterator<AdminLoanDTO> iter = loansForSale.iterator();
+
+
+        while(iter.hasNext()){
+            AdminLoanDTO next = iter.next();
+
+            if(next.getId().equals(l.getId())){
+                String notifiedCustomer = next.getWhoSelling();
+                this.notifications.get(notifiedCustomer).add(new Notification(l.getId() + " removed from for sale",
+                        currentTime,"Hello " + notifiedCustomer + " we regret to inform you that because"+
+                        "the loan '" + l.getId() +"' entered Risk mode it has been removed from the 'for sale section'"));
+                iter.remove();
+            }
+        }
+
+    }
     public void payLoanDebtAmount(Loan loan, double amount){
 
         //the customer that needs to pay
@@ -556,21 +571,30 @@ public class ABSEngine implements Engine{
 
 
         boolean exitRisk = false;
+
         if(loan.isPaidThisYaz()){
+            System.out.println("Customer already made the payment on this turn.");
             throw new LoanProccessingException("Customer already made the payment on this turn.",loan);
         }
         if(loan.getTimeNextPayment() > 1 && !loan.getStatus().equals(Loan.LoanStatus.RISK)){
+            System.out.println("Current yaz is not the turn to pay the loan.");
             throw new LoanProccessingException("Current yaz is not the turn to pay the loan.",loan);
         }
 
 
         //the customer that needs to pay
         Customer c = findCustomerById(loan.getOwnerName());
+        System.out.println("Customer that needs to pay is " + c.getId());
+
 
         // money that needs to be paid
         double moneyToReturn = loan.getSinglePaymentTotal();
-        moneyToReturn += loan.getUnpaidDebt();
+        System.out.println("A single payment is " + moneyToReturn);
 
+        moneyToReturn += loan.getUnpaidDebt();
+        System.out.println("unPaidDebt is " + loan.getUnpaidDebt());
+
+        System.out.println("So total money to return is  " + moneyToReturn);
 
         // if missed more payments than original length of time don't keep charging customer
         if(loan.getAmountPaidUntilNow() + loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid()){
@@ -583,8 +607,12 @@ public class ABSEngine implements Engine{
             moneyToReturn = loan.getUnpaidDebt();
             exitRisk = true;
         }
+        else if(loan.getStatus().equals(Loan.LoanStatus.RISK) && loan.getTimeNextPayment() == 1){
+            exitRisk = true;
+        }
 
         if (c.getBalance() >= moneyToReturn){
+            System.out.println("Customer has enough money in to pay back");
 
 
             //set did pay this yaz to true
@@ -608,6 +636,7 @@ public class ABSEngine implements Engine{
             loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
 
             loan.setAmountPaidUntilNow(loan.getAmountPaidUntilNow() + moneyToReturn);
+            System.out.println("Customer paid " + loan.getAmountPaidUntilNow() + moneyToReturn +"so far");
 
             if (exitRisk){
                 loan.setUnpaidDebt(0);
@@ -684,10 +713,65 @@ public class ABSEngine implements Engine{
         }
     }
 
-
-
-
     public int getCurrentTime() {
         return currentTime;
     }
+
+
+    public boolean isRewind() {
+        return isRewind;
+    }
+
+    public void setRewind(boolean rewind) {
+        isRewind = rewind;
+    }
+    public void enterRewindMode(){
+
+        latestSnapshot = new EngineSnapshot(loans,customers,categories,notifications,currentTime);
+        isRewind = true;
+
+    }
+
+    public void exitRewindMode(){
+        categories = latestSnapshot.categories;
+        currentTime = latestSnapshot.currentTime;
+        customers = latestSnapshot.customers;
+        loans = latestSnapshot.loans;
+        notifications = latestSnapshot.notifications;
+        isRewind = false;
+    }
+
+    public void rewindDecreaseTime(){
+
+        if(currentTime <= 1){
+            return;
+        }
+        currentTime -= 1;
+        EngineSnapshot engineSnapshot = timeLine.get(currentTime - 1);
+        categories = engineSnapshot.categories;
+        currentTime = engineSnapshot.currentTime;
+        customers = engineSnapshot.customers;
+        loans = engineSnapshot.loans;
+        notifications = engineSnapshot.notifications;
+
+    }
+
+    public void rewindIncreaseTime(){
+        if(currentTime >= latestSnapshot.currentTime){
+            return;
+        }
+        currentTime += 1;
+        EngineSnapshot engineSnapshot = timeLine.get(currentTime - 1);
+        categories = engineSnapshot.categories;
+        currentTime = engineSnapshot.currentTime;
+        customers = engineSnapshot.customers;
+        loans = engineSnapshot.loans;
+        notifications = engineSnapshot.notifications;
+    }
+
+    public List<AdminLoanDTO> getLoansForSale() {
+        return loansForSale;
+    }
+
+
 }

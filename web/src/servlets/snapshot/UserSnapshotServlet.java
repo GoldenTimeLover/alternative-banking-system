@@ -45,27 +45,22 @@ public class UserSnapshotServlet extends HttpServlet {
 
 
         NotificationDTO notificationDTO = new NotificationDTO(engine.getNotifications().get(usernameFromSession));
-        System.out.println("notification dto");
-        System.out.println(notificationDTO);
 
-        if(notificationDTO.notificationList.size() != 0){
-            System.out.println("fuck this");
-        }
+
+
 
         CustomerSnapshot customerSnapshot =
                 new CustomerSnapshot(
                         loansDTO,
                 new TransactionsDTO(loansDTO.balance,engine.findCustomerById(usernameFromSession).getTransactions()),
                 engine.getCurrentTime(),
-                notificationDTO);
+                notificationDTO,engine.isRewind(),engine.getLoansForSale());
 
 
         String s = gson.toJson(customerSnapshot,CustomerSnapshot.class);
 
 
         resp.getWriter().println(s);
-        System.out.println("The string returned is: ");
-        System.out.println(s);
         resp.setStatus(200);
     }
 

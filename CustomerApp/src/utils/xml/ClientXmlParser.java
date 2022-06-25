@@ -33,6 +33,10 @@ public class ClientXmlParser {
 
     }
 
+    public List<String> getCategories(){
+        return descriptor.getAbsCategories().getAbsCategory();
+    }
+
     public static AbsDescriptor deserializerForm(InputStream in) throws JAXBException {
 
         JAXBContext jc  = JAXBContext.newInstance(JAX_XML_PACKAGE_NAME);

@@ -9,11 +9,16 @@ import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -25,9 +30,17 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
+import resources.paths.Paths;
 import ui.adminPanel.AdminPanelController;
+import utils.http.AdminHttpClient;
 import utils.resources.AdminPaths;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -40,7 +53,9 @@ import java.util.Optional;
     The "Master" controller that all other controllers are subordinates to and know him through
     their inheritance of "SubController" class.
  */
-public class PrimaryController {
+public class PrimaryController implements Closeable {
+
+
 
 
     enum Theme {DARK,LIGHT,MCDONADLS}
@@ -60,14 +75,13 @@ public class PrimaryController {
     @FXML
     private BorderPane mainBorderPane;
 
-    @FXML
-    private ComboBox<Customer> userSelectorCB;
 
-    @FXML
-    private Label filePathText;
 
     @FXML
     private Label currentYazText;
+
+    @FXML
+    private Label rewindTextLabel;
 
     @FXML
     private Menu themes;
@@ -90,15 +104,35 @@ public class PrimaryController {
     @FXML
     private ImageView logoImage;
 
+    @FXML
+    private Label adminNameLabel;
+
+    @FXML
+    private Button rewindButton;
 
     private FadeTransition fadeTransition = new FadeTransition();
     private ScaleTransition scaleTransition = new ScaleTransition();
-    private ScaleTransition scaleTransition2 = new ScaleTransition();
+
+
+    public final StringProperty currentYazProperty = new SimpleStringProperty("");
+    public final StringProperty adminNameProperty = new SimpleStringProperty("");
+    public final BooleanProperty isSystemRewindProperty = new SimpleBooleanProperty(false);
 
     @FXML
     public void initialize(Stage primaryStage){
 
         this.primaryStage = primaryStage;
+
+        currentYazText.textProperty().bind(Bindings.concat(currentYazProperty,""));
+        adminNameLabel.textProperty().bind(Bindings.concat(adminNameProperty,""));
+
+        rewindButton.textProperty().bind(Bindings.concat(isSystemRewindProperty.get() ?  "Normal Mode": "Toggle Rewind Mode" ));
+        rewindTextLabel.visibleProperty().bind(isSystemRewindProperty);
+    }
+
+    public String getAdminName(){
+        System.out.println("admin name returned" + adminNameProperty.get());
+        return adminNameProperty.get();
     }
 
     @FXML
@@ -108,8 +142,6 @@ public class PrimaryController {
         if (!this.animationCheckBox.isSelected()) {
 
             this.scaleTransition.jumpTo(Duration.ZERO);
-            this.scaleTransition2.jumpTo(Duration.ZERO);
-            this.scaleTransition2.stop();
             this.scaleTransition.stop();
             this.fadeTransition.stop();
 
@@ -120,9 +152,6 @@ public class PrimaryController {
     }
 
 
-    public ComboBox<Customer> getUserSelectorCB() {
-        return userSelectorCB;
-    }
 
     @FXML
     void yazClicked(MouseEvent event){
@@ -136,22 +165,7 @@ public class PrimaryController {
         }
 
     }
-    @FXML
-    void fileClicked(MouseEvent event){
 
-        if (animationCheckBox.isSelected() && scaleTransition2.getCurrentRate()==0.0d) {
-            scaleTransition2.setDuration(Duration.millis(200));
-            scaleTransition2.setNode(this.filePathText);
-            this.scaleTransition2.setCycleCount(8);
-            this.scaleTransition2.setAutoReverse(true);
-            this.scaleTransition2.setToY(-1);
-            this.scaleTransition2.play();
-        }
-
-
-
-
-    }
 
     @FXML
     void logoClicked(MouseEvent event){
@@ -200,20 +214,7 @@ public class PrimaryController {
 
     }
 
-    public void IncreaseYaz(ActionEvent event){
 
-        engine.moveTimeForward();
-
-    }
-    public void insertUsersToComboBox(){
-
-
-        ObservableList<Customer> customers = FXCollections.observableArrayList(engine.getCustomers());
-        customers.add(0,new Customer("Admin",0,null,null,null));
-        userSelectorCB.setItems(customers);
-        userSelectorCB.getSelectionModel().select(0);
-        userSelectorCB.setDisable(false);
-    }
     @FXML
     void darkModeThemePressed(ActionEvent event) {
 
@@ -253,75 +254,6 @@ public class PrimaryController {
 
     }
 
-    @FXML
-    void userSelectorCBPressed(ActionEvent event) {
-
-            mainBorderPane.setCenter(adminPanelComponent);
-            adminPanelComponentController.unlockPanelButtons();
-
-    }
-
-
-    private void unlockAdminButtons(){
-        adminPanelComponentController.unlockPanelButtons();
-
-    }
-    public void setPrimaryStage(Stage stage){
-        this.primaryStage = stage;
-    }
-
-    public ABSEngine getEngine() {
-        return engine;
-    }
-
-    public void loadXMLButtonPressed(ActionEvent event){
-
-        FileChooser fileChooser = new FileChooser();
-        File selectedFile;
-        fileChooser.setTitle("Select a file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
-        selectedFile = fileChooser.showOpenDialog(primaryStage);
-
-
-        if(selectedFile == null)
-            return;
-
-        try{
-            engine = new ABSEngine();
-            engine.loadDataFromFile(selectedFile.getPath());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Success");
-            alert.setHeaderText("File loaded Successfully");
-            alert.setContentText(null);
-
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-
-            insertUsersToComboBox();
-            unlockAdminButtons();
-            filePathText.textProperty().bind(engine.currentFilePathProperty());
-
-            StringExpression sb = Bindings.concat("Current YAZ: ", engine.currTimeForGuiProperty());
-
-            currentYazText.textProperty().bind(sb);
-
-
-        }
-        catch(FileFormatException ex)
-        {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Error loading File!");
-            alert.setContentText(ex.getMessage());
-            System.out.println(ex.getMessage());
-            ButtonType yesButton = new ButtonType("Cool");
-            alert.getButtonTypes().setAll(yesButton);
-            Optional<ButtonType> result = alert.showAndWait();
-
-        }
-    }
-
 
     public void adminPanel(){
 
@@ -336,6 +268,11 @@ public class PrimaryController {
             adminPanelComponentController = loader.getController();
             adminPanelComponentController.setMainController(this);
             mainBorderPane.setCenter(adminPanelComponent);
+            adminPanelComponentController.loadCustomersIntoTable();
+            adminPanelComponentController.loadLoansItoTable();
+            adminPanelComponentController.startSnapshotRefresher();
+            adminPanelComponentController.decreaseYazButton.disableProperty().bind(Bindings.not(isSystemRewindProperty));
+
         } catch (IOException e) {
             System.out.println("nope");
             e.printStackTrace();
@@ -354,4 +291,42 @@ public class PrimaryController {
         alert.getButtonTypes().setAll(yesButton);
         Optional<ButtonType> result = alert.showAndWait();
     }
+
+    @FXML
+    void rewindButtonPressed(ActionEvent event) {
+
+        System.out.println("hey queen i have been pressed");
+        //noinspection ConstantConditions
+        String finalUrl = HttpUrl
+                .parse(AdminPaths.ADMIN_REWIND_TOGGLE)
+                .newBuilder()
+                .addQueryParameter("userName", getAdminName())
+                .build()
+                .toString();
+
+
+        AdminHttpClient.runAsync(finalUrl,"GET",null ,new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                System.out.println("failed");
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                System.out.println("returned");
+                if (response.code() != 200) {
+                } else {
+
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void close() throws IOException {
+        adminPanelComponentController.close();
+    }
+
 }
