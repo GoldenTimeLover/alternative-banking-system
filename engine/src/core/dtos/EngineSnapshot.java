@@ -3,6 +3,7 @@ package core.dtos;
 import core.entities.Customer;
 import core.entities.Loan;
 import core.entities.Notification;
+import core.entities.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,20 +23,36 @@ public class EngineSnapshot {
 
 
         this.loans = new ArrayList<>();
+
+        Map<String,Loan> tempLenders = new HashMap<>();
+
         for (Loan l : loans) {
-            this.loans.add(new Loan(l.getId(),l.getStartDate(), (int) l.getAmount(),null,new ArrayList<>(),l.getStatus(),l.getCategory(),
-                    l.getInterestRate(),l.getOwnerName(),l.getLengthOfTime(),l.getTimeBetweenPayments()));
+            Loan tempLoan = new Loan(l.getId(),l.getStartDate(), (int) l.getAmount(),null,new ArrayList<>(),l.getStatus(),l.getCategory(),
+                    l.getInterestRate(),l.getOwnerName(),l.getLengthOfTime(),l.getTimeBetweenPayments());
+            this.loans.add(tempLoan);
+            tempLenders.put(l.getId(),tempLoan);
         }
 
         this.customers = new ArrayList<>();
         for (Customer c : customers){
             Customer temp = new Customer(c.getId(), (int) c.getBalance(),new ArrayList<>(),new ArrayList<>(),new ArrayList<>());
             temp.setAdmin(c.isAdmin());
-            this.customers.add(temp);
 
+            //add transactions
+            for (Transaction t:c.getTransactions())
+                temp.addTransaction(new Transaction(t.getAmount(),t.getDate(),t.getType(),t.getBalanceBefore(),t.getBalanceAfter()));
+
+
+            //add lending loans to customers
+            for (Loan l : c.getGivingLoans())
+                temp.getGivingLoans().add(tempLenders.get(l.getId()));
+
+
+            this.customers.add(temp);
         }
 
         connectDataLoadedFromFile();
+
 
         this.categories = new ArrayList<>();
         this.categories.addAll(categories);
@@ -67,6 +84,7 @@ public class EngineSnapshot {
 
 
             temp.addLoan(loan);
+
         }
 
 

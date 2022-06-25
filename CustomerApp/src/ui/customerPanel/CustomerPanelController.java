@@ -186,8 +186,6 @@ public class CustomerPanelController extends CustomerSubController implements Cl
                 customerInfoComponentController.transactionObservableList.addAll(transactions);
 
 
-                System.out.println("sizes of lists:");
-                System.out.println(loansTheCustomerGave.size());
                 System.out.println(customerInfoComponentController.givingLoansObservableList.size());
 
                 if(loansTheCustomerGave.size() != customerInfoComponentController.givingLoansObservableList.size()||
