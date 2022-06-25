@@ -360,6 +360,10 @@ public class Loan implements Comparable{
         return res.toString();
     }
 
+    public void setLenderAmounts(Map<String, Double> lenderAmounts) {
+        this.lenderAmounts = lenderAmounts;
+    }
+
     public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
     }

@@ -101,6 +101,8 @@ public class BuyLoanServlet extends HttpServlet {
         double amountPaidUntilNow = loanById.getAmountPaidUntilNow();
 
         double percentagePagePaidSoFar = 1 - (amountPaidUntilNow / completeAmountToBePaid);
+        System.out.println(aDouble + "a double");
+        System.out.println(percentagePagePaidSoFar + "precentage page so far");
         double amount =  aDouble * percentagePagePaidSoFar;
 
         engine.addTransactionToCustomer(newOwner.getId(),amount, Transaction.TransactionType.WITHDRAW);

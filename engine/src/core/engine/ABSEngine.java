@@ -466,15 +466,21 @@ public class ABSEngine implements Engine{
 
     private void removeLoanFromForSale(Loan l){
 
-        for (AdminLoanDTO adminLoanDTO: loansForSale) {
-            if(adminLoanDTO.getId().equals(l.getId())){
-                String notifiedCustomer = adminLoanDTO.getWhoSelling();
+        Iterator<AdminLoanDTO> iter = loansForSale.iterator();
+
+
+        while(iter.hasNext()){
+            AdminLoanDTO next = iter.next();
+
+            if(next.getId().equals(l.getId())){
+                String notifiedCustomer = next.getWhoSelling();
                 this.notifications.get(notifiedCustomer).add(new Notification(l.getId() + " removed from for sale",
                         currentTime,"Hello " + notifiedCustomer + " we regret to inform you that because"+
                         "the loan '" + l.getId() +"' entered Risk mode it has been removed from the 'for sale section'"));
-                loansForSale.remove(adminLoanDTO);
+                iter.remove();
             }
         }
+
     }
     public void payLoanDebtAmount(Loan loan, double amount){
 
