@@ -1,5 +1,5 @@
 # A.B.S Alternative Banking System.
-
+![alt text](https://github.com/GoldenTimeLover/alternative-banking-system/blob/main/AdminApp/src/utils/resources/assets/logo.png)
 
 ## Description
 
@@ -11,11 +11,11 @@ The system is implemented as a client-server application where our desktop appli
 ## Technologies used in project
 To implement the project several technologies were used:
 
-***Java 8*** - Acted as the core language of the project. 
+***Java 8*** - Acted as the core language of the project.\
 ***JavaFX*** - The platform used to create GUI using FXML and
-SceneBuilder.
+SceneBuilder.\
 ***Apache Tomcat*** - The HTTP web server environment used to 
-implement the project as a server-client app.
-***GSON*** - library used in order to translate JSON into usable java objects.
-***OkHttp*** - library used to create and send HTTP requests to server.
-***Postman*** - Used during testing in order to test servlet endpoints.
+implement the project as a server-client app.\
+***GSON*** - library used in order to translate JSON into usable java objects.\
+***OkHttp*** - library used to create and send HTTP requests to server.\
+***Postman*** - Used during testing in order to test servlet endpoints.\
