@@ -104,9 +104,6 @@ public class PrimaryController {
         if(adminPanelComponentController != null){
             adminPanelComponentController.setMainController(this);
         }
-        else{
-            System.out.println("The loading of the controller in primary controller did not work");
-        }
     }
 
     @FXML
@@ -318,9 +315,9 @@ public class PrimaryController {
 
             insertUsersToComboBox();
             unlockAdminButtons();
-            filePathText.textProperty().bind(engine.currentFilePathProperty());
 
-            StringExpression sb = Bindings.concat("Current YAZ: ", engine.currTimeForGuiProperty());
+
+            StringExpression sb = Bindings.concat("Current YAZ: ");
 
             currentYazText.textProperty().bind(sb);
 
@@ -334,7 +331,6 @@ public class PrimaryController {
             alert.setTitle("Error");
             alert.setHeaderText("Error loading File!");
             alert.setContentText(ex.getMessage());
-            System.out.println(ex.getMessage());
             ButtonType yesButton = new ButtonType("Cool");
             alert.getButtonTypes().setAll(yesButton);
             Optional<ButtonType> result = alert.showAndWait();

@@ -69,7 +69,6 @@ public class AdminLoginController {
 
         String userName = userNameTextField.getText();
         if (userName.isEmpty()) {
-            System.out.println("empty login info ");
             errorMsgProperty.set("User name is empty. You can't login with empty user name");
             return;
         }
@@ -88,8 +87,7 @@ public class AdminLoginController {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Platform.runLater(() ->
-//                        errorMsgProperty.set("Something went wrong ):")
-                                System.out.println("something went wrong")
+                        errorMsgProperty.set("Something went wrong ):")
                 );
             }
 
@@ -102,7 +100,7 @@ public class AdminLoginController {
                 } else {
                     Platform.runLater(() -> {
                         try{
-                            System.out.println("i am in log in page!");
+
                             currentUser = userName;
 
 

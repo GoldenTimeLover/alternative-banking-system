@@ -49,9 +49,7 @@ public class CustomerPaymentController extends SubController {
         if(notificationAreaController != null){
             notificationAreaController.setMainController(this.mainController);
         }
-        else{
-            System.out.println("The loading of the controller in CustomerPaymentController did not work");
-        }
+
 
         SpinnerValueFactory<Integer> riskDebtSpinnerValueFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0,10000,0);

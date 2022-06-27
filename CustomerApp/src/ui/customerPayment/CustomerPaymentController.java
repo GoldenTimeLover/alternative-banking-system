@@ -5,6 +5,7 @@ import core.Exceptions.NotEnoughMoneyException;
 import core.entities.Loan;
 import core.entities.Notification;
 import core.entities.Transaction;
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -356,19 +357,8 @@ public class CustomerPaymentController extends CustomerSubController {
         aaaa.setCellValueFactory(new PropertyValueFactory<>("completeAmountToBePaid"));
 
 
-        TableColumn<Loan,Double> bbb = new TableColumn<>("paid so far");
-        bbb.setMinWidth(150);
-        bbb.setCellValueFactory(new PropertyValueFactory<>("amountPaidUntilNow"));
-
-
-
-        TableColumn<Loan, Boolean> ccc = new TableColumn<>("did pay this yazs");
-        ccc.setMinWidth(150);
-        ccc.setCellValueFactory(new PropertyValueFactory<>("paidThisYaz"));
-
-
         unpaidLoansTable.getColumns().addAll(idColumn,timeBetweenCol,startDateColumn,amountColumn,
-                statusColumn,lengthColumn,interestColumn,aaaa,bbb,ccc);
+                statusColumn,lengthColumn,interestColumn,aaaa);
 
 
     }
@@ -441,6 +431,11 @@ public class CustomerPaymentController extends CustomerSubController {
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     String s = response.body().string();
+
+                    Platform.runLater(()->{
+
+                        mainController.showAlert(Alert.AlertType.INFORMATION,"",s);
+                    });
 
                 }
             });

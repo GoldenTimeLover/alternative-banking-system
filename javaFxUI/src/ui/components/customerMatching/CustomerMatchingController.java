@@ -66,7 +66,6 @@ public class CustomerMatchingController extends SubController {
 
     @FXML
     public void initialize(){
-        System.out.println("initialize Matching controller");
 
 
         //amount field
@@ -313,7 +312,6 @@ public class CustomerMatchingController extends SubController {
             Loan loan = selectedLoans.get(i);
             double amountGiven = Math.min(loan.getRemainingAmount(),amountForEach);
             double finalAmountLoaned = mainController.getEngine().matchLoan(loan.getId(), amountGiven, customerId,maxPercentageSpinner.getValue());
-            System.out.println();
 
 
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);

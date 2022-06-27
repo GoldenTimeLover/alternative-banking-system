@@ -20,7 +20,7 @@ public class PutLoanForSaleServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
-        System.out.println("In Put loan for sale servlet");
+
         String user = req.getParameter("user");
         String loanId= req.getParameter("loanId");
 
@@ -30,7 +30,7 @@ public class PutLoanForSaleServlet extends HttpServlet {
             return;
         }
 
-        System.out.println("Parameters ok");
+
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
 
         Loan ln = engine.getLoanById(loanId);
@@ -45,7 +45,7 @@ public class PutLoanForSaleServlet extends HttpServlet {
             return;
 
         }
-        System.out.println("Loan found in system");
+
 
         AdminLoanDTO loan = new AdminLoanDTO(ln);
         loan.setWhoSelling(user);

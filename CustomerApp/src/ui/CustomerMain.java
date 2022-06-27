@@ -48,8 +48,6 @@ public class CustomerMain extends Application {
             @Override
             public void handle(WindowEvent event) {
 
-                System.out.println("ohhh weee i'm closing down this app!");
-
                 String finalUrl = HttpUrl
                         .parse(CustomerPaths.LOGOUT)
                         .newBuilder()
@@ -65,7 +63,6 @@ public class CustomerMain extends Application {
 
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        System.out.println("log out success");
                     }
                 });
 

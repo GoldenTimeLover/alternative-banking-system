@@ -18,6 +18,7 @@ public class FinanceLoansServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
+
         String loanId = req.getParameter("loanId");
         double amount = Double.parseDouble(req.getParameter("amount"));
         String loanOwnerName = req.getParameter("loanOwner");
@@ -30,7 +31,7 @@ public class FinanceLoansServlet extends HttpServlet {
         double finalAmountLoaned = engine.matchLoan(loan.getId(), amountGiven, lenderName,maxPercentage);
 
 
-        resp.getWriter().println("Loan to loan " + loan.getId() + " " + finalAmountLoaned);
+        resp.getWriter().println("Successfully loaned "+ + finalAmountLoaned +"$ to '" + loan.getId() + "' ");
         resp.setStatus(200);
 
     }

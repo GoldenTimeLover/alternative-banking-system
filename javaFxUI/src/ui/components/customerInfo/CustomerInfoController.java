@@ -107,7 +107,6 @@ public class CustomerInfoController extends SubController {
 
     public void setInfoForCustomerIntoTables(){
 
-        System.out.println("set Info For Customer Into Tables");
 
         clearTables();
 

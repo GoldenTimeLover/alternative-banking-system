@@ -19,7 +19,6 @@ public class RewindModeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
-        System.out.println("Setting rewind to " + !engine.isRewind());
         if(engine.isRewind()){
             engine.exitRewindMode();
         }else{

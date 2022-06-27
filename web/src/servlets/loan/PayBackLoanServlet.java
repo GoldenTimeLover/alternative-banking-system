@@ -36,7 +36,7 @@ public class PayBackLoanServlet extends HttpServlet{
                 try {
                     engine.payCurrLoan(loanToPay);
                     resp.setStatus(200);
-                    resp.getWriter().println("Success");
+                    resp.getWriter().println("Made payment on loan '" + loanId + "'");
                 } catch (NotEnoughMoneyException e) {
 
                     resp.getWriter().println("You are trying to make a payment on the loan '" +
@@ -64,12 +64,12 @@ public class PayBackLoanServlet extends HttpServlet{
             case "payEntire":
                 engine.payEntireLoan(loanToPay);
                 resp.setStatus(200);
-                resp.getWriter().println("Success");
+                resp.getWriter().println("Paid off entire loan '" + loanId + "'");
 
                 break;
             default:
                 resp.setStatus(400);
-                resp.getWriter().println("Something went wrong");
+                resp.getWriter().println("Couldn't complete operation.");
                 break;
         }
 

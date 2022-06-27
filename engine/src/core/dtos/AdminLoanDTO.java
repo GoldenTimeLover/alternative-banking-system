@@ -5,6 +5,7 @@ import core.entities.Loan;
 import core.entities.Transaction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,6 +56,7 @@ public class AdminLoanDTO {
         this.completeAmountToBePaid = completeAmountToBePaid;
         this.amountPaidUntilNow = amountPaidUntilNow;
         this.paidThisYaz = paidThisYaz;
+
     }
 
     public AdminLoanDTO(Loan l){
@@ -174,5 +176,62 @@ public class AdminLoanDTO {
 
     public void setWhoSelling(String whoSelling) {
         this.whoSelling = whoSelling;
+    }
+
+
+    @Override
+    public String toString() {
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("ID ");
+        stringBuilder.append(id);
+        stringBuilder.append("\n");
+
+
+        stringBuilder.append("Start Date ");
+        stringBuilder.append(startDate);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("End Date ");
+        stringBuilder.append(endDate);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("amount ");
+        stringBuilder.append(amount);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("Remaining amount ");
+        stringBuilder.append(remainingAmount);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("owner ");
+        stringBuilder.append(ownerName);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("Lenders");
+        stringBuilder.append(lenders);
+        stringBuilder.append("\n");
+
+        stringBuilder.append("paymentString");
+        stringBuilder.append(paymentsString);
+        stringBuilder.append("\n");
+
+
+        return stringBuilder.toString();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AdminLoanDTO other = (AdminLoanDTO) o;
+        if(!id.equals(other.id) || amount != other.getAmount() || this.amountPaidUntilNow != other.amountPaidUntilNow
+        || !this.getStatus().equals(other.getStatus()) || this.remainingAmount != other.remainingAmount)
+            return false;
+
+        return true;
     }
 }

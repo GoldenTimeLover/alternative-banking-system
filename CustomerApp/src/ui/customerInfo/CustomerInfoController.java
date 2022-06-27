@@ -54,17 +54,22 @@ public class CustomerInfoController extends CustomerSubController {
 
     @FXML
     public void initialize() {
-        SpinnerValueFactory<Integer> valueFactory =
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000000, 0);
+
+        try {
+            SpinnerValueFactory<Integer> valueFactory =
+                    new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1000000, 0);
 
 
-        amountSpinner.setValueFactory(valueFactory);
+            amountSpinner.setValueFactory(valueFactory);
 
-        amountSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                amountSpinner.increment(0); // won't change value, but will commit editor
-            }
-        });
+            amountSpinner.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {
+                    amountSpinner.increment(0); // won't change value, but will commit editor
+                }
+            });
+        }catch (NumberFormatException nfe){
+                amountSpinner.getValueFactory().setValue(0);
+        }
 
         borrowingLoansObservableList = loanerLoansTable.getItems();
         givingLoansObservableList = lenderLoansTable.getItems();
@@ -365,6 +370,7 @@ public class CustomerInfoController extends CustomerSubController {
         depositButton.disableProperty().bind(mainController.isRewindModeProperty);
         withdrawButton.disableProperty().bind(mainController.isRewindModeProperty);
         amountSpinner.disableProperty().bind(mainController.isRewindModeProperty);
+        toggleSellLoanButton.disableProperty().bind(mainController.isRewindModeProperty);
 
     }
 }
