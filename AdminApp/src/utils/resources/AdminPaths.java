@@ -21,7 +21,8 @@ public class AdminPaths {
 
     //server paths
     public final static String BASE_DOMAIN = "localhost";
-    public final static String APPLICATION_NAME = "/web_Web_exploded";
+//    public final static String APPLICATION_NAME = "/web_Web_exploded";
+    public final static String APPLICATION_NAME = "/web_Web";
     public final static String FULL_SERVER_PATH = "http://" + BASE_DOMAIN + ":8080" + APPLICATION_NAME;
 
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/user/login";

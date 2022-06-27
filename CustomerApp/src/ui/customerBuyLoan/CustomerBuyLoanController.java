@@ -82,7 +82,6 @@ public class CustomerBuyLoanController extends CustomerSubController implements 
                         );
 
                     }
-                    System.out.println("Returned from buy loan request");
                 }
             });
         }

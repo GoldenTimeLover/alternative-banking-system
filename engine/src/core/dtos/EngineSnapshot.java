@@ -27,8 +27,7 @@ public class EngineSnapshot {
         Map<String,Loan> tempLenders = new HashMap<>();
 
         for (Loan l : loans) {
-            Loan tempLoan = new Loan(l.getId(),l.getStartDate(), (int) l.getAmount(),null,new ArrayList<>(),l.getStatus(),l.getCategory(),
-                    l.getInterestRate(),l.getOwnerName(),l.getLengthOfTime(),l.getTimeBetweenPayments());
+            Loan tempLoan = new Loan(l);
 
             tempLoan.setLenderAmounts(new HashMap<>(l.getLenderAmounts()));
             this.loans.add(tempLoan);

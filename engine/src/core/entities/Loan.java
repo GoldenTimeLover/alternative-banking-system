@@ -113,6 +113,29 @@ public class Loan implements Comparable{
         this.payments = new ArrayList<>();
     }
 
+    public Loan(Loan loan){
+        this.id = loan.id;
+        this.startDate = loan.getStartDate();
+        this.amount = loan.getAmount();
+        this.remainingAmount = loan.getRemainingAmount();
+        this.borrower = loan.borrower;
+        this.lenders = loan.lenders;
+        this.status = loan.getStatus();
+        this.category = loan.getCategory();
+        this.interestRate = loan.getInterestRate();
+        this.ownerName = loan.getOwnerName();
+        this.lengthOfTime = loan.getLengthOfTime();
+        this.timeBetweenPayments = loan.getTimeBetweenPayments();
+        this.lenderAmounts = new HashMap<>();
+        this.timeNextPayment = loan.getTimeNextPayment();
+
+        this.paymentPerYaz = amount / lengthOfTime;
+        this.singlePayment = paymentPerYaz * timeBetweenPayments;
+        this.singlePaymentTotal = singlePayment + (singlePayment * interestRate / 100);
+        this.completeAmountToBePaid = singlePaymentTotal * (lengthOfTime / timeBetweenPayments);
+        this.amountPaidUntilNow = loan.getAmountPaidUntilNow();
+        this.payments = new ArrayList<>(loan.getPayments());
+    }
 
     @Override
     public int compareTo(Object o) {

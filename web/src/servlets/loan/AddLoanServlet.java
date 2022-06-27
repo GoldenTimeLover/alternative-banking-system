@@ -48,7 +48,7 @@ public class AddLoanServlet extends HttpServlet {
                 engine.checkLoanTimes(new Loan(l,user));
             } catch (FileFormatException e) {
                 resp.setStatus(400);
-                resp.getWriter().println(e.getMessage());
+                resp.getWriter().println("Loan interest and time don't match up");
                 return;
             }
             if(engine.getLoanById(l.getId()) != null){

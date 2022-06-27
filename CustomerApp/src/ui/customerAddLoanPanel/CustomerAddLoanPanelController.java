@@ -4,6 +4,7 @@ package ui.customerAddLoanPanel;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import core.dtos.CustomerSnapshot;
 import core.dtos.LoansDTO;
 import core.dtos.SingleLoanDTO;
@@ -11,7 +12,10 @@ import core.entities.Loan;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringExpression;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
@@ -42,8 +46,6 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
     @FXML
     private Spinner<Integer> loanAmountInput;
 
-    @FXML
-    private TextField categoriesTextField;
 
     @FXML
     private Spinner<Integer> mininumIntrerestSpinner;
@@ -56,6 +58,11 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
 
     @FXML
     private Button SendLoanRequestButton;
+
+    @FXML
+    private ListView<String> categorySpinner;
+
+    private ObservableList<String> selectedCategories;
 
 
     @FXML
@@ -109,20 +116,45 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
             }
         });
 
+
+        categorySpinner.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        categorySpinner.setOnMouseClicked(new EventHandler<Event>() {
+
+            @Override
+            public void handle(Event event) {
+                selectedCategories =  categorySpinner.getSelectionModel().getSelectedItems();
+            }
+
+        });
+
+
     }
 
     @FXML
-    void SendLoanRequestButtonPressed(ActionEvent event) {
+    void SendLoanRequestButtonPressed(ActionEvent event)
+    {
 
+        if(selectedCategories.size() == 0){
+
+            Platform.runLater(()->{
+                    mainController.showAlert(Alert.AlertType.INFORMATION,"","No category chosen");
+            });
+            return;
+        }
         String customerId = mainController.getUsername();
         String loanId = LoanIdTextField.getText();
-        String categories = categoriesTextField.getText();
+        String categories = selectedCategories.get(0);
         int amount = loanAmountInput.getValue();
         int minYaz = minLoanYazSpinner.getValue();
         int minInterest = mininumIntrerestSpinner.getValue();
         int paysEvery = PaysEverySpinner.getValue();
 
         if (amount == 0 || minYaz == 0 || minInterest == 0 || paysEvery == 0 || Objects.equals(loanId, "") || categories.equals("")){
+            Platform.runLater(()->{
+                mainController.showAlert(Alert.AlertType.INFORMATION,"","Please fill out all the fields");
+            });
+
             return;
         }
 
@@ -158,13 +190,8 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                         Platform.runLater(() -> {
                                     try {
                                         String s = response.body().string();
-                                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                        alert.setTitle("Success");
-                                        alert.setHeaderText("File loaded Successfully");
-                                        alert.setContentText(s);
-                                        ButtonType yesButton = new ButtonType("Cool");
-                                        alert.getButtonTypes().setAll(yesButton);
-                                        Optional<ButtonType> result = alert.showAndWait();
+                                        mainController.showAlert(Alert.AlertType.INFORMATION,"",s);
+
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -174,13 +201,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                         Platform.runLater(() -> {
                                     try {
                                         String s = response.body().string();
-                                        Alert alert = new Alert(Alert.AlertType.WARNING);
-                                        alert.setTitle("Failure");
-                                        alert.setHeaderText("File load was unsuccessful");
-                                        alert.setContentText(s);
-                                        ButtonType yesButton = new ButtonType("Cool");
-                                        alert.getButtonTypes().setAll(yesButton);
-                                        Optional<ButtonType> result = alert.showAndWait();
+                                        mainController.showAlert(Alert.AlertType.INFORMATION,"",s);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -194,7 +215,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
         }
         catch(Exception e)
         {
-            System.out.println(e.getMessage());
+
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Error loading File!");
@@ -264,19 +285,8 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
                                 } catch (IOException e) {
                                     s = "";
                                 }
-                                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                if(response.code() == 200){
-                                    alert.setTitle("Success");
-                                    alert.setHeaderText("File loaded Successfully");
-                                }else{
-                                    alert.setTitle("Rejection");
-                                    alert.setHeaderText("File was not loaded");
-                                }
-                                alert.setContentText(s);
-                                ButtonType yesButton = new ButtonType("Ok");
-                                alert.getButtonTypes().setAll(yesButton);
-                                Optional<ButtonType> result = alert.showAndWait();
-
+                                mainController.showAlert(Alert.AlertType.INFORMATION,"",s);
+                                setCategories();
                         }
                         );
 
@@ -286,7 +296,7 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
             }
             catch(Exception e)
             {
-                System.out.println(e.getMessage());
+
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText("Error loading File!");
@@ -296,6 +306,44 @@ public class CustomerAddLoanPanelController extends CustomerSubController {
 
             }
 
+    }
+
+
+    public void setCategories(){
+
+        String finalUrl = HttpUrl
+                .parse(CustomerPaths.GET_CATEGORIES)
+                .newBuilder()
+                .build()
+                .toString();
+
+        CustomerHttpClient.runAsync(finalUrl, "GET", null, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+
+            }
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                Platform.runLater(()->{
+                            try {
+                                categorySpinner.getItems().clear();
+                                String s = response.body().string();
+                                Gson gson = new Gson();
+                                List<String> ls = gson.fromJson(s, new TypeToken<List<String>>(){}.getType());
+
+                                for (String cat : ls){
+                                    categorySpinner.getItems().add(cat);
+                                }
+                            }
+                            catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                );
+
+            }
+        });
     }
 
 }

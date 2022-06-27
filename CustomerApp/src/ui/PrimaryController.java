@@ -273,7 +273,6 @@ public class PrimaryController implements Closeable {
             customerPanelComponentController.bindButtons();
 
         } catch (IOException e) {
-            System.out.println("nope");
             e.printStackTrace();
         }
     }

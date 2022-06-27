@@ -65,7 +65,6 @@ public class CustomerLoginController {
     @FXML
     void loginButtonClicked(ActionEvent event) {
 
-        System.out.println("hello world");
         String userName = userNameTextField.getText();
         if (userName.isEmpty()) {
             errorMsgProperty.set("User name is empty. You can't login with empty user name");
@@ -85,10 +84,7 @@ public class CustomerLoginController {
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                Platform.runLater(() ->
-//                        errorMsgProperty.set("Something went wrong ):")
-                                System.out.println("something went wrong")
-                );
+
             }
 
             @Override
@@ -100,7 +96,6 @@ public class CustomerLoginController {
                 } else {
                     Platform.runLater(() -> {
                         try{
-                            System.out.println("i am in log in page!");
                             currentUser = userName;
 
 
@@ -120,7 +115,6 @@ public class CustomerLoginController {
 
                             // show the app again
                             primaryStage.show();
-                            System.out.println("i am in log in page!");
                             primaryController.initialize(primaryStage,currentUser);
                             primaryController.customerPanel();
 

@@ -181,9 +181,7 @@ public class CustomerMatchingController extends CustomerSubController {
         double balance;
         try{
         balance = mainController.customerSnapshot.loansDTO.balance;
-            System.out.println("not exception");
         }catch (NullPointerException e){
-            System.out.println("exception");
             balance = 0.0;
         }
         if (amount > balance){
@@ -407,6 +405,9 @@ public class CustomerMatchingController extends CustomerSubController {
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
 
+                    Platform.runLater(()->{
+                            mainController.showAlert(Alert.AlertType.ERROR,"Error","Something went wrong!");
+                    });
                 }
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
@@ -414,7 +415,7 @@ public class CustomerMatchingController extends CustomerSubController {
                     Platform.runLater(()->{
                                 try {
                                     String s = response.body().string();
-                                    mainController.showAlert(Alert.AlertType.INFORMATION,"Success","Successfully invested in selected loans");
+                                    mainController.showAlert(Alert.AlertType.INFORMATION,"Success",s);
                                 }
                                 catch (IOException e) {
                                     e.printStackTrace();

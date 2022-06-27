@@ -1,5 +1,7 @@
 package core.entities;
 
+import core.dtos.CustomerSnapshot;
+import core.dtos.SingleLoanDTO;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
@@ -34,6 +36,22 @@ public class Customer {
         this.transactions = new ArrayList<>();
     }
 
+    public Customer(String id, int balance, CustomerSnapshot customerSnapshot) {
+        this.id = id;
+        this.balance.set(balance);
+        this.givingLoans = new ArrayList<>();
+        this.takingLoans = new ArrayList<>();
+
+        for (SingleLoanDTO singleLoanDTO :customerSnapshot.loansDTO.loanList)
+            takingLoans.add(new Loan(singleLoanDTO,id));
+
+        for (SingleLoanDTO singleLoanDTO : customerSnapshot.loansDTO.loansCustomerGaveToOthers)
+            givingLoans.add(new Loan(singleLoanDTO,id));
+
+
+        this.transactions = new ArrayList<>();
+        this.isAdmin = false;
+    }
 
     public void addTransaction(Transaction transaction){
         transactions.add(transaction);

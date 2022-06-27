@@ -84,7 +84,7 @@ public class ABSEngine implements Engine{
 
     public void loadDataFromFile(String filePath) throws FileFormatException {
 
-        System.out.println("Trying to Load Data From... " + filePath);
+
         ABSXmlParser xmlParser = new ABSXmlParser(filePath);
 
         //Load categories customers and loans from xmlFIle
@@ -102,7 +102,6 @@ public class ABSEngine implements Engine{
 
         dataLoaded = true;
 
-        System.out.println("Data Loaded Successfully!");
     }
 
 
@@ -310,11 +309,11 @@ public class ABSEngine implements Engine{
 
 
         if (theLoan == null){
-            System.out.println("Null Pointer to Loan Process Canceled");
+
             return 0.0;
         }
         if (lender == null){
-            System.out.println("Null Pointer to Lender Process Canceled");
+
             return 0.0;
         }
 
@@ -443,7 +442,7 @@ public class ABSEngine implements Engine{
                     // if the amount the customer paid until now + the amount he owes + the amount for a single payment
                     // is greater than the total he has to pay set the amount to the remainder...
                     if(loan.getUnpaidDebt() == loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()){
-                        System.out.println("do nothing");
+
                     }
                     else if(loan.getUnpaidDebt() + loan.getSinglePaymentTotal() <= loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()){
                         loan.setUnpaidDebt(loan.getUnpaidDebt() + loan.getSinglePaymentTotal());
@@ -451,7 +450,7 @@ public class ABSEngine implements Engine{
 
                     }
                     else if(loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid() - loan.getAmountPaidUntilNow()){
-                        System.out.println("Something is wrong");
+
                     }
 
                     else{
@@ -573,28 +572,26 @@ public class ABSEngine implements Engine{
         boolean exitRisk = false;
 
         if(loan.isPaidThisYaz()){
-            System.out.println("Customer already made the payment on this turn.");
             throw new LoanProccessingException("Customer already made the payment on this turn.",loan);
         }
         if(loan.getTimeNextPayment() > 1 && !loan.getStatus().equals(Loan.LoanStatus.RISK)){
-            System.out.println("Current yaz is not the turn to pay the loan.");
             throw new LoanProccessingException("Current yaz is not the turn to pay the loan.",loan);
         }
 
 
         //the customer that needs to pay
         Customer c = findCustomerById(loan.getOwnerName());
-        System.out.println("Customer that needs to pay is " + c.getId());
+
 
 
         // money that needs to be paid
         double moneyToReturn = loan.getSinglePaymentTotal();
-        System.out.println("A single payment is " + moneyToReturn);
+
 
         moneyToReturn += loan.getUnpaidDebt();
-        System.out.println("unPaidDebt is " + loan.getUnpaidDebt());
 
-        System.out.println("So total money to return is  " + moneyToReturn);
+
+
 
         // if missed more payments than original length of time don't keep charging customer
         if(loan.getAmountPaidUntilNow() + loan.getUnpaidDebt() + loan.getSinglePaymentTotal() > loan.getCompleteAmountToBePaid()){
@@ -612,7 +609,6 @@ public class ABSEngine implements Engine{
         }
 
         if (c.getBalance() >= moneyToReturn){
-            System.out.println("Customer has enough money in to pay back");
 
 
             //set did pay this yaz to true
@@ -636,7 +632,6 @@ public class ABSEngine implements Engine{
             loan.getPayments().add(new Transaction(moneyToReturn,currentTime,Transaction.TransactionType.DEPOSIT,0,0));
 
             loan.setAmountPaidUntilNow(loan.getAmountPaidUntilNow() + moneyToReturn);
-            System.out.println("Customer paid " + loan.getAmountPaidUntilNow() + moneyToReturn +"so far");
 
             if (exitRisk){
                 loan.setUnpaidDebt(0);
@@ -727,6 +722,7 @@ public class ABSEngine implements Engine{
     }
     public void enterRewindMode(){
 
+
         latestSnapshot = new EngineSnapshot(loans,customers,categories,notifications,currentTime);
         isRewind = true;
 
@@ -760,13 +756,23 @@ public class ABSEngine implements Engine{
         if(currentTime >= latestSnapshot.currentTime){
             return;
         }
-        currentTime += 1;
-        EngineSnapshot engineSnapshot = timeLine.get(currentTime - 1);
-        categories = engineSnapshot.categories;
-        currentTime = engineSnapshot.currentTime;
-        customers = engineSnapshot.customers;
-        loans = engineSnapshot.loans;
-        notifications = engineSnapshot.notifications;
+        if(currentTime == latestSnapshot.currentTime - 1) {
+            currentTime += 1;
+            categories = latestSnapshot.categories;
+            currentTime = latestSnapshot.currentTime;
+            customers = latestSnapshot.customers;
+            loans = latestSnapshot.loans;
+            notifications = latestSnapshot.notifications;
+        }
+        else {
+            currentTime += 1;
+            EngineSnapshot engineSnapshot = timeLine.get(currentTime - 1);
+            categories = engineSnapshot.categories;
+            currentTime = engineSnapshot.currentTime;
+            customers = engineSnapshot.customers;
+            loans = engineSnapshot.loans;
+            notifications = engineSnapshot.notifications;
+        }
     }
 
     public List<AdminLoanDTO> getLoansForSale() {

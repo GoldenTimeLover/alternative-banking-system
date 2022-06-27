@@ -90,7 +90,6 @@ public class AdminPanelController extends AdminSubController implements Closeabl
             ButtonType yesButton = new ButtonType("Ok");
             alert.getButtonTypes().setAll(yesButton);
             Optional<ButtonType> result = alert.showAndWait();
-            return;
         }else {
 
             this.selectedLoan = selectedItems.get(0);
@@ -115,8 +114,8 @@ public class AdminPanelController extends AdminSubController implements Closeabl
                 List<CustomerSnapshot> cSnapList = adminSnapshot.customerSnapshotList;
                 for (int i = 0; i < adminSnapshot.customerSnapshotList.size(); i++) {
                     CustomerSnapshot snapshot = cSnapList.get(i);
-                    customers.add(new Customer(snapshot.loansDTO.userName, (int) snapshot.loansDTO.balance,new ArrayList<>(),new ArrayList<>(),new ArrayList<>()));
-
+                    Customer tempCustomer = new Customer(snapshot.loansDTO.userName, (int) snapshot.loansDTO.balance,snapshot);
+                    customers.add(tempCustomer);
                 }
 
                 customerObservableList.clear();
@@ -134,16 +133,18 @@ public class AdminPanelController extends AdminSubController implements Closeabl
 
     private boolean loansChanged(List<AdminLoanDTO> snapshotList,List<AdminLoanDTO> localList){
 
-        Map<String,String> status = new HashMap<>();
+        Map<String,AdminLoanDTO> status = new HashMap<>();
         for (int i = 0; i < snapshotList.size(); i++) {
-            status.put(snapshotList.get(i).getId(),snapshotList.get(i).getStatus());
+            status.put(snapshotList.get(i).getId(),snapshotList.get(i));
         }
 
         for (int i=0;i<localList.size();i++){
-            if(!status.get(localList.get(i).getId()).equals(localList.get(i).getStatus())){
+            AdminLoanDTO dto1 = status.get(localList.get(i).getId());
+            AdminLoanDTO dto2 = localList.get(i);
+            if(!dto1.equals(dto2))
                 return true;
-            }
         }
+
         return false;
 
     }
@@ -375,16 +376,11 @@ public class AdminPanelController extends AdminSubController implements Closeabl
 
                 @Override
                 public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                    Platform.runLater(() ->
-//                        errorMsgProperty.set("Something went wrong ):")
-                                    System.out.println("something went wrong")
-                    );
+
                 }
 
                 @Override
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-
-                    System.out.println("whattt");
 
                 }
 
@@ -410,11 +406,7 @@ public class AdminPanelController extends AdminSubController implements Closeabl
                 public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                     if (response.code() != 200) {
                     } else {
-                        Platform.runLater(() -> {
-                            try{
-                            }
-                            catch(Exception ignore) {}
-                        });
+
                     }
                     Objects.requireNonNull(response.body()).close();
                     response.close();

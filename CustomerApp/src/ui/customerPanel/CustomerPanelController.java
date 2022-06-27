@@ -119,6 +119,7 @@ public class CustomerPanelController extends CustomerSubController implements Cl
 
     @FXML
     void addLoanButtonPressed(ActionEvent event) {
+        addLoanComponentController.setCategories();
         centerContent.setContent(addLoanComponent);
     }
 
@@ -349,6 +350,7 @@ public class CustomerPanelController extends CustomerSubController implements Cl
             addLoanComponent = loader.load(url.openStream());
             addLoanComponentController = loader.getController();
             addLoanComponentController.setMainController(mainController);
+
         } catch (IOException e) {
             e.printStackTrace();
         }

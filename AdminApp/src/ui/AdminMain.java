@@ -60,8 +60,6 @@ primary scene which calls other components as needed.
             @Override
             public void handle(WindowEvent event) {
 
-                System.out.println("ohhh weee i'm closing down this app!");
-
                 String finalUrl = HttpUrl
                         .parse(AdminPaths.LOGOUT)
                         .newBuilder()
@@ -77,7 +75,7 @@ primary scene which calls other components as needed.
 
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                        System.out.println("log out success");
+
                     }
                 });
 

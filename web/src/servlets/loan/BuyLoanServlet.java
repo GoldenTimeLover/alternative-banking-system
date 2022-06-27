@@ -21,7 +21,6 @@ public class BuyLoanServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 
-        System.out.println("Arrived in buy loan servlet");
         String buyerName = req.getParameter("user");
         String sellerName = req.getParameter("seller");
         String loanId= req.getParameter("loanId");
@@ -33,7 +32,6 @@ public class BuyLoanServlet extends HttpServlet {
         }
 
 
-        System.out.println("Parameters ok");
 
         ABSEngine engine = ServerUtils.getEngine(getServletContext());
 
@@ -50,6 +48,20 @@ public class BuyLoanServlet extends HttpServlet {
             resp.setStatus(400);
             return;
         }
+
+
+        //check the new owner has enough cash to buy the loan share
+        Double checkDouble = loanById.getLenderAmounts().get(oldOwner.getId());
+        double percentage = 1 - (loanById.getAmountPaidUntilNow() / loanById.getCompleteAmountToBePaid());
+        double checkAmount =  checkDouble * percentage;
+        if(newOwner.getBalance() < checkAmount){
+            resp.getWriter().println("Sorry you are trying to buy a loan share worth " + checkAmount + "$" +
+                    " but you only have " + newOwner.getBalance() +"$ in your balance.");
+            resp.setStatus(400);
+            return;
+        }
+
+
         //remove this part of loan from list of loans for sale
         for (int i = 0; i < engine.getLoansForSale().size(); i++) {
             if(engine.getLoansForSale().get(i).getId().equals(loanId)
@@ -68,6 +80,7 @@ public class BuyLoanServlet extends HttpServlet {
                 break;
             }
         }
+
         //remove loan from old lender's giving loans list
         for (int i = 0; i < oldOwner.getGivingLoans().size(); i++) {
             if(oldOwner.getGivingLoans().get(i).getId().equals(loanId)){
@@ -76,12 +89,24 @@ public class BuyLoanServlet extends HttpServlet {
             }
         }
 
-        //add new owner to loans lenders
-        loanById.getLenders().add(newOwner);
-        //add loan to new owners giving list
-        newOwner.getGivingLoans().add(loanById);
+        boolean alreadyLender = false;
+        for (Customer c: loanById.getLenders()) {
+            if (c.getId().equals(newOwner.getId())) {
+                alreadyLender = true;
+                break;
+            }
+        }
 
-        // get amount he owned in loan
+        //if the new onwner isn't one of the lenders already
+        if(!alreadyLender){
+            //add new owner to loans lenders
+            loanById.getLenders().add(newOwner);
+            //add loan to new owners giving list
+            newOwner.getGivingLoans().add(loanById);
+        }
+
+
+        // get amount old owner owned in loan
         Double aDouble = loanById.getLenderAmounts().get(oldOwner.getId());
 
         // remove him from dictionary of amounts
@@ -101,16 +126,14 @@ public class BuyLoanServlet extends HttpServlet {
         double amountPaidUntilNow = loanById.getAmountPaidUntilNow();
 
         double percentagePagePaidSoFar = 1 - (amountPaidUntilNow / completeAmountToBePaid);
-        System.out.println(aDouble + "a double");
-        System.out.println(percentagePagePaidSoFar + "precentage page so far");
+
         double amount =  aDouble * percentagePagePaidSoFar;
 
         engine.addTransactionToCustomer(newOwner.getId(),amount, Transaction.TransactionType.WITHDRAW);
         engine.addTransactionToCustomer(oldOwner.getId(),amount, Transaction.TransactionType.DEPOSIT);
 
 
-        System.out.println("The part of the loan previously owned by"+ oldOwner.getId() +
-                        " is not owned by " + newOwner.getId());
+
 
 
         resp.setStatus(200);

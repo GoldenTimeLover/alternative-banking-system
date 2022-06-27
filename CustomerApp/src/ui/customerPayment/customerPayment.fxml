@@ -50,7 +50,7 @@
             <Label styleClass="cool-label" text="Notifications:" />
             <ScrollPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
                <content>
-                  <VBox fx:id="notificationBox" prefHeight="200.0" prefWidth="199.0" />
+                  <VBox fx:id="notificationBox" prefHeight="200.0" prefWidth="250.0" />
                </content>
             </ScrollPane>
          </children>

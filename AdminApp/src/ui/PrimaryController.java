@@ -131,7 +131,6 @@ public class PrimaryController implements Closeable {
     }
 
     public String getAdminName(){
-        System.out.println("admin name returned" + adminNameProperty.get());
         return adminNameProperty.get();
     }
 
@@ -262,7 +261,7 @@ public class PrimaryController implements Closeable {
         loader.setLocation(url);
 
         try {
-            System.out.println("try this!");
+
             assert url != null;
             adminPanelComponent = loader.load(url.openStream());
             adminPanelComponentController = loader.getController();
@@ -274,7 +273,6 @@ public class PrimaryController implements Closeable {
             adminPanelComponentController.decreaseYazButton.disableProperty().bind(Bindings.not(isSystemRewindProperty));
 
         } catch (IOException e) {
-            System.out.println("nope");
             e.printStackTrace();
         }
     }
@@ -295,7 +293,6 @@ public class PrimaryController implements Closeable {
     @FXML
     void rewindButtonPressed(ActionEvent event) {
 
-        System.out.println("hey queen i have been pressed");
         //noinspection ConstantConditions
         String finalUrl = HttpUrl
                 .parse(AdminPaths.ADMIN_REWIND_TOGGLE)
@@ -309,12 +306,12 @@ public class PrimaryController implements Closeable {
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                System.out.println("failed");
+
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                System.out.println("returned");
+
                 if (response.code() != 200) {
                 } else {
 
